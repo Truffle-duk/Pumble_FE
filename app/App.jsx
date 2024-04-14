@@ -1,10 +1,10 @@
 import React from 'react';
-import {Text} from 'react-native';
+import Wallet from "@utils/Wallet";
 
 function App() {
 
     return (
-        <Text>This is Pumble</Text>
+        <Wallet />
     );
 }
 
