@@ -10,8 +10,8 @@ const saveWalletInfo = async (key, value, service) => {
     try {
         await Keychain.setGenericPassword(key, info, {
             service: service,
-            accessible: ACCESSIBLE.WHEN_PASSCODE_SET_THIS_DEVICE_ONLY,
-            accessControl: ACCESS_CONTROL.DEVICE_PASSCODE
+            accessible: ACCESSIBLE.WHEN_UNLOCKED
+            //accessControl: ACCESS_CONTROL.DEVICE_PASSCODE
         });
         console.log('✨WalletInfo saved successfully!')
     } catch (e) {
@@ -24,10 +24,10 @@ const getWalletInfo = async (service) => {
     try {
         const info = await Keychain.getGenericPassword({
             service: service,
-            authenticationPrompt: {
+            /*authenticationPrompt: {
                 title: "키체인 접근",
                 description: "지갑 정보를 가져오기 위해 키체인에 접근하시겠습니까?"
-            }
+            }*/
         });
 
         if (info) {
