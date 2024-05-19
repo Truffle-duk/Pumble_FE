@@ -1,55 +1,23 @@
 import React from "react";
-import { StyleSheet, View, Text, Button, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, Button, TouchableOpacity, Image, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 //pages
-import Ledger from "../screens/Ledger";
+import StackNavigator from "./StackNavigator";
 
 import { theme } from "@assets/Theme";
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
   
 const Tab = createBottomTabNavigator();
 
-//dummy pages
-function Home({title}){
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>{title}!</Text>
-        </View>
-      );
-}
-
-function Event(){
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>Event!</Text>
-        </View>
-      );
-}
-
-function Store(){
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>Store!</Text>
-        </View>
-      );
-}
-
-function MyPage(){
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>Mypage!</Text>
-        </View>
-      );
-}
-
-const BottomTabNavigator = ({navigation}) => {
+const BottomTabNavigator=({navigation})=>{
     const insets = useSafeAreaInsets(); //탭 가용범위 받아오기   
     
     return(
+        <>        
         <NavigationContainer>
-            <Tab.Navigator initialRouteName="Home"
+            <Tab.Navigator initialRouteName="HomeScreen"
             screenOptions={{
                 tabBarActiveTintColor:theme.color.main,
                 tabBarInactiveTintColor:theme.color.grey1,
@@ -71,12 +39,12 @@ const BottomTabNavigator = ({navigation}) => {
                     //그림자 문제....일단 투명으로 처리
                     shadowColor:"#00000000",
                 },
-                tabBarLabelStyle:{...styles.tabBarLabelStyle}
+                tabBarLabelStyle:{...styles.tabBarLabelStyle},
+                headerShown:false,
                 
             }}
             >
-                <Tab.Screen name="Home"
-                //component={Home("Home")}
+                <Tab.Screen name="HomeScreen"
                 options={{
                     tabBarLabel:"홈",
                     tabBarIcon:({focused})=>{
@@ -90,11 +58,10 @@ const BottomTabNavigator = ({navigation}) => {
                         )
                     },
                 }}>
-                    {/* 이 방법으로 props 전달 가능 */}
-                    {(props)=><Home title={"Home"}/>}   
+                    {(props)=><StackNavigator route={{id:1}}/>}
                 </Tab.Screen>
-                <Tab.Screen name="Ledger"
-                component={Ledger}
+                <Tab.Screen name="LedgerScreen"
+                //component={LedgerNavigator}
                 options={{
                     tabBarLabel:"장부",
                     tabBarIcon:({focused})=>{
@@ -107,9 +74,11 @@ const BottomTabNavigator = ({navigation}) => {
                                 />
                         )
                     }
-                }}/>
-                <Tab.Screen name="Event"
-                component={Event}
+                }}>
+                    {(props)=><StackNavigator route={{id:2}}/>}
+                </Tab.Screen>
+                <Tab.Screen name="EventScreen"
+                //component={Event}
                 options={{
                     tabBarLabel:"일정",
                     tabBarIcon:({focused})=>{
@@ -122,9 +91,11 @@ const BottomTabNavigator = ({navigation}) => {
                                 />
                         )
                     }
-                }}/>
-                <Tab.Screen name="Store"
-                component={Store}
+                }}>
+                    {(props)=><StackNavigator route={{id:3}}/>}
+                </Tab.Screen>
+                <Tab.Screen name="StoreScreen"
+                //component={Store}
                 options={{
                     tabBarLabel:"스토어",
                     tabBarIcon:({focused})=>{
@@ -137,9 +108,11 @@ const BottomTabNavigator = ({navigation}) => {
                                 />
                         )
                     }
-                }}/>
-                <Tab.Screen name="MyPage"
-                component={MyPage}
+                }}>
+                    {(props)=><StackNavigator route={{id:4}}/>}
+                </Tab.Screen>
+                <Tab.Screen name="MyPageScreen"
+                //component={MyPage}
                 options={{
                     tabBarLabel:"마이",
                     tabBarIcon:({focused})=>{
@@ -152,10 +125,13 @@ const BottomTabNavigator = ({navigation}) => {
                                 />
                         )
                     }
-                }}/>
+                }}>
+                    {(props)=><StackNavigator route={{id:5}}/>}
+                </Tab.Screen>
             </Tab.Navigator>
 
         </NavigationContainer>
+        </>        
     );
 }
 
