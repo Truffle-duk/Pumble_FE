@@ -89,12 +89,12 @@ const Ledger = () => {
   return (
     <SafeAreaView style={styles.container}>
       <BalanceDisplay />
-      {/* <FlatList
+      <FlatList
         data={data}
         renderItem={({ item }) => <ItemView item={item} onUpdate={updateItemDescription} />}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.id.toString()}
         ListHeaderComponent={TransactionListHeader}
-      /> */}
+      />
     </SafeAreaView>
   );
 };

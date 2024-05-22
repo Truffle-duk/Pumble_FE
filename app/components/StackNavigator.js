@@ -13,6 +13,7 @@ import Store from '@screens/Store';
 import MyPage from '@screens/MyPage';
 import Alarm from '@screens/Alarm';
 import { create } from 'react-test-renderer';
+import Ledger2 from '@screens/Ledger2';
 
 const Stack = createNativeStackNavigator();
 
@@ -59,7 +60,7 @@ const StackNavigator = ({route}) => {
                 ): id === 2 ?(
                     <Stack.Screen
                         name="Ledger"
-                        component={Ledger}
+                        component={Ledger2}
                         options={{
                             header:(props) => <StackHeader {...props}/>
                         }}
