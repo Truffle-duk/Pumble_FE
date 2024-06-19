@@ -14,20 +14,20 @@ const height = (
 ).toFixed(2);
 
 const fontSizes = {
-    fontSizes9: width * 9,
-    fontSizes10: width * 10,
-    fontSizes11: width * 11,
-    fontSizes12: width * 12,
-    fontSizes13: width * 13,
-    fontSizes14: width * 14,
-    fontSizes15: width * 15,
-    fontSizes16: width * 16,
-    fontSizes17: width * 17,
-    fontSizes18: width * 18,
-    fontSizes19: width * 19,
-    fontSizes20: width * 20,
-    fontSizes21: width * 21,
-    fontSizes22: width * 22,
+    fontSizes9: height * width * 9,
+    fontSizes10: height * width * 10,
+    fontSizes11: height * width * 11,
+    fontSizes12: height * width * 12,
+    fontSizes13: height * width * 13,
+    fontSizes14: height * width * 14,
+    fontSizes15: height * width * 15,
+    fontSizes16: height * width * 16,
+    fontSizes17: height * width * 17,
+    fontSizes18: height * width * 18,
+    fontSizes19: height * width * 19,
+    fontSizes20: height * width * 20,
+    fontSizes21: height * width * 21,
+    fontSizes22: height * width * 22,
 };
 
 const color={

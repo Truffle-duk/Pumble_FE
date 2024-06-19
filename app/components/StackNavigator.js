@@ -59,7 +59,7 @@ const StackNavigator = ({route}) => {
                         />
                 ): id === 2 ?(
                     <Stack.Screen
-                        name="Ledger"
+                        name="Ledger2"
                         component={Ledger2}
                         options={{
                             header:(props) => <StackHeader {...props}/>

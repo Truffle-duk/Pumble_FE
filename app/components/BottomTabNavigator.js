@@ -137,12 +137,12 @@ const BottomTabNavigator=({navigation})=>{
 
 const styles = StyleSheet.create({    
     iconStyle1:{
-        width:20*theme.width, 
-        height:20*theme.height
+        width:20*theme.width*theme.height, 
+        height:20*theme.height*theme.width
     },
     iconStyle2:{
-        width:24*theme.width, 
-        height:24*theme.height
+        width:24*theme.width*theme.height, 
+        height:24*theme.width*theme.height
     },
     tabBarLabelStyle:{
         fontFamily:'Pretendard-Bold',

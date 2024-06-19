@@ -66,7 +66,7 @@ const groupTransactionHistory=[
 
 ]
 
-function Ledger2(){
+function Ledger2({navigate}){
     const [balance, setBalance]=useState(2344440);
     const [datas,setDatas]=useState([]);
 
@@ -136,7 +136,9 @@ function Ledger2(){
 const styles = StyleSheet.create({
   background:{
     backgroundColor:theme.color.background,
-    paddingBottom:77*theme.height
+    paddingBottom:77*theme.height,
+    paddingHorizontal:16*theme.width,
+    paddingTop:30*theme.height,
   },
   balanceHeadText:{
     color:theme.color.main,
@@ -158,8 +160,7 @@ const styles = StyleSheet.create({
   },
   balanceContainer:{
     backgroundColor:theme.color.white,
-    marginHorizontal:16*theme.width,
-    marginVertical:30*theme.height,
+    marginBottom:30*theme.height,
     height:90*theme.height,
     borderRadius:15,
     flexDirection:'column',
@@ -167,7 +168,6 @@ const styles = StyleSheet.create({
   },
   transactionHistoryContainer:{
     backgroundColor:theme.color.white,
-    marginHorizontal:16*theme.width,
     marginBottom:30*theme.height,
     paddingBottom:15*theme.height,
     borderRadius:15,
@@ -190,8 +190,8 @@ const styles = StyleSheet.create({
     fontFamily:'Pretendard-Medium',
   },
   iconStyle:{
-    width:22*theme.width,
-    height:22*theme.height,
+    width:22*theme.width*theme.height,
+    height:22*theme.height*theme.width,
     marginLeft:15*theme.width,
   },
   activityIndicatorView:{
@@ -209,8 +209,8 @@ const styles = StyleSheet.create({
     color:theme.color.grey10,
   },
   historyItemImage:{
-    height:50*theme.height,
-    width:50*theme.width,
+    height:50*theme.width*theme.height,
+    width:50*theme.width*theme.height,
     backgroundColor:theme.color.background,
     borderRadius:100,
     marginRight:10*theme.width,
@@ -226,7 +226,8 @@ const styles = StyleSheet.create({
     alignItems:'center',
   },
   counterpartyText:{
-    fontFamily:"Pretendard-Medium",
+    //fontFamily:"Pretendard-Medium",
+    fontFamily:"Pretendard-SemiBold",
     fontSize:theme.fontSizes.fontSizes15,
     color:theme.color.grey2,
     lineHeight:22*theme.height,
