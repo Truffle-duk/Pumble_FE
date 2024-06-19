@@ -1,4 +1,4 @@
-const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 const path = require('path');
 
 const extraNodeModules = {
@@ -16,8 +16,15 @@ const extraNodeModules = {
  */
 const config = {
     resolver: {
-        extraNodeModules
-    }
+        extraNodeModules,
+        sourceExts: ['jsx', 'js', 'ts', 'tsx', 'cjs', 'json'],
+    },
+    watchFolders: [
+        path.resolve(__dirname, 'app/utils'),
+        path.resolve(__dirname, 'app/components'),
+        path.resolve(__dirname, 'app/screens'),
+        path.resolve(__dirname, 'app/assets')
+    ]
 };
 
 module.exports = mergeConfig(getDefaultConfig(__dirname), config);

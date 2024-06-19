@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 //pages
 import StackNavigator from "./StackNavigator";
 
-import { theme } from "@assets/Theme";
+import { theme } from "@assets/Theme.js";
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
   
 const Tab = createBottomTabNavigator();
@@ -135,14 +135,14 @@ const BottomTabNavigator=({navigation})=>{
     );
 }
 
-const styles = StyleSheet.create({    
+const styles = StyleSheet.create({
     iconStyle1:{
-        width:20*theme.width, 
-        height:20*theme.height
+        width:20*theme.width*theme.height,
+        height:20*theme.height*theme.width
     },
     iconStyle2:{
-        width:24*theme.width, 
-        height:24*theme.height
+        width:24*theme.width*theme.height,
+        height:24*theme.width*theme.height
     },
     tabBarLabelStyle:{
         fontFamily:'Pretendard-Bold',
