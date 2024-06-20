@@ -10,111 +10,15 @@ import { ThemeProvider, useNavigation } from '@react-navigation/native';
 
 //캘린더 로컬화
 import { LocaleConfig } from 'react-native-calendars';
+// api call
+import {call} from '@utils/ApiService'
+import {attendEvent} from "@utils/Contracts";
 
 const screenWidth=Dimensions.get('screen').width; 
 const screenHeight = Dimensions.get('screen').height;
 
 //dummy data
 const userName="귄귄이"
-const eventDatas=[
-  {
-    "Date":'2024-05-25',
-    "Name":"정기 봉사",
-    "StartTime":"16:00",
-    "EndTime":"18:00",
-    "Place":"부산시 사상구 덕포동 388-5 찬희빌딩 2층",
-    "Description":"...",
-    "isParticipated":true
-  },
-  {
-    "Date":'2024-05-30',
-    "Name":"정기 모임",
-    "StartTime":"13:00",
-    "EndTime":"17:00",
-    "Place":"서울시 도봉구",
-    "Description":"...!!",
-    "isParticipated":false
-  },
-  {
-    "Date":'2024-06-25',
-    "Name":"정기 봉사",
-    "StartTime":"16:00",
-    "EndTime":"18:00",
-    "Place":"부산시 사상구 덕포동 388-5 찬희빌딩 2층",
-    "Description":"...",
-    "isParticipated":false
-  },
-  {
-    "Date":'2024-06-30',
-    "Name":"정기 모임",
-    "StartTime":"13:00",
-    "EndTime":"17:00",
-    "Place":"서울시 도봉구",
-    "Description":"...!!",
-    "isParticipated":false
-  },
-
-]
-const thisMonthEventDatas=[
-  // {
-  //   "Date":'2024-05-25',
-  //   "Name":"정기 봉사",
-  //   "StartTime":"16:00",
-  //   "EndTime":"18:00",
-  //   "Place":"부산시 사상구 덕포동 388-5 찬희빌딩 2층",
-  //   "Description":"...",
-  //   "isParticipated":true
-  // },
-  // {
-  //   "Date":'2024-05-30',
-  //   "Name":"정기 모임",
-  //   "StartTime":"13:00",
-  //   "EndTime":"17:00",
-  //   "Place":"서울시 도봉구",
-  //   "Description":"...!!",
-  //   "isParticipated":false
-  // },
-  {
-    "Date":'2024-06-25',
-    "Name":"정기 봉사",
-    "StartTime":"16:00",
-    "EndTime":"18:00",
-    "Place":"부산시 사상구 덕포동 388-5 찬희빌딩 2층",
-    "Description":"...",
-    "isParticipated":false
-  },
-  {
-    "Date":'2024-06-30',
-    "Name":"정기 모임",
-    "StartTime":"13:00",
-    "EndTime":"17:00",
-    "Place":"서울시 도봉구",
-    "Description":"...!!",
-    "isParticipated":false
-  }
-]
-const lastEventData=[
-  {
-    "Date":'2024-05-30',
-    "Name":"정기 모임",
-    "StartTime":"13:00",
-    "EndTime":"17:00",
-    "Place":"서울시 도봉구",
-    "Description":"...!!",
-    "isParticipated":false
-  }
-]
-const upcomingEventData=[
-  {
-    "Date":'2024-06-25',
-    "Name":"정기 봉사",
-    "StartTime":"16:00",
-    "EndTime":"18:00",
-    "Place":"부산시 사상구 덕포동 388-5 찬희빌딩 2층",
-    "Description":"...",
-    "isParticipated":false
-  },
-]
 
 //날짜 세기
 const getDateDifference = (date1, date2) => {
@@ -164,28 +68,28 @@ function EventCard({lastEvent, upcomingEvent}){
             <View style={styles.eventCard}>
               <View>
                 <View style={styles.dDayContainer}>
-                  <Text style={styles.dDayText}>D+ {getDateDifference(lastEvent[0].Date, currentDate)}</Text>
+                  <Text style={styles.dDayText}>{lastEvent.DDay}</Text>
                 </View>
               </View>
               <View style={styles.eventCardDescriptionContainer}>
                 {/* <Image source={require(`../assets/Icons/eventIcon${random1}.png`)}/> */}
                 <Image source={eventIcons[random1]}
                   style={styles.eventCardIconStyle}/>
-                <Text style={styles.eventCardNameText}>{lastEvent[0].Name}</Text>
+                <Text style={styles.eventCardNameText}>{lastEvent.title}</Text>
                 <Text style={styles.eventCardLastText}>지난 일정</Text>
               </View>
             </View>
             <View style={styles.eventCard}>
               <View>
                 <View style={styles.dDayContainer}>
-                  <Text style={styles.dDayText}>D- {getDateDifference(currentDate, upcomingEvent[0].Date)+1}</Text>
+                  <Text style={styles.dDayText}>{upcomingEvent.DDay}</Text>
                 </View>
               </View>
               <View style={styles.eventCardDescriptionContainer}>
                 {/* <Image source={require(`../assets/Icons/eventIcon${random1}.png`)}/> */}
                 <Image source={eventIcons[random2]}
                   style={styles.eventCardIconStyle}/>
-                <Text style={styles.eventCardNameText}>{upcomingEvent[0].Name}</Text>
+                <Text style={styles.eventCardNameText}>{upcomingEvent.title}</Text>
                 <Text style={styles.eventCardLastText}>다가오는 일정</Text>
               </View>
             </View> 
@@ -208,15 +112,11 @@ function EventCalendar({data}){
 
   const [headerMonth, setHeaderMonth] = useState(moment().format('YYYY-MM'));
 
-  //dummy event data
-  // const eventDate={
-  //   //객체의 키값은 yyyy-MM-dd 형태, marked true로 표시 
-  //   '2024-05-25': { marked: true },
-  //   '2024-05-30': { marked: true }
-  // }
-
   const eventDate = data.reduce((acc, event) => {
-    acc[event.Date] = { marked: true };
+    const dateAndTime = event.startDate.split('T')
+    const date = dateAndTime[0]
+    const time = dateAndTime[1].substring(0,5)
+    acc[date] = { marked: true };
     return acc;
   }, {});
 
@@ -317,14 +217,14 @@ function EventList({thisMonthEvents, openModal}){
               <View style={styles.eventListItemDetailContainer}>
                 <View style={styles.eventListItemIcon}/>
                 <View>
-                  <Text style={styles.eventListItemName}>{thisMonthEvent.Name}</Text>
-                  <Text style={styles.eventListItemDate}>{thisMonthEvent.Date}</Text>
+                  <Text style={styles.eventListItemName}>{thisMonthEvent.title}</Text>
+                  <Text style={styles.eventListItemDate}>{thisMonthEvent.startDate.split('T')[0]}</Text>
                 </View>
               </View>  
-              {getDateDifference(currentDate, thisMonthEvent.Date)<0?(
-                thisMonthEvent.isParticipated?(<ParticipationComplete/>):(<ParticipatedDone/>)
+              {thisMonthEvent.status === 'done'?(
+                thisMonthEvent.isAttended?(<ParticipationComplete/>):(<ParticipatedDone/>)
               ):(
-                thisMonthEvent.isParticipated?(<ParticipationComplete/>):(<GoToParticipate index={index}/>)
+                thisMonthEvent.isAttended?(<ParticipationComplete/>):(<GoToParticipate index={index}/>)
               )}
             </View>
           )          
@@ -346,8 +246,31 @@ function EventList({thisMonthEvents, openModal}){
   )
 }
 
-function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData}){
+function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, updateHandler}){
   const [code,setCode]=useState("")
+  //TODO: 여러 일에 걸친 일정 반영 필요
+  const overlayDataDate = overlayData.startDate.split('T')[0];
+  const overlayDataTime = parseInt(overlayData.startDate.split('T')[1].substring(0,2));
+
+  const submitCode = async (id, submitCode, reward, groupId, groupUserId) => {
+    await setCode("")
+    await call(`/event/${id}`, "POST", {
+      "code": submitCode,
+      "groupUserId": 1
+    }).then(data => {
+      if (data.code === 200) {
+        alert("해당 일정에 참여 신청이 되었습니다.")
+      }
+    }).catch(error => console.log(error))
+
+    await attendEvent(id, reward, groupId, groupUserId)
+        .then(_ => {
+          alert(`${reward} PB를 받았어요!`)
+          closeModal()
+          updateHandler()
+        })
+        .catch(error => console.log(error))
+  }
 
   return(
     <Modal
@@ -360,7 +283,7 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData})
           <Animated.View style={styles.overlayContainer}>
             <View style={styles.overlayHeaderContainer}>
               <View style={styles.overlayHeaderTextContainer}>
-                <Text style={styles.overlayHeaderText}>{overlayData.Name}</Text>
+                <Text style={styles.overlayHeaderText}>{overlayData.title}</Text>
               </View>
               
               <TouchableOpacity onPress={closeModal} >
@@ -374,15 +297,15 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData})
               <Image source={require("@assets/Icons/dateIcon.png")}
                 style={styles.overlayInfoIcon}
               />
-              <Text style={styles.overlayInfoText}>{overlayData.Date}</Text>
-              <Text style={styles.overlayInfoTimeDetailText}>{overlayData.StartTime}~{overlayData.EndTime}</Text>
+              <Text style={styles.overlayInfoText}>{overlayDataDate}</Text>
+              <Text style={styles.overlayInfoTimeDetailText}>{overlayDataTime<10 ? `0${overlayDataTime}:00` : `${overlayDataTime}:00`}~{overlayDataTime<8 ? `0${overlayDataTime+2}:00` : `${overlayDataTime+2}:00`}</Text>
             </View>
             <View style={styles.overlayLine}/>
             <View style={styles.overlayInfoContainer}>
               <Image source={require("@assets/Icons/placeIcon.png")}
                 style={styles.overlayInfoIcon}
               />
-              <Text style={styles.overlayInfoText}>{overlayData.Place}</Text>
+              <Text style={styles.overlayInfoText}>{overlayData.place}</Text>
             </View >
             <View style={styles.overlayLine}/>
             <View style={styles.overlayInfoDetailContainer}>
@@ -391,7 +314,7 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData})
               />
               <View>
                 <Text style={styles.overlayInfoText}>활동 내용</Text>
-                <Text style={styles.overlayInfoDetailText}>{overlayData.Description}</Text>
+                <Text style={styles.overlayInfoDetailText}>{overlayData.description}</Text>
               </View>
             </View>
             <View style={styles.overlayInputContainer}>
@@ -406,7 +329,7 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData})
                   style={styles.overlayInputCodeText}
                 />
               </View>
-              <TouchableOpacity style={styles.overlayInputBtn}>
+              <TouchableOpacity style={styles.overlayInputBtn} onPress={()=>submitCode(overlayData.eventId, code, overlayData.reward, 1, 1)}>
                 <Text style={styles.overlayInputBtnText}>입력</Text>
               </TouchableOpacity>
 
@@ -435,21 +358,30 @@ export default function Event(){
   const [user,setUser]=useState("Name");
   const [datas,setDatas] = useState([]);
   const [thisMonthDatas, setThisMonthDatas]=useState([]);
-  const [lastEvents, setLastEvents]=useState(lastEventData);
-  const [upcomingEvents, setUpcomingEvents]=useState(upcomingEventData);
+  const [lastEvents, setLastEvents]=useState({title:"", DDay:""});
+  const [upcomingEvents, setUpcomingEvents]=useState({title:"", DDay:""});
 
   const [overlayVisible, setOverlayVisible]=useState(false);
-  const [overlayData, setOverlayData]=useState([])
+  const [overlayData, setOverlayData]=useState({"description": "", "endDate": "", "eventId": 0, "isAttended": 0, "place": "", "startDate": "T00", "status": ""})
   const animatedHeight = useRef(new Animated.Value(0)).current;
 
   useEffect(()=>{
+    call('/events/all?groupId=1', "GET")
+        .then(data => setDatas(data.result.events))
+    call('/events/month?groupId=1&groupUserId=1', "GET")
+        .then(data => setThisMonthDatas(data.result.events))
+    call('/events/lastAndNext?groupId=1', "GET")
+        .then(data => {
+          setUpcomingEvents(data.result.events[0])
+          setLastEvents(data.result.events[1])
+        })
     setUser(userName);
-    setDatas(eventDatas);
-    setThisMonthDatas(thisMonthEventDatas);
-    setLastEvents(lastEventData);
-    setUpcomingEvents(upcomingEventData);
-    //console.log(lastEvents);
   },[])
+
+  const updateData = () => {
+    call('/events/month?groupId=1&groupUserId=1', "GET")
+        .then(data => setThisMonthDatas(data.result.events))
+  }
 
   const openModal = (index) => {
     setOverlayVisible(true);
@@ -469,15 +401,13 @@ export default function Event(){
     }).start(() => setOverlayVisible(false));
   };
 
-
-
   return (
     <ScrollView contentContainerStyle={styles.background}>
       <Top user={user} thisMonthEvent={thisMonthDatas}/>
       <EventCard lastEvent={lastEvents} upcomingEvent={upcomingEvents}/>
       <EventCalendar data={datas}/>          
       <EventList thisMonthEvents={thisMonthDatas} openModal={openModal}/>
-      <EventOverlay overlayVisible={overlayVisible} animatedHeight={animatedHeight} closeModal={closeModal} overlayData={overlayData}/>
+      <EventOverlay overlayVisible={overlayVisible} animatedHeight={animatedHeight} closeModal={closeModal} overlayData={overlayData} updateHandler={updateData}/>
     </ScrollView>
   );
 }
