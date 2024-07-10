@@ -151,5 +151,6 @@ const styles = StyleSheet.create({
         fontFamily:"Pretendard-Bold",
         fontSize:theme.fontSizes.fontSizes20,
     }
+
 })
 export default StackNavigator;
