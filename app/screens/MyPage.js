@@ -1,10 +1,10 @@
 import { StyleSheet, View, Text, ScrollView } from 'react-native';
 
-function Event(){
+function MyPage(){
     return (
         <ScrollView style={styles.background}>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={styles.ledgerText}>일정</Text>
+                <Text style={styles.ledgerText}>마이페이지</Text>
             </View>
         </ScrollView>
 
@@ -22,4 +22,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default Event;
+export default MyPage;

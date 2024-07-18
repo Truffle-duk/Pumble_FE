@@ -1,9 +1,13 @@
 import React from 'react';
+import {SafeAreaProvider} from "react-native-safe-area-context";
+import BottomTabNavigator from "@components/BottomTabNavigator";
 
 function App() {
 
     return (
-        <Text>This is Pumble</Text>
+        <SafeAreaProvider>
+            <BottomTabNavigator />
+        </SafeAreaProvider>
     );
 }
 
