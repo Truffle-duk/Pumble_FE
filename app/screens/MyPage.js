@@ -73,7 +73,7 @@ function CheckPurchasedProductList({navigation}){
     <View style={styles.mypageCheckDetailContainer}>
       <Text style={styles.mypageCheckDetailTitle}>구매 상품</Text>
       <TouchableOpacity style={styles.mypageCheckDetailNavigate}
-        // onPress={()=>navigation.navigate('PurchasedProductList')}  //페이지 완성 시 연결
+        onPress={()=>navigation.navigate('PurchasedProductList')}
         >
         <Text style={styles.mypageCheckDetailNavigateText}>구매 상품 내역 확인하기</Text>
       </TouchableOpacity>
