@@ -13,6 +13,7 @@ import Store from '@screens/Store';
 import MyPage from '@screens/MyPage';
 import Alarm from '@screens/Alarm';
 import { create } from 'react-test-renderer';
+import ModifyProfile from '@screens/ModifyProfile';
 
 const Stack = createNativeStackNavigator();
 
@@ -109,6 +110,8 @@ const StackNavigator = ({route}) => {
                 )
             }
             <Stack.Screen name="Alarm" component={Alarm}/>
+
+            <Stack.Screen name='ModifyProfile' component={ModifyProfile}/>
 
         </Stack.Navigator>
         </>
