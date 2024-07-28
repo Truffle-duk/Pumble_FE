@@ -15,6 +15,7 @@ import Alarm from '@screens/Alarm';
 import { create } from 'react-test-renderer';
 import ModifyProfile from '@screens/ModifyProfile';
 import PBHistory from '@screens/PBHistory';
+import PurchasedProductList from '@screens/PurchasedProductList';
 
 const Stack = createNativeStackNavigator();
 
@@ -114,6 +115,7 @@ const StackNavigator = ({route}) => {
 
             <Stack.Screen name='ModifyProfile' component={ModifyProfile}/>
             <Stack.Screen name='PBHistory' component={PBHistory}/>
+            <Stack.Screen name='PurchasedProductList' component={PurchasedProductList}/>
 
         </Stack.Navigator>
         </>
