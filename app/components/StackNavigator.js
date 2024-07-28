@@ -14,6 +14,7 @@ import MyPage from '@screens/MyPage';
 import Alarm from '@screens/Alarm';
 import { create } from 'react-test-renderer';
 import ModifyProfile from '@screens/ModifyProfile';
+import PBHistory from '@screens/PBHistory';
 
 const Stack = createNativeStackNavigator();
 
@@ -112,6 +113,7 @@ const StackNavigator = ({route}) => {
             <Stack.Screen name="Alarm" component={Alarm}/>
 
             <Stack.Screen name='ModifyProfile' component={ModifyProfile}/>
+            <Stack.Screen name='PBHistory' component={PBHistory}/>
 
         </Stack.Navigator>
         </>

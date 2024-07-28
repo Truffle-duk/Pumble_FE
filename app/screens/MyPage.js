@@ -60,7 +60,7 @@ function CheckPBHistory({navigation}){
     <View style={styles.mypageCheckDetailContainer}>
       <Text style={styles.mypageCheckDetailTitle}>내 PB</Text>
       <TouchableOpacity style={styles.mypageCheckDetailNavigate}
-        // onPress={()=>navigation.navigate('PBHistory')}  //페이지 완성 시 연결
+        onPress={()=>navigation.navigate('PBHistory')}
         >
         <Text style={styles.mypageCheckDetailNavigateText}>PB 내역 확인하기</Text>
       </TouchableOpacity>
