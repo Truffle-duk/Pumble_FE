@@ -20,7 +20,7 @@ function ProfileView({navigation}){
         </View>
       </View>
       <TouchableOpacity style={styles.modifyProfileBtn}
-        //onPress={()=>navigation.navigate('ModifyProfile')}  //페이지 완성 시 연결
+        onPress={()=>navigation.navigate('ModifyProfile')} 
         >
         <Text style={styles.modifyProfileText}>프로필 수정</Text>
       </TouchableOpacity>
