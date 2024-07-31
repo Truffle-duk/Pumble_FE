@@ -97,7 +97,7 @@ export default function PurchasedProductList(){
     },[])
 
     return (
-        <ScrollView style={styles.background}>
+        <ScrollView contentContainerStyle={styles.background}>
           <Text style={styles.headText}>구매 상품 내역</Text>
           {
             MyPurchasedProducts.length===0?(
@@ -120,7 +120,7 @@ const styles=StyleSheet.create({
     backgroundColor:theme.color.white,
     paddingTop:30*theme.height,
     paddingHorizontal:16*theme.width,
-    paddingBottom:77*theme.height,
+    paddingBottom:92*theme.height,
   },
   headText:{
     color:theme.color.grey2,

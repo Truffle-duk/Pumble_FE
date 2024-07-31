@@ -79,7 +79,7 @@ function PBBalenceCard({balence}){
 
 function PBHistoryList({histories}){
   return(
-    <View style={{marginBottom:107}}>
+    <View>
       <Text style={styles.PBHistoryHeadText}>상세내역</Text>
       {
         histories.length===0?(
@@ -119,7 +119,7 @@ export default function PBHistory(){
     return (
         // <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         // </View>
-        <ScrollView style={styles.background}>
+        <ScrollView contentContainerStyle={styles.background}>
           <PBBalenceCard balence={PBbalence}/>
           <PBHistoryList histories={PBhistory}/>
         </ScrollView>
@@ -131,7 +131,7 @@ const styles=StyleSheet.create({
     backgroundColor:theme.color.white,
     paddingTop:30*theme.height,
     paddingHorizontal:16*theme.width,
-    paddingBottom:107*theme.height,
+    paddingBottom:77*theme.height,
   },
   PBBalenceCardContainer:{
     backgroundColor:theme.color.mainOpacity10,
