@@ -230,7 +230,7 @@ export default function MyPage({navigation}){
         {/* <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <Text>Mypage!</Text>
         </View> */}
-        <ScrollView style={styles.background}>
+        <ScrollView contentContainerStyle={styles.background}>
           <ProfileView navigation={navigation}/>
           <MyPageBanner/>
           <View style={styles.lineHorizontal}/>
@@ -239,7 +239,6 @@ export default function MyPage({navigation}){
           <CheckPurchasedProductList navigation={navigation}/>
           <View style={styles.lineHorizontal}/>
           <ManageGroup openLogoutOverlay={openLogoutModal} openQuitOverlay={openQuitModal}/>
-          <View style={{height:107*theme.height}}/>
           <LogoutOverlay overlayVisible={logoutOverlayVisible} animatedHeight={animatedHeight} closeModal={closeLogoutModal}/>
           <QuitOverlay overlayVisible={quitOverlayVisible}  animatedHeight={animatedHeight} closeModal={closeQuitModal}/>
         </ScrollView>
