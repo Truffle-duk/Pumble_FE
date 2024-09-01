@@ -39,7 +39,7 @@ function LedgerCard({navigation}){
 function NotificationCard({navigation}){
   return(
     <TouchableOpacity style={styles.navigationCard}
-      // onPress={()=>navigation.navigate('Notification')} 나중에 Notification 페이지 생성 시, 연결
+      onPress={()=>navigation.navigate('Notification')} // 나중에 Notification 페이지 생성 시, 연결
       >
       <Text style={styles.navigationCardTitleText}>공지사항</Text>
         <Text style={styles.navigationCardDetailText}>바로 확인 가능해요</Text>

@@ -11,7 +11,7 @@ const Store_CoffeeDessert_Detail = () => {
     const route = useRoute();
     const { product } = route.params;
     const [isModalVisible, setModalVisible] = useState(false);
-    const [money, setMoney] = useState(false);
+    const [money, setMoney] = useState(true);
 
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
