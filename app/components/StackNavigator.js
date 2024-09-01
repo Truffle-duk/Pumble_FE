@@ -16,6 +16,9 @@ import { create } from 'react-test-renderer';
 import ModifyProfile from '@screens/ModifyProfile';
 import PBHistory from '@screens/PBHistory';
 import PurchasedProductList from '@screens/PurchasedProductList';
+import Community from '@screens/Community';
+import Post from '@screens/Post';
+import Writepost from '@screens/WritePost';
 
 import Store2 from '@screens/Store2';
 import Store_CoffeeDessert from '@screens/Store_CoffeeDessert';
@@ -46,13 +49,28 @@ function StackHeader({ navigation, scene, previous }){
         </View>
     );
 }
-function MyPageHeader(){
+function CustomHeader({navigation, title }){
     return(
         <View style={styles.MyPageHeader}>
-            <Text style={styles.MyPageHeaderTitle}>마이 페이지</Text>
+            <TouchableOpacity
+                onPress={()=> navigation.goBack()}>
+                <Image source={require('../assets/Icons/backArrow.png')}
+                 style={styles.backIcon}/>
+            </TouchableOpacity>
+            <View style={styles.headerTextContainer}>
+                <Text style={styles.MyPageHeaderTitle}>{title}</Text>
+            </View>
+            
         </View>
     );
 }
+// function MyPageHeader(){
+//     return(
+//         <View style={styles.MyPageHeader}>
+//             <Text style={styles.MyPageHeaderTitle}>마이 페이지</Text>
+//         </View>
+//     );
+// }
 
 const StackNavigator = ({route}) => {
     const { id } = route;
@@ -111,7 +129,7 @@ const StackNavigator = ({route}) => {
                         //     },
                         // }}
                         options={{
-                            header:()=><MyPageHeader/>
+                            header:(props)=><CustomHeader {...props} title={"마이 페이지"}/>
                         }}
                         />
                 ): (
@@ -126,20 +144,61 @@ const StackNavigator = ({route}) => {
             }
             
             <Stack.Screen name="Alarm" component={Alarm}/>
-            <Stack.Screen name='ModifyProfile' component={ModifyProfile}/>
+            {/* <Stack.Screen name='ModifyProfile' component={ModifyProfile}/>
             <Stack.Screen name='PBHistory' component={PBHistory}/>
-            <Stack.Screen name='PurchasedProductList' component={PurchasedProductList}/>
-            <Stack.Screen name="Store2" component={Store2} options={{ title: '리워드 스토어' }}/>
-            <Stack.Screen name="Store_CoffeeDessert" component={Store_CoffeeDessert}/>
-            <Stack.Screen name="Store_FoodFranchise" component={Store_FoodFranchise}/>
-            <Stack.Screen name="Store_GiftCard" component={Store_GiftCard}/>
-            <Stack.Screen name="Store_Entertainment" component={Store_Entertainment}/>
-            <Stack.Screen name="Store_Ect" component={Store_Ect}/>
-            <Stack.Screen name="Store_CoffeeDessert_Detail" component={Store_CoffeeDessert_Detail}options={{ title: '리워드 스토어' }}/>
-            <Stack.Screen name="Store_Entertainment_Detail" component={Store_Entertainment_Detail}options={{ title: '리워드 스토어' }}/>
-            <Stack.Screen name="Store_FoodFranchise_Detail" component={Store_FoodFranchise_Detail}options={{ title: '리워드 스토어' }}/>
-            <Stack.Screen name="Store_GiftCard_Detail" component={Store_GiftCard_Detail}options={{ title: '리워드 스토어' }}/>
-            <Stack.Screen name="Store_Ect_Detail" component={Store_Ect_Detail}options={{ title: '리워드 스토어' }}/>
+            <Stack.Screen name='PurchasedProductList' component={PurchasedProductList}/> */}
+            <Stack.Screen name='Community' component={Community}  options={{
+                            header:(props)=><CustomHeader {...props} title={"커뮤니티"}/>
+                        }}/>
+            {/* <Stack.Screen name='Ledger2' component={Ledger2}/> */}
+            <Stack.Screen name='ModifyProfile' component={ModifyProfile} options={{
+                            header:(props)=><CustomHeader {...props} title={"마이 페이지"}/>
+                        }}/>
+            <Stack.Screen name='PBHistory' component={PBHistory}  options={{
+                            header:(props)=><CustomHeader {...props} title={"내 PB 내역"}/>
+                        }}/>
+            <Stack.Screen name='PurchasedProductList' component={PurchasedProductList}  options={{
+                            header:(props)=><CustomHeader {...props} title={"구매 상품 내역"}/>
+                        }}/>
+            <Stack.Screen name='Post' component={Post}  options={{
+                            header:(props)=><CustomHeader {...props} title={"커뮤니티"}/>
+                        }}/>
+            <Stack.Screen name='Writepost' component={Writepost}  options={{
+                            header:(props)=><CustomHeader {...props} title={"글 쓰기"}/>
+                        }}/>
+            <Stack.Screen name="Store2" component={Store2} options={{
+                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
+                        }}/>
+            <Stack.Screen name="Store_CoffeeDessert" component={Store_CoffeeDessert} options={{
+                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
+                        }}/>
+            <Stack.Screen name="Store_FoodFranchise" component={Store_FoodFranchise} options={{
+                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
+                        }}/>
+            <Stack.Screen name="Store_GiftCard" component={Store_GiftCard} options={{
+                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
+                        }}/>
+            <Stack.Screen name="Store_Entertainment" component={Store_Entertainment} options={{
+                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
+                        }}/>
+            <Stack.Screen name="Store_Ect" component={Store_Ect} options={{
+                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
+                        }}/>
+            <Stack.Screen name="Store_CoffeeDessert_Detail" component={Store_CoffeeDessert_Detail} options={{
+                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
+                        }}/>
+            <Stack.Screen name="Store_Entertainment_Detail" component={Store_Entertainment_Detail} options={{
+                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
+                        }}/>
+            <Stack.Screen name="Store_FoodFranchise_Detail" component={Store_FoodFranchise_Detail} options={{
+                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
+                        }}/>
+            <Stack.Screen name="Store_GiftCard_Detail" component={Store_GiftCard_Detail} options={{
+                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
+                        }}/>
+            <Stack.Screen name="Store_Ect_Detail" component={Store_Ect_Detail} options={{
+                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
+                        }}/>
 
         </Stack.Navigator>
         </>
@@ -174,13 +233,24 @@ const styles = StyleSheet.create({
         borderBottomColor:theme.color.grey1,
         borderBottomWidth:0.5,
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         alignItems: 'center',
+        paddingHorizontal:16*theme.width,
     },
     MyPageHeaderTitle:{
         color:theme.color.gery10,
         fontFamily:"Pretendard-Bold",
         fontSize:theme.fontSizes.fontSizes20,
+    },
+    backIcon:{
+        height:24*theme.height*theme.width,
+        width:24*theme.height*theme.width,
+    },
+    headerTextContainer:{
+        flex:1,
+        marginRight:24*theme.height*theme.width,
+        justifyContent:'center',
+        alignItems:'center',
     }
 
 })
