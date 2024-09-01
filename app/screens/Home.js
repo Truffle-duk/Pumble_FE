@@ -55,7 +55,7 @@ function NotificationCard({navigation}){
 function CommunityCard({navigation}){
   return(
     <TouchableOpacity style={styles.navigationCard}
-      // onPress={()=>navigation.navigate('Community')}  나중에 community 페이지 생성 시, 연결
+      onPress={()=>navigation.navigate('Community')}  //나중에 community 페이지 생성 시, 연결
       >
       <Text style={styles.navigationCardTitleText}>커뮤니티</Text>
         <Text style={styles.navigationCardDetailText}>모두와 소통해요</Text>
