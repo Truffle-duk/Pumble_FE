@@ -13,6 +13,9 @@ import Store from '@screens/Store';
 import MyPage from '@screens/MyPage';
 import Alarm from '@screens/Alarm';
 import { create } from 'react-test-renderer';
+import ModifyProfile from '@screens/ModifyProfile';
+import PBHistory from '@screens/PBHistory';
+import PurchasedProductList from '@screens/PurchasedProductList';
 
 import Store2 from '@screens/Store2';
 import Store_CoffeeDessert from '@screens/Store_CoffeeDessert';
@@ -121,15 +124,17 @@ const StackNavigator = ({route}) => {
                         />
                 )
             }
+            
             <Stack.Screen name="Alarm" component={Alarm}/>
-
+            <Stack.Screen name='ModifyProfile' component={ModifyProfile}/>
+            <Stack.Screen name='PBHistory' component={PBHistory}/>
+            <Stack.Screen name='PurchasedProductList' component={PurchasedProductList}/>
             <Stack.Screen name="Store2" component={Store2} options={{ title: '리워드 스토어' }}/>
             <Stack.Screen name="Store_CoffeeDessert" component={Store_CoffeeDessert}/>
             <Stack.Screen name="Store_FoodFranchise" component={Store_FoodFranchise}/>
             <Stack.Screen name="Store_GiftCard" component={Store_GiftCard}/>
             <Stack.Screen name="Store_Entertainment" component={Store_Entertainment}/>
             <Stack.Screen name="Store_Ect" component={Store_Ect}/>
-
             <Stack.Screen name="Store_CoffeeDessert_Detail" component={Store_CoffeeDessert_Detail}options={{ title: '리워드 스토어' }}/>
             <Stack.Screen name="Store_Entertainment_Detail" component={Store_Entertainment_Detail}options={{ title: '리워드 스토어' }}/>
             <Stack.Screen name="Store_FoodFranchise_Detail" component={Store_FoodFranchise_Detail}options={{ title: '리워드 스토어' }}/>
