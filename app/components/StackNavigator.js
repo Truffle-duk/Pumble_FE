@@ -18,7 +18,9 @@ import PBHistory from '@screens/PBHistory';
 import PurchasedProductList from '@screens/PurchasedProductList';
 import Community from '@screens/Community';
 import Post from '@screens/Post';
-import Writepost from '@screens/WritePost';
+import WritePost from '@screens/WritePost';
+import Notification from '@screens/Notification';
+import NoticeDetail from '@screens/NoticeDetail';
 
 import Store2 from '@screens/Store2';
 import Store_CoffeeDessert from '@screens/Store_CoffeeDessert';
@@ -163,9 +165,16 @@ const StackNavigator = ({route}) => {
             <Stack.Screen name='Post' component={Post}  options={{
                             header:(props)=><CustomHeader {...props} title={"커뮤니티"}/>
                         }}/>
-            <Stack.Screen name='Writepost' component={Writepost}  options={{
+            <Stack.Screen name='WritePost' component={WritePost}  options={{
                             header:(props)=><CustomHeader {...props} title={"글 쓰기"}/>
                         }}/>
+
+            <Stack.Screen name='Notification' component={Notification}  options={{
+                                        header:(props)=><CustomHeader {...props} title={"공지사항"}/>
+                                    }}/>
+            <Stack.Screen name='NoticeDetail' component={NoticeDetail}  options={{
+                                                    header:(props)=><CustomHeader {...props} title={"공지사항"}/>
+                                                }}/>
             <Stack.Screen name="Store2" component={Store2} options={{
                             header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
                         }}/>
