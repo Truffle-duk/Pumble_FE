@@ -1,15 +1,39 @@
 import { theme } from "@assets/Theme";
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { StyleSheet, View, Text, Button, TouchableOpacity, Image, TextInput } from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
 
-function ModifyProfileImage(){
+
+function ModifyProfileImage({imageUri,setImageUri}){
+
+  const selectImage = () => {
+    const options = {
+      mediaType: 'photo',
+      maxWidth: 300,
+      maxHeight: 300,
+      quality: 1,
+    };
+
+    launchImageLibrary(options, response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        const uri = response.assets[0].uri;
+        setImageUri(uri);
+        console.log('Image uri: ', imageUri);
+      }
+    });
+  };
+
   return(
     <View style={styles.profileModifyImageContainer}>
       <View style={styles.profileImageContainer}>
         <Image source={require('@assets/Images/Guinguin_Face.png')}
         style={styles.profileImage}/>
       </View>
-      <TouchableOpacity style={styles.profileImageModifyBtn}>
+      <TouchableOpacity style={styles.profileImageModifyBtn} onPress={selectImage}>
         <Image source={require('@assets/Icons/galleryAdd.png')}
         style={styles.profileImageModifyBtnIcon}/>
       </TouchableOpacity>
@@ -51,9 +75,11 @@ function SaveBtn(){
 }
 
 export default function ModifyProfile(){
+  const [imageUri, setImageUri] = useState("");
+
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor:theme.color.white }}>
-          <ModifyProfileImage/>
+          <ModifyProfileImage imageUri={imageUri} setImageUri={setImageUri}/>
           <ModifyProfileName/>
           <SaveBtn/>
         </View>
