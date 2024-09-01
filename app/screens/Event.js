@@ -11,8 +11,8 @@ import { ThemeProvider, useNavigation } from '@react-navigation/native';
 //캘린더 로컬화
 import { LocaleConfig } from 'react-native-calendars';
 // api call
-import {call} from '@utils/ApiService'
-import {attendEvent} from "@utils/Contracts";
+//import {call} from '@utils/ApiService'
+//import {attendEvent} from "@utils/Contracts";
 
 const screenWidth=Dimensions.get('screen').width; 
 const screenHeight = Dimensions.get('screen').height;
@@ -254,14 +254,14 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
 
   const submitCode = async (id, submitCode, reward, groupId, groupUserId) => {
     await setCode("")
-    await call(`/event/${id}`, "POST", {
+    /*await call(`/event/${id}`, "POST", {
       "code": submitCode,
       "groupUserId": 1
     }).then(data => {
       if (data.code === 200) {
         alert("해당 일정에 참여 신청이 되었습니다.")
       }
-    }).catch(error => console.log(error))
+    }).catch(error => console.log(error))*/
 
     await attendEvent(id, reward, groupId, groupUserId)
         .then(_ => {
@@ -365,7 +365,7 @@ export default function Event(){
   const [overlayData, setOverlayData]=useState({"description": "", "endDate": "", "eventId": 0, "isAttended": 0, "place": "", "startDate": "T00", "status": ""})
   const animatedHeight = useRef(new Animated.Value(0)).current;
 
-  useEffect(()=>{
+  /*useEffect(()=>{
     call('/events/all?groupId=1', "GET")
         .then(data => setDatas(data.result.events))
     call('/events/month?groupId=1&groupUserId=1', "GET")
@@ -381,7 +381,7 @@ export default function Event(){
   const updateData = () => {
     call('/events/month?groupId=1&groupUserId=1', "GET")
         .then(data => setThisMonthDatas(data.result.events))
-  }
+  }*/
 
   const openModal = (index) => {
     setOverlayVisible(true);
@@ -407,7 +407,7 @@ export default function Event(){
       <EventCard lastEvent={lastEvents} upcomingEvent={upcomingEvents}/>
       <EventCalendar data={datas}/>          
       <EventList thisMonthEvents={thisMonthDatas} openModal={openModal}/>
-      <EventOverlay overlayVisible={overlayVisible} animatedHeight={animatedHeight} closeModal={closeModal} overlayData={overlayData} updateHandler={updateData}/>
+      <EventOverlay overlayVisible={overlayVisible} animatedHeight={animatedHeight} closeModal={closeModal} overlayData={overlayData} /*updateHandler={updateData}*//>
     </ScrollView>
   );
 }
