@@ -13,6 +13,22 @@ import Store from '@screens/Store';
 import MyPage from '@screens/MyPage';
 import Alarm from '@screens/Alarm';
 import { create } from 'react-test-renderer';
+import ModifyProfile from '@screens/ModifyProfile';
+import PBHistory from '@screens/PBHistory';
+import PurchasedProductList from '@screens/PurchasedProductList';
+
+import Store2 from '@screens/Store2';
+import Store_CoffeeDessert from '@screens/Store_CoffeeDessert';
+import Store_FoodFranchise from '@screens/Store_FoodFranchise';
+import Store_GiftCard from '@screens/Store_GiftCard';
+import Store_Entertainment from '@screens/Store_Entertainment';
+import Store_Ect from '@screens/Store_Ect';
+
+import Store_CoffeeDessert_Detail from '@screens/Store_CoffeeDessert_Detail';
+import Store_Entertainment_Detail from '@screens/Store_Entertainment_Detail';
+import Store_FoodFranchise_Detail from '@screens/Store_FoodFranchise_Detail';
+import Store_GiftCard_Detail from '@screens/Store_GiftCard_Detail';
+import Store_Ect_Detail from '@screens/Store_Ect_Detail';
 
 const Stack = createNativeStackNavigator();
 
@@ -108,7 +124,22 @@ const StackNavigator = ({route}) => {
                         />
                 )
             }
+            
             <Stack.Screen name="Alarm" component={Alarm}/>
+            <Stack.Screen name='ModifyProfile' component={ModifyProfile}/>
+            <Stack.Screen name='PBHistory' component={PBHistory}/>
+            <Stack.Screen name='PurchasedProductList' component={PurchasedProductList}/>
+            <Stack.Screen name="Store2" component={Store2} options={{ title: '리워드 스토어' }}/>
+            <Stack.Screen name="Store_CoffeeDessert" component={Store_CoffeeDessert}/>
+            <Stack.Screen name="Store_FoodFranchise" component={Store_FoodFranchise}/>
+            <Stack.Screen name="Store_GiftCard" component={Store_GiftCard}/>
+            <Stack.Screen name="Store_Entertainment" component={Store_Entertainment}/>
+            <Stack.Screen name="Store_Ect" component={Store_Ect}/>
+            <Stack.Screen name="Store_CoffeeDessert_Detail" component={Store_CoffeeDessert_Detail}options={{ title: '리워드 스토어' }}/>
+            <Stack.Screen name="Store_Entertainment_Detail" component={Store_Entertainment_Detail}options={{ title: '리워드 스토어' }}/>
+            <Stack.Screen name="Store_FoodFranchise_Detail" component={Store_FoodFranchise_Detail}options={{ title: '리워드 스토어' }}/>
+            <Stack.Screen name="Store_GiftCard_Detail" component={Store_GiftCard_Detail}options={{ title: '리워드 스토어' }}/>
+            <Stack.Screen name="Store_Ect_Detail" component={Store_Ect_Detail}options={{ title: '리워드 스토어' }}/>
 
         </Stack.Navigator>
         </>
