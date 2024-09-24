@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: theme.color.white,
         alignItems: 'center',
-        padding: 16,
+
     },
     logo: {
         width: 180 * theme.width,
@@ -71,14 +71,15 @@ const styles = StyleSheet.create({
     input: {
         width: 358 * theme.width,
         height: 52 * theme.height,
-        borderColor: theme.color.grey1,
+        borderColor: theme.color.grey6,
         borderWidth: 1,
         borderRadius: 5,
-        paddingHorizontal: 20,
-        marginBottom: 15,
+
+        marginTop: 20 * theme.height,
         backgroundColor: theme.color.grey6,
         fontFamily: 'Pretendard-SemiBold',
         fontSize: theme.fontSizes.fontSizes16,
+        color: theme.color.grey1,
     },
     signUpButton: {
         width: 358 * theme.width,
@@ -87,7 +88,8 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 20,
+        marginBottom: 20* theme.height,
+        marginTop: 20 * theme.height,
     },
     signUpButtonText: {
         color: theme.color.white,

@@ -24,7 +24,7 @@ const CreateGroup = () => {
             <View style={styles.buttonContainer}>
                 <Button
                     title="생성하기"
-                    /*onPress={() => navigation.navigate('Alarm9')}*/
+                    onPress={() => navigation.navigate('GoHome')}
                 />
             </View>
         </View>

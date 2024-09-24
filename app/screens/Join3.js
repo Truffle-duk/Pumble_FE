@@ -77,13 +77,16 @@ const Join3 = () => {
                 {Math.floor(timeLeft / 60)}:{('0' + (timeLeft % 60)).slice(-2)} {/* 00:00 형식 */}
             </Text>
 
-            <Text style={styles.instruction}>- 유효 시간이 지났을 경우 인증 메일을 다시 보내주세요.</Text>
-            <Text style={styles.instruction}>- 하루동안 5번까지 새로운 인증 코드를 받을 수 있습니다.</Text>
+            {/* 두 줄 텍스트를 View로 감싸고 중앙 정렬 */}
+            <View style={styles.instructionContainer}>
+                <Text style={styles.instruction}>- 유효 시간이 지났을 경우 인증 메일을 다시 보내주세요.</Text>
+                <Text style={styles.instruction}>- 하루동안 5번까지 새로운 인증 코드를 받을 수 있습니다.</Text>
+            </View>
 
             <TouchableOpacity
                 style={[
                     styles.button,
-                    (!isCodeComplete || !isTimerActive) && styles.buttonDisabled,
+                    { backgroundColor: isCodeComplete && isTimerActive ? theme.color.main : theme.color.grey1 },
                 ]}
                 onPress={handleVerification}
                 disabled={!isCodeComplete || !isTimerActive}  // 숫자 6개 미완성 또는 타이머가 0이면 버튼 비활성화
@@ -97,52 +100,63 @@ const Join3 = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        backgroundColor: 'white',
+        backgroundColor: theme.color.white,
+        padding:20,
     },
     title: {
+        marginTop : 76*theme.height,
         color: theme.color.grey2,
         fontFamily: 'Pretendard-Bold',
         fontSize: theme.fontSizes.fontSizes26,
     },
     subtitle: {
-        fontSize: 14,
-        color: '#888',
-        marginBottom: 20,
+        marginTop : 15*theme.height,
+        color: theme.color.grey1,
+        fontFamily: 'Pretendard-Medium',
+        fontSize: theme.fontSizes.fontSizes15,
     },
     codeContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 20,
+        marginBottom: 30*theme.height,
     },
     codeInput: {
+        marginTop: 60*theme.height,
         borderBottomWidth: 2,
-        borderColor: '#ddd',
-        fontSize: 24,
+        borderColor: theme.color.grey1,
+        color: theme.color.grey2,
+        fontFamily: 'Roboto-Bold',
+        fontSize: theme.fontSizes.fontSizes36,
         textAlign: 'center',
-        width: 40,
+        width: 50*theme.width, // 코드 입력 칸 크기 조정
         paddingVertical: 10,
     },
     timer: {
-        fontSize: 18,
-        color: '#4A90E2',
+        fontFamily: 'Roboto-Medium',
+        fontSize: theme.fontSizes.fontSizes20,
+        color: theme.color.main,
         textAlign: 'center',
-        marginBottom: 20,
+
+    },
+    instructionContainer: {
+        marginTop: 50*theme.height,
+        alignItems: 'center', // 두 줄 텍스트 중앙 정렬
     },
     instruction: {
-        fontSize: 12,
-        color: '#888',
+        fontFamily: 'Pretendard-Medium',
+        fontSize: theme.fontSizes.fontSizes12,
+        color: theme.color.grey1,
         textAlign: 'center',
     },
     button: {
-
+        position: 'absolute',
+        bottom: 70 * theme.height,
+        left: 16*theme.width,
         paddingVertical: 15,
         alignItems: 'center',
         borderRadius: 5,
         width: 358 * theme.width,
         height: 50 * theme.height,
-        top: 400 * theme.height,
-
     },
     buttonText: {
         color: theme.color.white,
@@ -150,7 +164,7 @@ const styles = StyleSheet.create({
         fontSize: theme.fontSizes.fontSizes18,
     },
     buttonDisabled: {
-        backgroundColor: '#aaa',
+        backgroundColor: theme.color.grey1,
     },
 
 });

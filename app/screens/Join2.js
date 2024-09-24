@@ -34,7 +34,7 @@ const Join2 = () => {
             {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
             <View style={styles.bottomContainer}>
                 <TouchableOpacity
-                    style={[styles.button, { backgroundColor: email ? theme.color.main : '#CCC' }]}
+                    style={[styles.button, { backgroundColor: email ? theme.color.main : theme.color.grey6, }]}
                     onPress={handleEmailSubmit}
                     disabled={!email}
                 >
@@ -48,15 +48,17 @@ const Join2 = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        backgroundColor: 'white',
+        backgroundColor: theme.color.white,
+        padding:20,
     },
     title: {
+        marginTop : 76*theme.height,
         color: theme.color.grey2,
         fontFamily: 'Pretendard-Bold',
         fontSize: theme.fontSizes.fontSizes26,
     },
     subtitle: {
+        marginTop : 15*theme.height,
         color: theme.color.grey1,
         fontFamily: 'Pretendard-Medium',
         fontSize: theme.fontSizes.fontSizes15,
@@ -64,11 +66,10 @@ const styles = StyleSheet.create({
     input: {
         width: 358 * theme.width,
         height: 52 * theme.height,
+        marginTop: 30*theme.height,
         borderColor: theme.color.grey6,
         borderWidth: 1,
         borderRadius: 5,
-        paddingHorizontal: 10,
-        marginBottom: 10,
         backgroundColor: theme.color.grey6,
     },
     errorText: {
@@ -80,13 +81,14 @@ const styles = StyleSheet.create({
 
     },
     button: {
+        position: 'absolute',
+        bottom: 70 * theme.height,
 
-        paddingVertical: 15,
         alignItems: 'center',
         borderRadius: 5,
-        width: 358 * theme.width,
+        width: 358*theme.width,
         height: 50 * theme.height,
-        top: 400 * theme.height,
+        justifyContent: 'center', // 버튼 안의 텍스트를 가운데 정렬
 
     },
     buttonText: {

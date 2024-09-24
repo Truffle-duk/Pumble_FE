@@ -41,6 +41,7 @@ const Join1 = () => {
                 <CheckBox
                     value={termsChecked}
                     onValueChange={() => handleIndividualCheck(setTermsChecked, termsChecked)}
+                    tintColors={{ true: theme.color.main, false: theme.color.grey6 }} // 색상 추가
                 />
                 <Text style={styles.label}>서비스 이용 약관 (필수)</Text>
             </View>
@@ -48,6 +49,7 @@ const Join1 = () => {
                 <CheckBox
                     value={privacyChecked}
                     onValueChange={() => handleIndividualCheck(setPrivacyChecked, privacyChecked)}
+                    tintColors={{ true: theme.color.main, false: theme.color.grey6 }} // 색상 추가
                 />
                 <Text style={styles.label}>개인정보 수집 및 이용 동의 (필수)</Text>
             </View>
@@ -55,6 +57,7 @@ const Join1 = () => {
                 <CheckBox
                     value={ageChecked}
                     onValueChange={() => handleIndividualCheck(setAgeChecked, ageChecked)}
+                    tintColors={{ true: theme.color.main, false: theme.color.grey6 }} // 색상 추가
                 />
                 <Text style={styles.label}>만 14세 이상 확인 (필수)</Text>
             </View>
@@ -62,11 +65,12 @@ const Join1 = () => {
                 <CheckBox
                     value={allChecked}
                     onValueChange={handleAllChecked}
+                    tintColors={{ true: theme.color.main, false: theme.color.main }} // 색상 추가
                 />
                 <Text style={styles.label}>전체 동의</Text>
             </View>
             <TouchableOpacity
-                style={[styles.button, { backgroundColor: allChecked ? theme.color.main : theme.color.grey1 }]}
+                style={[styles.button, { backgroundColor: allChecked ? theme.color.main : theme.color.grey6 }]}
                 onPress={() => {
                     if (allChecked) {
                         navigation.navigate('Join2');
@@ -80,38 +84,41 @@ const Join1 = () => {
     );
 };
 
+
 const styles = StyleSheet.create({
     container: {
-            flex: 1,
-            backgroundColor: theme.color.white,
-            alignItems: 'center',
-            padding: 16,
-        },
+        flex: 1,
+        backgroundColor: theme.color.white,
+        padding : 20
+    },
     title: {
-        marginBottom: 10,
+        marginTop : 76*theme.height,
+        marginBottom: 40*theme.height,
         color: theme.color.grey2,
         fontFamily: 'Pretendard-Bold',
         fontSize: theme.fontSizes.fontSizes26,
     },
     checkboxContainer: {
-
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',  // 'left' -> 'center' 또는 'flex-start'
+        marginBottom: 15,      // 체크박스 항목 간의 간격 조정
+
     },
     label: {
         color: theme.color.grey10,
         fontFamily: 'Pretendard-SemiBold',
         fontSize: theme.fontSizes.fontSizes15,
+        marginLeft: 10,        // 체크박스와 텍스트 사이 간격 조정
     },
     button: {
-
-        paddingVertical: 15,
+        position: 'absolute',
+        bottom: 70 * theme.height,
+        left : 16*theme.width,
         alignItems: 'center',
         borderRadius: 5,
-        width: 358 * theme.width,
+        width: 358*theme.width,
         height: 50 * theme.height,
-        top: 400 * theme.height,
-
+        justifyContent: 'center', // 버튼 안의 텍스트를 가운데 정렬
     },
     buttonText: {
         color: theme.color.white,

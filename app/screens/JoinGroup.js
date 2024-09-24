@@ -10,7 +10,8 @@ const JoinGroup = () => {
     const isButtonDisabled = meetingCode.trim() === '';
 
     const handleCompletePress = () => {
-        alert("참여 완료", "모임에 성공적으로 참여하였습니다!");
+        alert("참여 완료", "모임에 성공적으로 참여하였습니다!")
+        navigation.navigate('GoHome');
     };
 
     return (
@@ -35,7 +36,7 @@ const JoinGroup = () => {
 
             {/* 추가된 두 문장 */}
             <Text style={styles.infoText}>모임 코드가 없다면?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('StartGroup')}>
+            <TouchableOpacity onPress={() => navigation.navigate('CreateGroup')}>
                 <Text style={styles.linkText}>새 모임 만들기</Text>
             </TouchableOpacity>
         </View>

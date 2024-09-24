@@ -23,7 +23,7 @@ const Start = () => {
 
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => navigation.navigate('JoinGroup')} // Alarm7 페이지로 이동
+                onPress={() => navigation.navigate('JoinGroup')}
             >
                 <Text style={styles.buttonText}>모임 참여하기</Text>
             </TouchableOpacity>
@@ -35,36 +35,42 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: 'white',
+
         alignItems: 'center',
-        justifyContent: 'center',
+        backgroundColor: theme.color.white,
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#4A90E2',
-        marginBottom: 10,
+        marginTop : 100*theme.height,
+        color: theme.color.main,
+        fontFamily: 'Pretendard-Bold',
+        fontSize: theme.fontSizes.fontSizes32,
     },
     subtitle: {
-        fontSize: 16,
-        color: '#888',
-        marginBottom: 20,
+        marginTop : 25*theme.height,
+        color: theme.color.grey10,
+        fontFamily: 'Pretendard-SemiBold',
+        fontSize: theme.fontSizes.fontSizes15,
     },
     image: {
-        width: 200,
-        height: 200,
+        width: 330*theme.width*theme.height,
+        height: 330*theme.height*theme.width,
         marginBottom: 30,
     },
     button: {
-        backgroundColor: '#4A90E2',
+        position: 'absolute',
+        bottom: 70 * theme.height,
+        left: 16*theme.width,
         paddingVertical: 15,
-        paddingHorizontal: 40,
+        alignItems: 'center',
         borderRadius: 5,
+        width: 358 * theme.width,
+        height: 50 * theme.height,
+        backgroundColor : theme.color.main,
     },
     buttonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
+        color: theme.color.white,
+        fontFamily: 'Pretendard-SemiBold',
+        fontSize: theme.fontSizes.fontSizes18,
     },
 });
 
