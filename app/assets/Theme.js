@@ -29,6 +29,7 @@ const fontSizes = {
     fontSizes21: height * width * 21,
     fontSizes22: height * width * 22,
     fontSizes25: height * width * 25,
+    fontSizes26: height * width * 26,
 };
 
 const color={

@@ -16,7 +16,7 @@ const BottomTabNavigator=({navigation})=>{
     
     return(
         <>        
-        <NavigationContainer>
+        {/* <NavigationContainer> */}
             <Tab.Navigator initialRouteName="HomeScreen"
             screenOptions={{
                 tabBarActiveTintColor:theme.color.main,
@@ -130,7 +130,7 @@ const BottomTabNavigator=({navigation})=>{
                 </Tab.Screen>
             </Tab.Navigator>
 
-        </NavigationContainer>
+        {/* </NavigationContainer> */}
         </>        
     );
 }
