@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { StyleSheet, View, Text, Button, TouchableOpacity, Image, StatusBar } from 'react-native';
+import React, { useEffect, useRef, useState } from "react";
+import { StyleSheet, View, Text, Button, TouchableOpacity, Image, StatusBar, Modal, Animated, Alert } from 'react-native';
 import { NavigationContainer, ParamListBase } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -45,20 +45,143 @@ import Store_Ect_Detail from '@screens/Store_Ect_Detail';
 
 const Stack = createNativeStackNavigator();
 
+const groupList=[
+    {
+        "Name":"고사모"
+    },
+]
+
+function SwitchOverlay({overlayVisible, animatedHeight, closeModal, navigation, alert}){
+    const [isLogout,setIsLogout]=useState(false);
+    //const [switchGroup,setSwitchGroup]=useState("")
+  
+    return(
+      <Modal
+        transparent={true}
+        visible={overlayVisible}
+        animationType="None"
+        onRequestClose={closeModal}
+      >
+        <TouchableOpacity onPress={closeModal} activeOpacity={1} style={styles.overlayBackground}>
+          <Animated.View style={styles.overlayContainer}>
+  
+            <View style={styles.overlayHeaderContainer}>
+              <View style={styles.overlayHeaderTextContainer}>
+                <Text style={styles.overlayHeaderText}>모임전환</Text>
+              </View>
+              
+              <TouchableOpacity onPress={closeModal} >
+                  <Image source={require("@assets/Icons/closeIcon.png")}
+                    style={styles.overlayHeaderIcon}
+                    />
+              </TouchableOpacity>
+            </View>
+            {/* <View style={styles.logoutTextContainer}>
+              <Text style={styles.logoutText}>로그아웃 하시겠어요?</Text>
+              <Text style={styles.logoutDetailText}>나중에 다시 로그인 할 수 있어요!</Text>
+            </View>          
+  
+            <TouchableOpacity style={styles.logoutBtn}
+              onPress={()=>setIsLogout(true)}>
+              <Text style={styles.logoutBtnText}>로그아웃 하기</Text>
+            </TouchableOpacity> */}
+            <TouchableOpacity>
+                <Text style={styles.overlayGroupNameMain}>고사모</Text>
+            </TouchableOpacity>
+            <View style={styles.lineHorizontal}/>
+            <TouchableOpacity>
+                <Text style={styles.overlayGroupName}>강사모</Text>
+            </TouchableOpacity>
+            <View style={styles.lineHorizontal}/>
+            <TouchableOpacity>
+                <Text style={styles.overlayGroupName}>햄사모</Text>
+            </TouchableOpacity>
+            <View style={styles.lineHorizontal}/>
+            <TouchableOpacity>
+                <Text style={styles.overlayGroupName}>쿼사모</Text>
+            </TouchableOpacity>
+            <View style={styles.lineHorizontal}/>
+            <View style={{alignItems:'center'}}>
+                <View style={styles.overlayDetailContainer}>
+                    <TouchableOpacity onPress={()=>navigation.navigate('AppMyPage')}>
+                        <Text style={styles.overlayDetailText}>계정 관리</Text>
+                    </TouchableOpacity>
+                    <View style={styles.lineVertical}/>
+                    <TouchableOpacity onPress={()=>alert()}>
+                        <Text style={styles.overlayDetailText}>로그아웃</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+            
+
+  
+          </Animated.View>
+        </TouchableOpacity>
+      </Modal>
+  
+    );
+  }
+
 //header
 function StackHeader({ navigation, scene, previous }){
+  const [switchOverlayVisible, setSwitchOverlayVisible]=useState(false);
+  const animatedHeight=useRef(new Animated.Value(0)).current;
+
+  const openSwitchModal=()=>{
+    setSwitchOverlayVisible(true);
+    Animated.timing(animatedHeight, {
+      toValue: 287, // 모달의 높이
+      duration: 0, // 애니메이션 지속 시간
+      useNativeDriver: false
+    }).start();
+  };
+
+  const closeSwitchModal = () => {
+    Animated.timing(animatedHeight, {
+      toValue: 287,
+      duration: 0,
+      useNativeDriver: false
+    }).start(() => setSwitchOverlayVisible(false));
+  };
+  //const [quitGroup, setQuitGroup]=useState("");
+
+    const logoutAlert=()=>{
+        Alert.alert(
+            "로그아웃",
+            "로그아웃 하시겠어요?",
+            [
+                {
+                    text:"취소", 
+                    //onPress: () => setQuitGroup(groupName)
+                    style:'cancel'
+                },
+                {
+                    text:"로그아웃", 
+                    //onPress: () => setQuitGroup(groupName)
+                },
+            ],
+            {cancelable:true}
+        );
+    };
+
     return(
         <View style={styles.stackHeaderStyle}>
-            <Text style={styles.headerTitle}>고사모</Text>
-            <TouchableOpacity 
-            //onPress={() => navigation.navigate("Alarm")}
-            onPress={() => navigation.navigate("AppMyPage")}
-            >
+            <View style={styles.stackHeaderGroupContainer}>
+                <Text style={styles.headerTitle}>고사모</Text>
+                <TouchableOpacity onPress={openSwitchModal}>
+                    <Image source={require('@assets/Icons/dropdownIcon2.png')}
+                    style={styles.dropdownIcon}/>
+                </TouchableOpacity>
+                
+            </View>
+            
+            <TouchableOpacity onPress={() => navigation.navigate("Alarm")}>
                 <Image
                 source={require('../assets/Icons/alarmIcon.png')}
                 style={styles.headerIcon}
                 />
             </TouchableOpacity>
+            <SwitchOverlay overlayVisible={switchOverlayVisible} animatedHeight={animatedHeight} closeModal={closeSwitchModal} navigation={navigation} alert={logoutAlert}/>
         </View>
     );
 }
@@ -87,6 +210,27 @@ function CustomHeader({navigation, title }){
 
 const StackNavigator = ({route}) => {
     const { id } = route;
+    
+    const [switchOverlayVisible, setSwitchOverlayVisible]=useState(false);
+    const animatedHeight=useRef(new Animated.Value(0)).current;
+  
+    const openSwitchModal=()=>{
+      setLogoutOverlayVisible(true);
+      Animated.timing(animatedHeight, {
+        toValue: 287, // 모달의 높이
+        duration: 0, // 애니메이션 지속 시간
+        useNativeDriver: false
+      }).start();
+    };
+  
+    const closeSwitchModal = () => {
+      Animated.timing(animatedHeight, {
+        toValue: 287,
+        duration: 0,
+        useNativeDriver: false
+      }).start(() => setLogoutOverlayVisible(false));
+    };
+  
 
     return(
         <>
@@ -219,8 +363,7 @@ const StackNavigator = ({route}) => {
             <Stack.Screen name="Store_Ect_Detail" component={Store_Ect_Detail} options={{
                             header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
                         }}/>
-
-
+            
             <Stack.Screen name='AppMyPage' component={AppMyPage}  options={{
                 header:(props)=><CustomHeader {...props} title={"계정 관리"}/>
             }}/>
@@ -251,6 +394,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+    },
+    stackHeaderGroupContainer:{
+        flexDirection:'row',
+        //justifyContent:'center',
+        alignItems:'center'
+    },
+    dropdownIcon:{
+        width:15*theme.width*theme.height,
+        height:10*theme.width*theme.height,
+        marginLeft:10*theme.width
     },
     headerTitle:{
         color:theme.color.white,
@@ -287,7 +440,82 @@ const styles = StyleSheet.create({
         marginRight:24*theme.height*theme.width,
         justifyContent:'center',
         alignItems:'center',
-    }
+    },
+    overlayBackground:{
+        flex:1, 
+        justifyContent: 'flex-end', // 하단 정렬
+        backgroundColor: 'rgba(0,0,0,0.2)',
+      },
+      overlayContainer:{
+        backgroundColor:theme.color.white,
+        borderTopLeftRadius:15,
+        borderTopRightRadius:15,
+        paddingHorizontal:15*theme.width,
+        paddingBottom:50*theme.height,
+        //justifyContent:'center',
+        //alignItems:'center'
+        //height:600*theme.height
+      },
+      overlayHeaderContainer:{
+        flexDirection:'row',
+        marginBottom:7*theme.height,
+        height:68*theme.height,
+        justifyContent:'space-between',
+        //backgroundColor:'red'
+      },
+      overlayHeaderTextContainer:{
+        flex:1,
+        justifyContent:'center',
+        marginLeft:24*theme.width,
+        alignItems:'center',
+        //backgroundColor:'blue'
+      },
+      overlayHeaderText:{
+        //justifyContent:'center'
+        fontSize:theme.fontSizes.fontSizes20,
+        fontFamily:"Pretendard-SemiBold",
+        color:theme.color.black,
+      },
+      overlayHeaderIcon:{
+        height:24*theme.height*theme.width,
+        width:24*theme.width*theme.height,
+        marginTop:15*theme.height,
+      },
+      lineHorizontal:{
+        height:1,
+        backgroundColor:theme.color.background,
+        marginVertical:15*theme.height,
+      },
+      lineVertical:{
+        width:1,
+        backgroundColor:theme.color.grey1,
+        //backgroundColor:'red',
+        marginHorizontal:35*theme.width
+      },
+      overlayGroupNameMain:{
+        fontSize:theme.fontSizes.fontSizes20,
+        fontFamily:"Pretendard-Medium",
+        color:theme.color.main,
+        lineHeight:22
+      },
+      overlayGroupName:{
+        fontSize:theme.fontSizes.fontSizes20,
+        fontFamily:"Pretendard-Medium",
+        color:theme.color.grey2,
+        lineHeight:22
+      },
+      overlayDetailContainer:{
+        flexDirection:'row',
+        alignItems:'center',
+        marginTop:15*theme.height
+      },
+      overlayDetailText:{
+        fontSize:theme.fontSizes.fontSizes16,
+        fontFamily:"Pretendard-Medium",
+        color:theme.color.grey1,
+        lineHeight:22
+      }
+
 
 })
 export default StackNavigator;
