@@ -11,7 +11,7 @@ const Onboarding =({navigation}) =>{
 
     const completeOnboarding = async () => {
         await AsyncStorage.setItem('alreadyLaunched', 'true');  // 온보딩 완료 상태 저장
-        navigation.replace('GoHome');  // 메인 화면으로 이동
+        navigation.replace('Login');  // 메인 화면으로 이동
     };
 
     //   const completeOnboarding = (navigation) => {
