@@ -25,6 +25,10 @@ import NoticeDetail from '@screens/NoticeDetail';
 //new page
 import AppMyPage from '@screens/AppMyPage';
 import AppManageGroup from '@screens/AppManageGroup';
+import JoinGroup from '@screens/JoinGroup';
+import CreateGroup from '@screens/CreateGroup';
+import ManageMyGroup from '@screens/ManageMyGroup';
+import AppModifyProfile from '@screens/AppModifyProfile';
 
 import Store2 from '@screens/Store2';
 import Store_CoffeeDessert from '@screens/Store_CoffeeDessert';
@@ -47,8 +51,8 @@ function StackHeader({ navigation, scene, previous }){
         <View style={styles.stackHeaderStyle}>
             <Text style={styles.headerTitle}>고사모</Text>
             <TouchableOpacity 
-            onPress={() => navigation.navigate("Alarm")}
-            //onPress={() => navigation.navigate("AppMyPage")}
+            //onPress={() => navigation.navigate("Alarm")}
+            onPress={() => navigation.navigate("AppMyPage")}
             >
                 <Image
                 source={require('../assets/Icons/alarmIcon.png')}
@@ -220,13 +224,18 @@ const StackNavigator = ({route}) => {
             <Stack.Screen name='AppMyPage' component={AppMyPage}  options={{
                 header:(props)=><CustomHeader {...props} title={"계정 관리"}/>
             }}/>
-            <Stack.Screen name='ModifyProfile2' component={ModifyProfile} options={{
+            <Stack.Screen name='ModifyProfile2' component={AppModifyProfile} options={{
                             header:(props)=><CustomHeader {...props} title={"계정 관리"}/>
                         }}/>
             <Stack.Screen name='AppManageGroup' component={AppManageGroup} options={{
                             header:(props)=><CustomHeader {...props} title={"모임 관리"}/>
                         }}/>
+            <Stack.Screen name='ManageMyGroup' component={ManageMyGroup} options={{
+                header:(props)=><CustomHeader {...props} title={"모임 관리"}/>
+            }}/>
 
+            <Stack.Screen name="JoinGroup" component={JoinGroup} options={{headerShown: false}}/>
+            <Stack.Screen name="CreateGroup" component={CreateGroup} options={{headerShown: false}}/>
         </Stack.Navigator>
         </>
 

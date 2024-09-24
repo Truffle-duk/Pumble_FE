@@ -79,12 +79,12 @@ function ManageGroup({navigation}){
         <Text style={styles.mypageCheckDetailNavigateText}>모임 관리하기</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.mypageCheckDetailNavigate}
-        //onPress={()=>navigation.navigate('PurchasedProductList')}
+        onPress={()=>navigation.navigate('JoinGroup')}
         >
         <Text style={styles.mypageCheckDetailNavigateText}>모임 연결하기</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.mypageCheckDetailNavigate}
-        //onPress={()=>navigation.navigate('PurchasedProductList')}
+        onPress={()=>navigation.navigate('CreateGroup')}
         >
         <Text style={styles.mypageCheckDetailNavigateText}>새 모임 만들기</Text>
       </TouchableOpacity>
