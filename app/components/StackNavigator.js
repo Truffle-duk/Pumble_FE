@@ -22,6 +22,10 @@ import WritePost from '@screens/WritePost';
 import Notification from '@screens/Notification';
 import NoticeDetail from '@screens/NoticeDetail';
 
+//new page
+import AppMyPage from '@screens/AppMyPage';
+import AppManageGroup from '@screens/AppManageGroup';
+
 import Store2 from '@screens/Store2';
 import Store_CoffeeDessert from '@screens/Store_CoffeeDessert';
 import Store_FoodFranchise from '@screens/Store_FoodFranchise';
@@ -42,7 +46,10 @@ function StackHeader({ navigation, scene, previous }){
     return(
         <View style={styles.stackHeaderStyle}>
             <Text style={styles.headerTitle}>고사모</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Alarm")}>
+            <TouchableOpacity 
+            onPress={() => navigation.navigate("Alarm")}
+            //onPress={() => navigation.navigate("AppMyPage")}
+            >
                 <Image
                 source={require('../assets/Icons/alarmIcon.png')}
                 style={styles.headerIcon}
@@ -207,6 +214,17 @@ const StackNavigator = ({route}) => {
                         }}/>
             <Stack.Screen name="Store_Ect_Detail" component={Store_Ect_Detail} options={{
                             header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
+                        }}/>
+
+
+            <Stack.Screen name='AppMyPage' component={AppMyPage}  options={{
+                header:(props)=><CustomHeader {...props} title={"계정 관리"}/>
+            }}/>
+            <Stack.Screen name='ModifyProfile2' component={ModifyProfile} options={{
+                            header:(props)=><CustomHeader {...props} title={"계정 관리"}/>
+                        }}/>
+            <Stack.Screen name='AppManageGroup' component={AppManageGroup} options={{
+                            header:(props)=><CustomHeader {...props} title={"모임 관리"}/>
                         }}/>
 
         </Stack.Navigator>
