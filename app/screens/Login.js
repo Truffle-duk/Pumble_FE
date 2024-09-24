@@ -25,7 +25,8 @@ const Login = () => {
                 placeholderTextColor={theme.color.grey1}
                 secureTextEntry={true}
             />
-            <TouchableOpacity style={styles.signUpButton}>
+            <TouchableOpacity style={styles.signUpButton}
+            onPress={()=>navigation.navigate('GoHome')}>
                 <Text style={styles.signUpButtonText}>로그인 하기</Text>
             </TouchableOpacity>
 
@@ -74,12 +75,12 @@ const styles = StyleSheet.create({
         borderColor: theme.color.grey6,
         borderWidth: 1,
         borderRadius: 5,
-
+        paddingLeft: 20*theme.width,
         marginTop: 20 * theme.height,
-        backgroundColor: theme.color.grey6,
+        backgroundColor: theme.color.background,
         fontFamily: 'Pretendard-SemiBold',
         fontSize: theme.fontSizes.fontSizes16,
-        color: theme.color.grey1,
+        color: theme.color.grey10,
     },
     signUpButton: {
         width: 358 * theme.width,
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 20* theme.height,
+        marginBottom: 30* theme.height,
         marginTop: 20 * theme.height,
     },
     signUpButtonText: {
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: 260 * theme.width,
-        marginBottom: 30,
+        marginBottom: 50*theme.height,
     },
     footerLinkText: {
         color: theme.color.grey1,
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
         fontSize: theme.fontSizes.fontSizes14,
         fontFamily: 'Pretendard-Medium',
         color: theme.color.grey2,
-        marginBottom: 10,
+        marginBottom: 20*theme.height,
     },
     socialLoginButtons: {
         flexDirection: 'row',

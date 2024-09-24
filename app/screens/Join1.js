@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
@@ -36,6 +36,11 @@ const Join1 = () => {
 
     return (
         <View style={styles.container}>
+            <TouchableOpacity
+            onPress={()=>navigation.goBack()}>
+                <Image source={require('@assets/Icons/backArrow2.png')}
+                style={styles.backIcon}/>
+            </TouchableOpacity>
             <Text style={styles.title}>약관 동의하기</Text>
             <View style={styles.checkboxContainer}>
                 <CheckBox
@@ -92,7 +97,7 @@ const styles = StyleSheet.create({
         padding : 20
     },
     title: {
-        marginTop : 76*theme.height,
+        marginTop : 30*theme.height,
         marginBottom: 40*theme.height,
         color: theme.color.grey2,
         fontFamily: 'Pretendard-Bold',
@@ -125,6 +130,10 @@ const styles = StyleSheet.create({
         fontFamily: 'Pretendard-SemiBold',
         fontSize: theme.fontSizes.fontSizes18,
     },
+    backIcon:{
+        width:26*theme.height*theme.width,
+        height:26*theme.height*theme.width,
+    }
 });
 
 export default Join1;

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
 
@@ -56,6 +56,11 @@ const Join3 = () => {
 
     return (
         <View style={styles.container}>
+            <TouchableOpacity
+            onPress={()=>navigation.goBack()}>
+                <Image source={require('@assets/Icons/backArrow2.png')}
+                style={styles.backIcon}/>
+            </TouchableOpacity>
             <Text style={styles.title}>인증 코드 입력하기</Text>
             <Text style={styles.subtitle}>인증을 위해 전송된 코드를 입력해주세요</Text>
 
@@ -72,12 +77,15 @@ const Join3 = () => {
                     />
                 ))}
             </View>
-
-            <Text style={styles.timer}>
-                {Math.floor(timeLeft / 60)}:{('0' + (timeLeft % 60)).slice(-2)} {/* 00:00 형식 */}
-            </Text>
-
-            {/* 두 줄 텍스트를 View로 감싸고 중앙 정렬 */}
+            <View style={{alignItems:'center'}}>
+                <View style={styles.timerContainer}>
+                    <Text style={styles.timer}>
+                        {Math.floor(timeLeft / 60)}:{('0' + (timeLeft % 60)).slice(-2)} {/* 00:00 형식 */}
+                    </Text>
+                </View>
+            </View>
+            
+            
             <View style={styles.instructionContainer}>
                 <Text style={styles.instruction}>- 유효 시간이 지났을 경우 인증 메일을 다시 보내주세요.</Text>
                 <Text style={styles.instruction}>- 하루동안 5번까지 새로운 인증 코드를 받을 수 있습니다.</Text>
@@ -104,7 +112,7 @@ const styles = StyleSheet.create({
         padding:20,
     },
     title: {
-        marginTop : 76*theme.height,
+        marginTop : 30*theme.height,
         color: theme.color.grey2,
         fontFamily: 'Pretendard-Bold',
         fontSize: theme.fontSizes.fontSizes26,
@@ -119,6 +127,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 30*theme.height,
+        marginHorizontal :20*theme.width,
     },
     codeInput: {
         marginTop: 60*theme.height,
@@ -128,19 +137,26 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto-Bold',
         fontSize: theme.fontSizes.fontSizes36,
         textAlign: 'center',
-        width: 50*theme.width, // 코드 입력 칸 크기 조정
+        width: 36*theme.width, // 코드 입력 칸 크기 조정
         paddingVertical: 10,
+    },
+    timerContainer:{
+        width:70*theme.width,
+        height:32*theme.height,
+        borderRadius:5,
+        backgroundColor:theme.color.mainOpacity10,
+        alignItems:'center',
+        justifyContent:'center',
     },
     timer: {
         fontFamily: 'Roboto-Medium',
         fontSize: theme.fontSizes.fontSizes20,
         color: theme.color.main,
-        textAlign: 'center',
-
+        //textAlign: 'center',
     },
     instructionContainer: {
         marginTop: 50*theme.height,
-        alignItems: 'center', // 두 줄 텍스트 중앙 정렬
+        alignItems: 'flex-start', 
     },
     instruction: {
         fontFamily: 'Pretendard-Medium',
@@ -152,8 +168,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 70 * theme.height,
         left: 16*theme.width,
-        paddingVertical: 15,
+        //paddingVertical: 15,
         alignItems: 'center',
+        justifyContent:'center',
         borderRadius: 5,
         width: 358 * theme.width,
         height: 50 * theme.height,
@@ -166,6 +183,10 @@ const styles = StyleSheet.create({
     buttonDisabled: {
         backgroundColor: theme.color.grey1,
     },
+    backIcon:{
+        width:26*theme.height*theme.width,
+        height:26*theme.height*theme.width,
+    }
 
 });
 

@@ -54,14 +54,16 @@ const styles = StyleSheet.create({
     image: {
         width: 330*theme.width*theme.height,
         height: 330*theme.height*theme.width,
-        marginBottom: 30,
+        //marginBottom: 30,
+        marginTop:50*theme.height
     },
     button: {
         position: 'absolute',
         bottom: 70 * theme.height,
         left: 16*theme.width,
-        paddingVertical: 15,
+        //paddingVertical: 15,
         alignItems: 'center',
+        justifyContent:'center',
         borderRadius: 5,
         width: 358 * theme.width,
         height: 50 * theme.height,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
 
@@ -29,6 +29,11 @@ const Join4 = () => {
 
     return (
         <View style={styles.container}>
+            <TouchableOpacity
+            onPress={()=>navigation.goBack()}>
+                <Image source={require('@assets/Icons/backArrow2.png')}
+                style={styles.backIcon}/>
+            </TouchableOpacity>
             <Text style={styles.title}>가입 정보 입력하기</Text>
 
             <View style={styles.inputContainer}>
@@ -37,6 +42,7 @@ const Join4 = () => {
                     style={styles.inputBox}
                     placeholder="이메일 주소"
                     value={email}
+                    placeholderTextColor={theme.color.grey1}
                     onFocus={handleEmailFocus}
                     onChangeText={setEmail}
                 />
@@ -48,6 +54,7 @@ const Join4 = () => {
                     style={styles.inputBox}
                     placeholder="비밀번호"
                     value={password}
+                    placeholderTextColor={theme.color.grey1}
                     secureTextEntry
                     onChangeText={setPassword}
                 />
@@ -59,6 +66,7 @@ const Join4 = () => {
                 <TextInput
                     style={styles.inputBox}
                     placeholder="비밀번호 확인"
+                    placeholderTextColor={theme.color.grey1}
                     value={confirmPassword}
                     secureTextEntry
                     onChangeText={setConfirmPassword}
@@ -70,6 +78,7 @@ const Join4 = () => {
                 <TextInput
                     style={styles.inputBox}
                     placeholder="닉네임 입력"
+                    placeholderTextColor={theme.color.grey1}
                     value={nickname}
                     onChangeText={setNickname}
                 />
@@ -94,10 +103,11 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     title: {
-        marginTop : 76*theme.height,
+        marginTop : 30*theme.height,
         color: theme.color.grey2,
         fontFamily: 'Pretendard-Bold',
         fontSize: theme.fontSizes.fontSizes26,
+        marginBottom:20*theme.height
     },
     inputContainer: {
         marginTop: 20 * theme.height,
@@ -112,13 +122,14 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: theme.color.grey6,
         borderRadius: 5,
-        paddingHorizontal: 12*theme.height,
-        paddingVertical: 14*theme.width,
+        paddingHorizontal: 20*theme.width,
+        //paddingVertical: 14*theme.width,
         fontSize: theme.fontSizes.fontSizes16,
-        backgroundColor: theme.color.backgroundColor,
+        backgroundColor: theme.color.background,
+        color: theme.color.grey10,
     },
     helperText: {
-        color: theme.color.grey3,
+        color: theme.color.grey6,
         fontSize: theme.fontSizes.fontSizes12,
         marginTop: 5 * theme.height,
     },
@@ -126,8 +137,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 16 * theme.width,
         bottom: 70 * theme.height,
-        paddingVertical: 15,
+        //paddingVertical: 15,
         alignItems: 'center',
+        justifyContent:'center',
         borderRadius: 5,
         width: 358 * theme.width,
         height: 50 * theme.height,
@@ -141,6 +153,10 @@ const styles = StyleSheet.create({
         fontFamily: 'Pretendard-SemiBold',
         fontSize: theme.fontSizes.fontSizes18,
     },
+    backIcon:{
+        width:26*theme.height*theme.width,
+        height:26*theme.height*theme.width,
+    }
 });
 
 export default Join4;

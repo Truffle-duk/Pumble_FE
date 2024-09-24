@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
 
@@ -21,12 +21,18 @@ const Join2 = () => {
 
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
+            <TouchableOpacity
+            onPress={()=>navigation.goBack()}>
+                <Image source={require('@assets/Icons/backArrow2.png')}
+                style={styles.backIcon}/>
+            </TouchableOpacity>
             <Text style={styles.title}>이메일 인증하기</Text>
             <Text style={styles.subtitle}>인증을 위해 유효한 이메일을 입력해주세요</Text>
             <TextInput
                 style={styles.input}
                 placeholder={placeholderVisible ? "GuinGuin@pumble.com" : ""}
                 value={email}
+                placeholderTextColor={theme.color.grey1}
                 onChangeText={(text) => setEmail(text)}
                 onFocus={() => setPlaceholderVisible(false)}
                 onBlur={() => setPlaceholderVisible(email === '')}
@@ -52,7 +58,7 @@ const styles = StyleSheet.create({
         padding:20,
     },
     title: {
-        marginTop : 76*theme.height,
+        marginTop : 30*theme.height,
         color: theme.color.grey2,
         fontFamily: 'Pretendard-Bold',
         fontSize: theme.fontSizes.fontSizes26,
@@ -70,7 +76,9 @@ const styles = StyleSheet.create({
         borderColor: theme.color.grey6,
         borderWidth: 1,
         borderRadius: 5,
-        backgroundColor: theme.color.grey6,
+        paddingLeft:20*theme.width,
+        backgroundColor: theme.color.background,
+        color: theme.color.grey10,
     },
     errorText: {
         color: 'red',
@@ -96,6 +104,10 @@ const styles = StyleSheet.create({
         fontFamily: 'Pretendard-SemiBold',
         fontSize: theme.fontSizes.fontSizes18,
     },
+    backIcon:{
+        width:26*theme.height*theme.width,
+        height:26*theme.height*theme.width,
+    }
 });
 
 export default Join2;

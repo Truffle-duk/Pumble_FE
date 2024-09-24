@@ -30,6 +30,7 @@ const fontSizes = {
     fontSizes22: height * width * 22,
     fontSizes25: height * width * 25,
     fontSizes26: height * width * 26,
+    fontSizes28: height * width * 28,
     fontSizes32: height * width * 32,
     fontSizes34: height * width * 34,
     fontSizes36: height * width * 36,
