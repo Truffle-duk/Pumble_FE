@@ -1,10 +1,59 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
 
+const URL="https://www.pumble.site/api/auth/signIn?provider=local"
+
+const postData = async({email, passwd, navigation}) => {
+    //const token = 'your_bearer_token_here'; // 사용자의 Bearer Token
+    const data = {
+        "email": email,
+        "password": passwd
+    };
+
+    try {
+        const response = await fetch(URL, {
+            method: 'POST',
+            headers: {
+                //'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            console.log(response);
+            
+            Alert.alert(
+                "로그인 실패",
+                "이메일 혹은 비밀번호를 다시 확인해주세요.",
+                [
+                    {
+                        text:"확인",
+                        style:'cancel'
+                    }
+                ],
+                {cancelable:true}
+            );
+            throw new Error('Network response was not ok');
+        } 
+
+        const responseData = await response.json();
+        console.log('Response:', responseData);
+        navigation.navigate('GoHome');
+
+    } catch (error){
+        console.error('Error:', error);
+    }
+};
+
+
 const Login = () => {
     const navigation = useNavigation();
+
+    const [id, setId]= useState("");
+    const [pw,setPw]=useState("");
 
     const handleSignUpPress = () => {
         navigation.navigate('Join1');
@@ -16,17 +65,26 @@ const Login = () => {
 
             <TextInput
                 style={styles.input}
-                placeholder="아이디/이메일"
+                value={id}
+                placeholder="이메일"
                 placeholderTextColor={theme.color.grey1}
+                multiline={false}
+                keyboardType="email-address" 
+                onChangeText={setId}
             />
             <TextInput
                 style={styles.input}
+                value={pw}
                 placeholder="비밀번호"
                 placeholderTextColor={theme.color.grey1}
                 secureTextEntry={true}
+                multiline={false}
+                onChangeText={setPw}
             />
             <TouchableOpacity style={styles.signUpButton}
-            onPress={()=>navigation.navigate('GoHome')}>
+            //onPress={()=>navigation.navigate('GoHome')}
+            onPress={()=>postData({email:id, passwd:pw, navigation:navigation})}
+            >
                 <Text style={styles.signUpButtonText}>로그인 하기</Text>
             </TouchableOpacity>
 
