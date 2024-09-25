@@ -1,6 +1,63 @@
 import React, { useEffect, useState } from "react";
 import { theme } from "@assets/Theme";
 import { StyleSheet, View, Text, Button, TouchableOpacity, Image, ScrollView } from 'react-native';
+import * as Keychain from 'react-native-keychain';
+
+const getAccessToken = async () => {
+  try {
+      const credentials = await Keychain.getInternetCredentials("AccessToken");
+      if (credentials) {
+          //console.log("AccessToken:", credentials.password);
+          return credentials.password; // AccessToken 반환
+      } else {
+          console.log('No access token found');
+      }
+  } catch (error) {
+      console.error('Error retrieving access token:', error);
+  }
+};
+
+const getRefreshToken = async () => {
+  try {
+      const credentials = await Keychain.getInternetCredentials("RefreshToken");
+      if (credentials) {
+          //console.log("RefreshToken:", credentials.password);
+          return credentials.password; // RefreshToken 반환
+      } else {
+          console.log('No refresh token found');
+      }
+  } catch (error) {
+      console.error('Error retrieving refresh token:', error);
+  }
+};
+
+const fetchData = async ({no}) => {
+  const URL=`https://www.pumble.site/api/community/1/post/list?page=${no}`
+  const token= await getAccessToken();
+  try {
+      const response = await fetch(URL, {
+          method: 'GET', // 생략 가능
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}` // 필요하다면 토큰 추가
+          }
+      });
+
+      if (!response.ok) {
+          console.log(no)
+          console.log('Response Data:', response);
+          throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json(); // 응답을 JSON으로 변환
+      console.log('Response Data:', data);
+      return(data);
+
+  } catch (error) {
+      console.error('Fetch Error:', error);
+  }
+};
+
 
 // const Posts=[
 //   {
@@ -244,15 +301,15 @@ function PostingList({posts, navigation}){
           posts.map((post, index)=>
             <TouchableOpacity onPress={()=>navigation.navigate('Post')}>
               <View style={styles.postContentContainer}>
-                <Text style={styles.postTitleText}>{post.articles[0].title}</Text>
-                <Text style={styles.postDetailText}>{post.articles[0].content}</Text>
+                <Text style={styles.postTitleText}>{post.title}</Text>
+                <Text style={styles.postDetailText}>{post.content}</Text>
                 <View style={styles.postDetailContainer}>
                   <View style={styles.postIconContainer}>
                     <Image source={require('@assets/Icons/replyIcon.png')}
                     style={styles.postIcon}/>
-                    <Text style={styles.postReplyText}>{post.articles[0].Reply}</Text>
+                    <Text style={styles.postReplyText}>{post.commentCount}</Text>
                   </View>
-                  <Text style={styles.postDate}>{post.articles[0].Date}</Text>
+                  <Text style={styles.postDate}>{post.createdAt.split('T')[0]}</Text>
                 </View>  
               </View>                  
               <View style={styles.line}/>
@@ -281,30 +338,47 @@ function WritingBtn({navigation}){
 
 export default function Community({navigation}){
   const [PostLists, setPostLists] = useState([]);
-  const [page, setPage] = useState(0);  //페이지 번호
+  const [page, setPage] = useState(1);  //페이지 번호
   const [loading, setLoading] = useState(false);  //
-  const [hasMore, setHasMore] = useState(true);   //isLast항목 참고
+  const [hasMore, setHasMore] = useState(false);   //isLast항목 참고
+
+  // useEffect(()=>{
+  //   fetchData
+  // },[])
 
   useEffect(()=>{
     //setPostLists(Posts);
-    fetchData(page);
+    fetchPostList(page);
   },[page])
 
-  const fetchData = (page) => {
+  const fetchPostList = (page) => {
     if (loading) return;
     
     setLoading(true);
     
-    setTimeout(() => {
-      const newData = Posts.filter(post => post.currentPage === page);
-      setPostLists(prevData => [...prevData, ...newData]);
-      setHasMore(newData.length > 0);
+    setTimeout(async () => {
+      //const newData = Posts.filter(post => post.currentPage === page);
+      
+      if(!hasMore){
+        const data= await fetchData({no:page});
+        console.log("data",data);
+        const newData=data.result.postList
+        setPostLists(prevData => [...prevData, ...newData]);
+        setHasMore(data.result.isLast);
+      }
+      // }else{
+
+      // }
+      // const newData=fetchData({no:page});
+
+      // setPostLists(prevData => [...prevData, ...newData]);
+      // setHasMore(newData.result.isLast);
       setLoading(false);
     }, 500); // 1초 지연시간을 주어 로딩 효과를 나타냄
   };
 
   const handleScroll = ({ nativeEvent }) => {
-    if (isCloseToBottom(nativeEvent) && hasMore && !loading) {
+    if (isCloseToBottom(nativeEvent) && !hasMore && !loading) {
       setPage(prevPage => prevPage + 1);
     }
   };
