@@ -2,8 +2,47 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
+import * as Keychain from 'react-native-keychain';
 
 const URL="https://www.pumble.site/api/auth/signIn?provider=local"
+
+const storeToken = async ({accessToken, refreshToken, email}) => {
+    try {
+        await Keychain.setInternetCredentials("AccessToken", email, accessToken);
+        await Keychain.setInternetCredentials("RefreshToken", email, refreshToken);
+    } catch (error) {
+        console.error('Error storing token:', error);
+    }
+}
+
+const getAccessToken = async () => {
+    try {
+        const credentials = await Keychain.getInternetCredentials("AccessToken");
+        if (credentials) {
+            //console.log("AccessToken:", credentials.password);
+            return credentials.password; // AccessToken 반환
+        } else {
+            console.log('No access token found');
+        }
+    } catch (error) {
+        console.error('Error retrieving access token:', error);
+    }
+};
+
+const getRefreshToken = async () => {
+    try {
+        const credentials = await Keychain.getInternetCredentials("RefreshToken");
+        if (credentials) {
+            //console.log("RefreshToken:", credentials.password);
+            return credentials.password; // RefreshToken 반환
+        } else {
+            console.log('No refresh token found');
+        }
+    } catch (error) {
+        console.error('Error retrieving refresh token:', error);
+    }
+};
+
 
 const postData = async({email, passwd, navigation}) => {
     //const token = 'your_bearer_token_here'; // 사용자의 Bearer Token
@@ -37,10 +76,12 @@ const postData = async({email, passwd, navigation}) => {
                 {cancelable:true}
             );
             throw new Error('Network response was not ok');
-        } 
+        }
 
         const responseData = await response.json();
         console.log('Response:', responseData);
+        storeToken({accessToken:responseData.result.accessToken, refreshToken:responseData.result.refreshToken, email:email})
+        //console.log('Token:', getAccessToken(), getRefreshToken(
         navigation.navigate('GoHome');
 
     } catch (error){
