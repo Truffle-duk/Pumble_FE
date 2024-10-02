@@ -12,7 +12,6 @@ import Event from '@screens/Event';
 import Store from '@screens/Store';
 import MyPage from '@screens/MyPage';
 import Alarm from '@screens/Alarm';
-import { create } from 'react-test-renderer';
 import ModifyProfile from '@screens/ModifyProfile';
 import PBHistory from '@screens/PBHistory';
 import PurchasedProductList from '@screens/PurchasedProductList';
@@ -31,25 +30,9 @@ import ManageMyGroup from '@screens/ManageMyGroup';
 import AppModifyProfile from '@screens/AppModifyProfile';
 
 import Store2 from '@screens/Store2';
-import Store_CoffeeDessert from '@screens/Store_CoffeeDessert';
-import Store_FoodFranchise from '@screens/Store_FoodFranchise';
-import Store_GiftCard from '@screens/Store_GiftCard';
-import Store_Entertainment from '@screens/Store_Entertainment';
-import Store_Ect from '@screens/Store_Ect';
-
-import Store_CoffeeDessert_Detail from '@screens/Store_CoffeeDessert_Detail';
-import Store_Entertainment_Detail from '@screens/Store_Entertainment_Detail';
-import Store_FoodFranchise_Detail from '@screens/Store_FoodFranchise_Detail';
-import Store_GiftCard_Detail from '@screens/Store_GiftCard_Detail';
-import Store_Ect_Detail from '@screens/Store_Ect_Detail';
+import ItemDetail from "@screens/ItemDetail";
 
 const Stack = createNativeStackNavigator();
-
-const groupList=[
-    {
-        "Name":"고사모"
-    },
-]
 
 function SwitchOverlay({overlayVisible, animatedHeight, closeModal, navigation, alert}){
     const [isLogout,setIsLogout]=useState(false);
@@ -307,7 +290,9 @@ const StackNavigator = ({route}) => {
             <Stack.Screen name='Community' component={Community}  options={{
                             header:(props)=><CustomHeader {...props} title={"커뮤니티"}/>
                         }}/>
-            {/* <Stack.Screen name='Ledger2' component={Ledger2}/> */}
+            <Stack.Screen name="Ledger2" component={Ledger} options={{
+                    header:(props) => <StackHeader {...props}/>
+                }}/>
             <Stack.Screen name='ModifyProfile' component={ModifyProfile} options={{
                             header:(props)=><CustomHeader {...props} title={"마이 페이지"}/>
                         }}/>
@@ -333,36 +318,9 @@ const StackNavigator = ({route}) => {
             <Stack.Screen name="Store2" component={Store2} options={{
                             header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
                         }}/>
-            <Stack.Screen name="Store_CoffeeDessert" component={Store_CoffeeDessert} options={{
-                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
-                        }}/>
-            <Stack.Screen name="Store_FoodFranchise" component={Store_FoodFranchise} options={{
-                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
-                        }}/>
-            <Stack.Screen name="Store_GiftCard" component={Store_GiftCard} options={{
-                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
-                        }}/>
-            <Stack.Screen name="Store_Entertainment" component={Store_Entertainment} options={{
-                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
-                        }}/>
-            <Stack.Screen name="Store_Ect" component={Store_Ect} options={{
-                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
-                        }}/>
-            <Stack.Screen name="Store_CoffeeDessert_Detail" component={Store_CoffeeDessert_Detail} options={{
-                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
-                        }}/>
-            <Stack.Screen name="Store_Entertainment_Detail" component={Store_Entertainment_Detail} options={{
-                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
-                        }}/>
-            <Stack.Screen name="Store_FoodFranchise_Detail" component={Store_FoodFranchise_Detail} options={{
-                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
-                        }}/>
-            <Stack.Screen name="Store_GiftCard_Detail" component={Store_GiftCard_Detail} options={{
-                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
-                        }}/>
-            <Stack.Screen name="Store_Ect_Detail" component={Store_Ect_Detail} options={{
-                            header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
-                        }}/>
+            <Stack.Screen name="ItemDetail" component={ItemDetail} options={{
+                header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
+            }}/>
             
             <Stack.Screen name='AppMyPage' component={AppMyPage}  options={{
                 header:(props)=><CustomHeader {...props} title={"계정 관리"}/>

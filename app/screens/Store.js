@@ -1,8 +1,44 @@
 import { theme } from "@assets/Theme";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { StyleSheet, View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
+import Keychain from "react-native-keychain";
+import {call} from "@utils/ApiService";
 
 const Store = ({ navigation }) => {
+    const dummy = [
+        {
+            image: 'https://pumble-s3.s3.ap-northeast-2.amazonaws.com/store/4dde93d405a1086fb5f025fa183fc445.png',
+            name: 'test',
+            price: 0,
+        },
+        {
+            image: 'https://pumble-s3.s3.ap-northeast-2.amazonaws.com/store/4dde93d405a1086fb5f025fa183fc445.png',
+            name: 'test',
+            price: 0,
+        },
+        {
+            image: 'https://pumble-s3.s3.ap-northeast-2.amazonaws.com/store/4dde93d405a1086fb5f025fa183fc445.png',
+            name: 'test',
+            price: 0,
+        },
+        {
+            image: 'https://pumble-s3.s3.ap-northeast-2.amazonaws.com/store/4dde93d405a1086fb5f025fa183fc445.png',
+            name: 'test',
+            price: 0,
+        }
+    ]
+    const [items, setItems] = useState(dummy)
+    useEffect(() => {
+        const api = '/store/1/recent'
+        call(api, true, 'GET')
+            .then(data => {
+                setItems(data.result.items)
+            })
+            .catch(err => {
+                console.log('Error occurred at Store.js: ' + err)
+            })
+    }, []);
+
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -44,37 +80,37 @@ const Store = ({ navigation }) => {
                     <View style={styles.productRow}>
                         <View style={styles.productCard}>
                             <Image
-                                source={require('../assets/Images/ice_sample.png')}
+                                source={{uri: items[0].image}}
                                 style={styles.productImage}
                             />
-                            <Text style={styles.productText}>12 pb</Text>
-                            <Text style={styles.productDescription}>스타벅스 아이스 아메리카노</Text>
+                            <Text style={styles.productText}>{items[0].price + ' pb'}</Text>
+                            <Text style={styles.productDescription}>{items[0].name}</Text>
                         </View>
                         <View style={styles.productCard}>
                             <Image
-                                source={require('../assets/Images/ice_sample.png')}
+                                source={{uri: items[1].image}}
                                 style={styles.productImage}
                             />
-                            <Text style={styles.productText}>10 pb</Text>
-                            <Text style={styles.productDescription}>스타벅스 아이스 아메리카노</Text>
+                            <Text style={styles.productText}>{items[1].price + ' pb'}</Text>
+                            <Text style={styles.productDescription}>{items[1].name}</Text>
                         </View>
                     </View>
                     <View style={styles.productRow}>
                         <View style={styles.productCard}>
                             <Image
-                                source={require('../assets/Images/ice_sample.png')}
+                                source={{uri: items[2].image}}
                                 style={styles.productImage}
                             />
-                            <Text style={styles.productText}>12 pb</Text>
-                            <Text style={styles.productDescription}>스타벅스 아이스 아메리카노</Text>
+                            <Text style={styles.productText}>{items[2].price + ' pb'}</Text>
+                            <Text style={styles.productDescription}>{items[2].name}</Text>
                         </View>
                         <View style={styles.productCard}>
                             <Image
-                                source={require('../assets/Images/ice_sample.png')}
+                                source={{uri: items[3].image}}
                                 style={styles.productImage}
                             />
-                            <Text style={styles.productText}>10 pb</Text>
-                            <Text style={styles.productDescription}>스타벅스 아이스 아메리카노</Text>
+                            <Text style={styles.productText}>{items[3].price + ' pb'}</Text>
+                            <Text style={styles.productDescription}>{items[3].name}</Text>
                         </View>
                     </View>
                 </View>
@@ -97,13 +133,13 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     bannerImage: {
-        width: 390 * theme.width,
+        width: 405 * theme.width,
         height: 294 * theme.height,
     },
     iconRow: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        marginBottom: 20,
+        marginBottom: 30,
     },
     iconContainer: {
         alignItems: 'center',
@@ -124,6 +160,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginBottom: 8
     },
     sectionTitle: {
         fontFamily: 'Pretendard-SemiBold',
@@ -136,23 +173,28 @@ const styles = StyleSheet.create({
     },
     moreButtonText: {
         fontFamily: 'Pretendard-Regular',
+        fontSize: theme.fontSizes.fontSizes16,
         color: theme.color.grey10,
         textAlign: 'center',
     },
     productRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        marginBottom: 20
     },
     productCard: {
         width: 174 * theme.width,
-        height: 223 * theme.height,
+        height: 223 * theme.width,
         borderRadius: 15,
         alignItems: 'center',
     },
     productImage: {
         width: 174 * theme.width,
-        height: 174 * theme.height,
+        height: 174 * theme.width,
         borderRadius: 15,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: '#00000022'
     },
     productText: {
         fontFamily: 'Pretendard-SemiBold',
@@ -162,7 +204,7 @@ const styles = StyleSheet.create({
     },
     productDescription: {
         fontFamily: 'Pretendard-Regular',
-        fontSize: theme.fontSizes.fontSizes12,
+        fontSize: theme.fontSizes.fontSizes13,
         textAlign: 'center',
         color: theme.color.black,
         alignSelf: 'flex-start',

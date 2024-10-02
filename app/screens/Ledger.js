@@ -3,36 +3,22 @@ import {ActivityIndicator, Image, ScrollView, StyleSheet, Text, View} from 'reac
 import {theme} from "@assets/Theme";
 import "@ethersproject/shims";
 import {ethers} from "ethers";
-import {response} from "../../.yarn/releases/yarn-1.22.22";
 
-// 배포 서버 연결
+/*// 배포 서버 연결
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
 
-/*//함수 호출을 위한 지갑 발급(추후 RN_keychain에 있는 걸로 변경)
-const tempWallet = ethers.Wallet.createRandom();
-const senderWallet = new ethers.Wallet(process.env.senderAddr, provider);
-const tx = {
-    to: tempWallet.address,
-    value: ethers.parseEther("1.0")
-};
-const txResponse = await senderWallet.sendTransaction(tx);
-await txResponse.wait();
-console.log(`Transaction hash: ${txResponse.hash}`);
-const connectedWallet = tempWallet.connect(provider);*/
+const ledgerContractAddress = "0x7C16D9c5db44302a9b0aed4066EB4Aa77FA59f6d"
+const ledgerContractABI = [
+    "event TransactionCreated(string indexed hGroupId, string groupId, uint256 transactionIndex, bool isDeposit, uint256 amount, string counterparty, string description, uint256 timestamp, string receiptDetails)",
+    "event RetrieveBalance(string indexed hGroupId, string groupId, uint256 balance)",
+    "function createGroup(string memory _groupId, string memory _name)",
+    "function recordDeposit(string memory _groupId, uint256 _amount, string memory _counterparty, string memory _description)",
+    "function recordWithdrawal(string memory _groupId, uint256 _amount, string memory _counterparty, string memory _description)",
+    "function updateReceiptDetails(string memory _groupId, uint256 _transactionIndex, string memory _receiptDetails)"
+];
+const ledgerContract = new ethers.Contract(ledgerContractAddress, ledgerContractABI, provider)
 
-// const ledgerContractAddress = process.env.ledgerContractAddr
-// const ledgerContractABI = [
-//     "event TransactionCreated(string indexed hGroupId, string groupId, uint256 transactionIndex, bool isDeposit, uint256 amount, string counterparty, string description, uint256 indexed timestamp, string receiptDetails)",
-//     "event RetrieveBalance(string indexed hGroupId, string groupId, uint256 balance)",
-//     "function createGroup(string _groupId, string _name)",
-//     "function recordDeposit(string _groupId, uint256 _amount, string _counterparty, string _description)",
-//     "function recordWithdrawal(string _groupId, uint256 _amount, string _counterparty, string _description)",
-//     "function updateReceiptDetails(string _groupId, uint256 _transactionIndex, string _receiptDetails)",
-//     "function getGroupBalance(string _groupId)"
-// ];
-// const ledgerContract = new ethers.Contract(ledgerContractAddress, ledgerContractABI, provider)
-
-/*async function getBalance(groupId) {
+async function getBalance(groupId) {
     const hGroupIdHash = ethers.id(groupId); // keccak256 해시
 
     // 필터 설정
@@ -91,35 +77,58 @@ async function getPastEvents(groupId) {
 function Ledger2(){
     const [balance, setBalance]=useState(0);
     const [datas,setDatas]=useState([]);
-    const [transactionIdx, setTransactionIdx] = useState();
+    const [transactionIdx, setTransactionIdx] = useState(0);
 
-    // // 초기화
-    // useEffect(()=>{
-    //     // 이전 거래내역 데이터 가져오기
-    //     //TODO: 날짜 범위 필터링 필요
-    //     getPastEvents("testuuid")
-    //         .then(response => {
-    //             setDatas(response.reverse())
-    //         })
-    // },[])
-    //
-    // // 거래내역 데이터가 변할 때마다 잔액 다시 조회
-    // useEffect(() => {
-    //     getBalance("testuuid")
-    //         .then(response => setBalance(Number(response[0].args[2])))
-    // }, [datas]);
-    //
-    // ledgerContract.on("TransactionCreated", (hGroupId, groupId, transactionIndex, isDeposit, amount, counterparty, description, timestamp, receiptDetails, event) => {
-    //     console.log(event)
-    //     setTransactionIdx(transactionIndex)
-    //     setDatas(prevState => {
-    //         const eventExists = prevState.some(data => data.args[2].toString() === transactionIndex.toString());
-    //         if (!eventExists) {
-    //             return [{"args": [hGroupId, groupId, transactionIndex, isDeposit, amount, counterparty, description, timestamp, receiptDetails]}, ...prevState];
-    //         }
-    //         return prevState;
-    //     });
-    // });
+    /*useEffect(() => {
+        const initialize = async () => {
+            // 임시 지갑 생성 및 트랜잭션 전송
+            const tempWallet = ethers.Wallet.createRandom();
+            const senderWallet = new ethers.Wallet("0xfe6f622f37ad5ed4d3da49682069f27976afe19d9b53b98189a16f74ee3b151b", provider);
+            const tx = {
+                to: tempWallet.address,
+                value: ethers.parseEther("1.0")
+            };
+            try {
+                const txResponse = await senderWallet.sendTransaction(tx);
+                await txResponse.wait();
+                console.log(`Transaction hash: ${txResponse.hash}`);
+            } catch (error) {
+                console.error("Transaction failed:", error);
+            }
+
+            // 이전 거래내역 데이터 가져오기
+            getPastEvents("testuuid")
+                .then(response => {
+                    setDatas(response.reverse());
+                });
+        };
+
+        initialize();
+    }, []);
+
+    // 거래내역 데이터가 변할 때마다 잔액 다시 조회
+    useEffect(() => {
+        getBalance("testuuid")
+            .then(response => {
+                console.log(response)
+                setBalance(Number(response[0].args[2]))
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }, [datas]);
+
+    ledgerContract.on("TransactionCreated", (hGroupId, groupId, transactionIndex, isDeposit, amount, counterparty, description, timestamp, receiptDetails, event) => {
+        console.log(event)
+        setTransactionIdx(transactionIndex)
+        setDatas(prevState => {
+            const eventExists = prevState.some(data => data.args[2].toString() === transactionIndex.toString());
+            if (!eventExists) {
+                return [{"args": [hGroupId, groupId, transactionIndex, isDeposit, amount, counterparty, description, timestamp, receiptDetails]}, ...prevState];
+            }
+            return prevState;
+        });
+    });*/
 
     const formatDateForTop = (bigintDate) => {
         const recordDate = new Date(Number(bigintDate)*1000)

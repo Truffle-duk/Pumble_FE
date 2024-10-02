@@ -1,14 +1,58 @@
 import { theme } from "@assets/Theme";
 import { ThemeProvider } from "@react-navigation/native";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { StyleSheet, View, Text, Button, TouchableOpacity, Image, StatusBar, ScrollView } from 'react-native';
 import { Dimensions } from 'react-native';
+import {ethers} from "ethers";
 
 const screenWidth=Dimensions.get('screen').width; 
 const screenHeight = Dimensions.get('screen').height;
 
+const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
+const ledgerContractAddress = "0x7C16D9c5db44302a9b0aed4066EB4Aa77FA59f6d"
+const ledgerContractABI = ["event RetrieveBalance(string indexed hGroupId, string groupId, uint256 balance)"];
+/*async function getBalance(groupId) {
+  const hGroupIdHash = ethers.id(groupId); // keccak256 해시
+
+  // 필터 설정
+  const filter = {
+    address: ledgerContractAddress,
+    fromBlock: 'latest',
+    toBlock: 'latest',
+    topics: [
+      ethers.id("RetrieveBalance(string,string,uint256)"), // 이벤트 시그니처
+      hGroupIdHash
+    ]
+  };
+
+  try {
+    const logs = await provider.getLogs(filter)
+
+    // 로그를 이벤트 객체로 디코딩
+    const iface = new ethers.Interface(ledgerContractABI);
+    const events = logs.map(log => iface.parseLog(log))
+
+    return events;
+  } catch (error) {
+    console.error("Error fetching getBalance events:", error);
+    throw error;
+  }
+}*/
+
 
 function LedgerCard({navigation}){
+  const [balance, setBalance] = useState(1000000)
+
+  /*useEffect(() => {
+    getBalance("testuuid")
+        .then(response => {
+          console.log(response)
+          setBalance(Number(response[0].args[2]))
+        })
+        .catch(err => {
+          console.log(err)
+        })
+  }, []);*/
   return(
     <View style={styles.ledgerContainer}>
       <View style={styles.ledgerDetailContainer}>
@@ -16,7 +60,7 @@ function LedgerCard({navigation}){
           <Text style={styles.ledgerHeadText}>공금</Text>
           <View style={styles.ledgerBalanceTextContainer}>
             <Text style={styles.ledgerBalanceText}>잔액</Text>
-            <Text style={styles.ledgerBalanceTotalText}>1,000,000원</Text>
+            <Text style={styles.ledgerBalanceTotalText}>{balance.toLocaleString() + '원'}</Text>
           </View>          
         </View>
         <Image source={require("../assets/Images/Guinguin_Coin.png")}
@@ -26,7 +70,7 @@ function LedgerCard({navigation}){
       <View style={styles.ledgerLine}/>
       <View style={styles.ledgerGotoLedgerContainer}>
         <TouchableOpacity style={styles.ledgerGotoLedgerTouch}
-          onPress={()=>navigation.navigate('Ledger')}>
+          onPress={()=>navigation.navigate('Ledger2')}>
           <Text style={styles.ledgerGotoLedgerText}>내역 보러가기</Text>
           <Image source={require("@assets/Icons/dropdownIcon.png")}
             style={styles.ledgerGotoLedgerIcon}/>

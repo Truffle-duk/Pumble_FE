@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
+import {call} from "@utils/ApiService";
 
-const Join3 = () => {
-    const navigation = useNavigation();
-
+const Join3 = ({route}) => {
+    const navigation = useNavigation()
     // 입력된 6자리 코드 상태
     const [code, setCode] = useState(['', '', '', '', '', '']);
     const [isTimerActive, setIsTimerActive] = useState(true);
@@ -46,9 +46,19 @@ const Join3 = () => {
 
     const handleVerification = () => {
         if (isCodeComplete && isTimerActive) {
-            setIsVerified(true);  // 인증을 성공한 것으로 처리
-            alert('인증 성공!');
-            navigation.navigate('Join4'); // 인증 성공 시 다음 페이지로 이동
+            const inputCode = parseInt(code.join(''))
+            const verifyApi = '/auth/verifyEmail'
+            const email = route.params.email
+            call(verifyApi, false, 'POST', {email: email, code: inputCode})
+                .then(data => {
+                    if (data.result.isMatched) {
+                        setIsVerified(true);  // 인증을 성공한 것으로 처리
+                        alert('인증 성공!');
+                        navigation.navigate('Join4', {email: email}); // 인증 성공 시 다음 페이지로 이동
+                    } else {
+                        alert('인증 코드가 맞지 않거나 시간이 만료되었습니다.');
+                    }
+                })
         } else {
             alert('인증 코드가 맞지 않거나 시간이 만료되었습니다.');
         }

@@ -3,93 +3,21 @@ import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
 import * as Keychain from 'react-native-keychain';
+import {call} from "@utils/ApiService";
 
-const getAccessToken = async () => {
-    try {
-        const credentials = await Keychain.getInternetCredentials("AccessToken");
-        if (credentials) {
-            //console.log("AccessToken:", credentials.password);
-            return credentials.password; // AccessToken 반환
-        } else {
-            console.log('No access token found');
-        }
-    } catch (error) {
-        console.error('Error retrieving access token:', error);
-    }
-};
-
-const getRefreshToken = async () => {
-    try {
-        const credentials = await Keychain.getInternetCredentials("RefreshToken");
-        if (credentials) {
-            //console.log("RefreshToken:", credentials.password);
-            return credentials.password; // RefreshToken 반환
-        } else {
-            console.log('No refresh token found');
-        }
-    } catch (error) {
-        console.error('Error retrieving refresh token:', error);
-    }
-};
-
-
-const fetchData = async ({no}) => {
-    const URL=`https://www.pumble.site/api/community/1/notice/${no}`
-    const token= await getAccessToken();
-    try {
-        const response = await fetch(URL, {
-            method: 'GET', // 생략 가능
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // 필요하다면 토큰 추가
-            }
-        });
-
-        if (!response.ok) {
-            console.log(no)
-            console.log('Response Data:', response);
-            throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json(); // 응답을 JSON으로 변환
-        console.log('Response Data:', data);
-        return(data);
-
-    } catch (error) {
-        console.error('Fetch Error:', error);
-    }
-};
-
-const NoticeDetail = (noticeId) => {
+const NoticeDetail = () => {
     const route = useRoute();
-    const navigation = useNavigation();
-    const { notice } = route.params;
+    const { noticeId } = route.params;
 
     const [noti, setNoti]=useState(null)
 
     useEffect(() => {
-        const fetchNotifications = async () => {
-            //console.log("notice1d:",noticeId)
-            const { route } = noticeId; // noticeId로 받은 객체에서 route 추출
-            const notiId = route.params.noticeId;
-
-            // console.log("notice1d:", noticeId)
-            // console.log("notice1d2:", notiId)
-            const data = await fetchData({no: notiId}); 
-            console.log("tttt",data.result)
-            setNoti(data.result);
-        };
-        
-        fetchNotifications()
-        .then( _ => {
-            console.log("noti",noti)
-        }); // 비동기 함수 호출
-        //console.log("noti",noti)
+        const noticeDetailApi = `/community/1/notice/${noticeId}`
+        call(noticeDetailApi, true, 'GET')
+            .then(data => {
+                setNoti(data.result)
+            })
     }, []);
-
-    const handleBackPress = () => {
-        navigation.goBack();
-    };
 
     return (
         <View style={styles.container}>

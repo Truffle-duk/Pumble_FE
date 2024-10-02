@@ -1,77 +1,52 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { useRoute } from '@react-navigation/native';
-
+import {StyleSheet, View, Text, ScrollView, TouchableOpacity, Image} from 'react-native';
 import { theme } from "@assets/Theme";
+import {call} from "@utils/ApiService";
 
-import Store_CoffeeDessert from '@screens/Store_CoffeeDessert';
-import Store_FoodFranchise from '@screens/Store_FoodFranchise';
-import Store_GiftCard from '@screens/Store_GiftCard';
-import Store_Entertainment from '@screens/Store_Entertainment';
-import Store_Ect from '@screens/Store_Ect';
-
-const Store2 = () => {
-    const route = useRoute();
-    const { initialTab } = route.params || { initialTab: 'default' };
-
-
-    const [selectedTab, setSelectedTab] = useState(initialTab || '커피/디저트');
+const Store2 = ({navigation}) => {
+    const [selectedTab, setSelectedTab] = useState('cafe');
+    const [items, setItems] = useState([])
 
     useEffect(() => {
-        if (initialTab) {
-            setSelectedTab(initialTab);
-        }
-    }, [initialTab]);
-
-    const renderSelectedTab = () => {
-        switch (selectedTab) {
-            case '커피/디저트':
-                return <Store_CoffeeDessert />;
-            case '외식/프랜차이즈':
-                return <Store_FoodFranchise />;
-            case '상품권/면제권':
-                return <Store_GiftCard />;
-            case '엔터테인':
-                return <Store_Entertainment />;
-            case '기타' :
-                return <Store_Ect />;
-            default:
-                return <Store_CoffeeDessert />;
-        }
-    };
+        const api = `/store/1/list?category=${selectedTab}`
+        call(api, true, 'GET')
+            .then(data => {
+                setItems(data.result.items)
+            })
+    }, [selectedTab]);
 
     return (
         <View style={styles.container}>
             <View style={styles.tabContainer}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('커피/디저트')}>
+                    <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('cafe')}>
                         <View style={styles.tabContent}>
-                            <Text style={[styles.tabText, selectedTab === '커피/디저트' && styles.activeTabText]}>커피/디저트</Text>
-                            {selectedTab === '커피/디저트' && <View style={styles.activeTabUnderline} />}
+                            <Text style={[styles.tabText, selectedTab === 'cafe' && styles.activeTabText]}>커피/디저트</Text>
+                            {selectedTab === 'cafe' && <View style={styles.activeTabUnderline} />}
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('외식/프랜차이즈')}>
+                    <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('fast-food')}>
                         <View style={styles.tabContent}>
-                            <Text style={[styles.tabText, selectedTab === '외식/프랜차이즈' && styles.activeTabText]}>외식/프랜차이즈</Text>
-                            {selectedTab === '외식/프랜차이즈' && <View style={styles.activeTabUnderline} />}
+                            <Text style={[styles.tabText, selectedTab === 'fast-food' && styles.activeTabText]}>외식/프랜차이즈</Text>
+                            {selectedTab === 'fast-food' && <View style={styles.activeTabUnderline} />}
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('상품권/면제권')}>
+                    <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('ticket')}>
                         <View style={styles.tabContent}>
-                            <Text style={[styles.tabText, selectedTab === '상품권/면제권' && styles.activeTabText]}>상품권/면제권</Text>
-                            {selectedTab === '상품권/면제권' && <View style={styles.activeTabUnderline} />}
+                            <Text style={[styles.tabText, selectedTab === 'ticket' && styles.activeTabText]}>상품권/면제권</Text>
+                            {selectedTab === 'ticket' && <View style={styles.activeTabUnderline} />}
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('엔터테인')}>
+                    <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('entertain')}>
                         <View style={styles.tabContent}>
-                            <Text style={[styles.tabText, selectedTab === '엔터테인' && styles.activeTabText]}>엔터테인</Text>
-                            {selectedTab === '엔터테인' && <View style={styles.activeTabUnderline} />}
+                            <Text style={[styles.tabText, selectedTab === 'entertain' && styles.activeTabText]}>엔터테인</Text>
+                            {selectedTab === 'entertain' && <View style={styles.activeTabUnderline} />}
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('기타')}>
+                    <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('etc')}>
                         <View style={styles.tabContent}>
-                            <Text style={[styles.tabText, selectedTab === '기타' && styles.activeTabText]}>기타</Text>
-                            {selectedTab === '기타' && <View style={styles.activeTabUnderline} />}
+                            <Text style={[styles.tabText, selectedTab === 'etc' && styles.activeTabText]}>기타</Text>
+                            {selectedTab === 'etc' && <View style={styles.activeTabUnderline} />}
                         </View>
                     </TouchableOpacity>
                 </ScrollView>
@@ -79,7 +54,30 @@ const Store2 = () => {
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.productsSection}>
                     <Text style={styles.sectionTitle}>전체 상품</Text>
-                    {renderSelectedTab()}
+                    {items.length !== 0 ?
+                        items.map((item, idx) => {
+                            if (idx % 2 === 0) {
+                                const image1 = item && item.image ? {uri: item.image} : require('@assets/Images/defaultGift.png')
+                                const image2 = items[idx + 1] && items[idx + 1].image ? {uri: items[idx + 1].image} : require('@assets/Images/defaultGift.png')
+
+                                return <View key={idx} style={styles.productRow}>
+                                    <TouchableOpacity key={item.itemId} style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {itemId: item.itemId, category: selectedTab})}>
+                                        <Image source={image1} style={styles.productImage}/>
+                                        <Text style={styles.productText}>{item.price + ' pb'}</Text>
+                                        <Text style={styles.productDescription}>{item.name}</Text>
+                                    </TouchableOpacity>
+                                    {items[idx + 1] && (
+                                        <TouchableOpacity key={items[idx + 1].itemId} style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {itemId: items[idx + 1].itemId, category: selectedTab})}>
+                                            <Image source={image2} style={styles.productImage}/>
+                                            <Text
+                                                style={styles.productText}>{items[idx + 1].price + ' pb'}</Text>
+                                            <Text style={styles.productDescription}>{items[idx + 1].name}</Text>
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
+                            }
+                        }) : <View/>
+                    }
                 </View>
             </ScrollView>
         </View>
@@ -130,6 +128,35 @@ const styles = StyleSheet.create({
         fontSize: theme.fontSizes.fontSizes16,
         color: theme.color.grey2,
         marginBottom: 10,
+    },
+    productCard: {
+        width: 175 * theme.width,
+        marginBottom: 20,
+    },
+    productImage: {
+        width: 175 * theme.width,
+        height: 175 * theme.width,
+        borderRadius: 15,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#00000022'
+    },
+    productText: {
+        fontFamily: 'Pretendard-SemiBold',
+        fontSize: theme.fontSizes.fontSizes18,
+        color: theme.color.grey2,
+        alignSelf: 'flex-start',
+    },
+    productDescription: {
+        fontFamily: 'Pretendard-Regular',
+        fontSize: theme.fontSizes.fontSizes13,
+        textAlign: 'center',
+        color: theme.color.black,
+        alignSelf: 'flex-start',
+    },
+    productRow : {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     },
 });
 
