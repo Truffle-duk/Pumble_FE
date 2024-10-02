@@ -1,10 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { theme } from "@assets/Theme";
 import { StyleSheet, View, Text, Button, TouchableOpacity, Image, ScrollView, TextInput } from 'react-native';
+import Keychain from "react-native-keychain";
+import {call} from "@utils/ApiService";
 
-export default function Writepost(){
+export default function Writepost({navigation}){
     const [Title,setTitle]=useState("");
     const [Content,setContent]=useState("");
+
+    const submitPost = async () => {
+        const api = "/community/1/post"
+        const request = {
+            title: Title,
+            content: Content
+        }
+
+        await call(api, true, 'POST', request)
+            .then(data => {
+                if (data.code !== 200) {
+                    console.log('Response Data:', data);
+                    new Error('Network response was not ok');
+                } else {
+                    alert("글이 정상적으로 게시되었습니다.")
+                    navigation.goBack()
+                }
+            })
+            .catch(err => {
+                console.error('Fetch Error:', err);
+            })
+    }
 
     return(
         <View style={styles.background}>
@@ -42,7 +66,7 @@ export default function Writepost(){
             </View>
             <View style={styles.line}/>
             <View style={styles.doneBtnContainer}>
-                <TouchableOpacity style={styles.doneBtn}>
+                <TouchableOpacity style={styles.doneBtn} onPress={()=>submitPost()}>
                     <Text style={styles.doneBtnText}>완료</Text>
                 </TouchableOpacity>
             </View>

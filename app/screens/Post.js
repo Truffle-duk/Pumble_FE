@@ -1,120 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { theme } from "@assets/Theme";
 import { StyleSheet, View, Text, Button, TouchableOpacity, Image, ScrollView, TextInput } from 'react-native';
+import Keychain from "react-native-keychain";
+import {call} from "@utils/ApiService";
 
-// const Posts=[
-//     {
-//       "ID":"1",
-//       "Title":"하 힘들다...",
-//       "Content":"맞냐? 자괴감만 든다....ㄹㅇ......에바지예",
-//       "Like":0,
-//       "Reply":1,
-//       "Date":"2024.07.06"
-//     },
-//     {
-//       "ID":"2",
-//       "Title":"하 힘들다...",
-//       "Content":"고양이 야옹~고양이 야옹~고양이 야옹~고양이 야옹~고양이 야옹~고양이 야옹~고양이 야옹~고양이 야옹~고양이 야옹~고양이 야옹~고양이 야옹~고양이 야옹~고양이 야옹~고양이 야옹~고양이 야옹~",
-//       "Like":3,
-//       "Reply":1,
-//       "Date":"2024.07.06"
-//     },
-//     {
-//       "ID":"3",
-//       "Title":"하 힘들다...",
-//       "Content":"맞냐? 자괴감만 든다....ㄹㅇ......에바지예",
-//       "Like":0,
-//       "Reply":1,
-//       "Date":"2024.07.06"
-//     },
-//     {
-//       "ID":"4",
-//       "Title":"하 힘들다...",
-//       "Content":"맞냐? 자괴감만 든다....ㄹㅇ......에바지예",
-//       "Like":0,
-//       "Reply":1,
-//       "Date":"2024.07.06"
-//     },
-//     {
-//       "ID":"5",
-//       "Title":"하 힘들다...",
-//       "Content":"맞냐? 자괴감만 든다....ㄹㅇ......에바지예",
-//       "Like":0,
-//       "Reply":1,
-//       "Date":"2024.07.06"
-//     },
-//     {
-//       "ID":"6",
-//       "Title":"하 힘들다...",
-//       "Content":"맞냐? 자괴감만 든다....ㄹㅇ......에바지예",
-//       "Like":0,
-//       "Reply":1,
-//       "Date":"2024.07.06"
-//     },
-//     {
-//       "ID":"7",
-//       "Title":"하 힘들다...",
-//       "Content":"맞냐? 자괴감만 든다....ㄹㅇ......에바지예",
-//       "Like":0,
-//       "Reply":1,
-//       "Date":"2024.07.06"
-//     },
-//     {
-//       "ID":"8",
-//       "Title":"하 힘들다...",
-//       "Content":"맞냐? 자괴감만 든다....ㄹㅇ......에바지예",
-//       "Like":0,
-//       "Reply":1,
-//       "Date":"2024.07.06"
-//     },
-//     {
-//       "ID":"9",
-//       "Title":"하 힘들다...",
-//       "Content":"맞냐? 자괴감만 든다....ㄹㅇ......에바지예",
-//       "Like":0,
-//       "Reply":1,
-//       "Date":"2024.07.06"
-//     },
-//     {
-//       "ID":"10",
-//       "Title":"하 힘들다...",
-//       "Content":"맞냐? 자괴감만 든다....ㄹㅇ......에바지예",
-//       "Like":0,
-//       "Reply":1,
-//       "Date":"2024.07.06"
-//     },
-//   ]
 
 const posta=[
     {
         "id":123,
         "title": "title",
         "content": "contents",
-        //"date": "2024-08-06T16:00",
-        "created_at": "2024-08-06T16:00",
+        "createdAt": "2024-08-06",
         "isWriter": true,
         "Reply":2,
     }
 ]
-
-const replies=[
-    {
-        "id":1,
-        "content":"contents",
-        "created_at": "2024-08-07T16:00",
-        "isWriter": true,
-    },
-    {
-        "id":2,
-        "content":"contents22",
-        "created_at": "2024-08-07T16:00",
-        "isWriter": false,
-    }
-]
   
 
-function PostingView({post}){
-    const [postId, setPostId]=useState("");
+function PostingView({post, replyCount}){
+    const [postId, setPostId]=useState(post.id);
 
     return(
         <View style={styles.postContainer}>
@@ -125,8 +29,7 @@ function PostingView({post}){
                 </View>
                 <View>
                     <Text style={styles.postProfileText}>익명</Text>
-                    {/* <Text style={styles.postDate}>{post.created_at.split('T')[0].replace(/-/g, '.')}</Text> */}
-                    <Text style={styles.postDate}>{post.created_at}</Text>
+                    <Text style={styles.postDate}>{post.createdAt.replaceAll('-', '.')}</Text>
                 </View>
             </View>
             <Text style={styles.postTitleText}>{post.title}</Text>
@@ -135,12 +38,10 @@ function PostingView({post}){
                 <View style={styles.postIconContainer}>
                     <Image source={require('@assets/Icons/replyIcon.png')}
                     style={styles.postIcon}/>
-                    <Text style={styles.postReplyText}>{post.Reply}</Text>
+                    <Text style={styles.postReplyText}>{replyCount}</Text>
                 </View>
-                {post.isWriter?(
-                    <TouchableOpacity
-                    onPress={()=>setPostId(post.id)}
-                    >
+                {post.isWriter ? (
+                    <TouchableOpacity onPress={()=>setPostId(post.id)}>
                         <Image source={require('@assets/Icons/deleteIcon.png')} style={styles.postIcon}/>
                     </TouchableOpacity>):(<View/>)}
             </View>
@@ -158,27 +59,23 @@ function Reply({replyList}){
                     <View/>
                 ):(
                     replyList.map((reply,index)=>
-                        <View style={styles.replyContainer}>
+                        <View style={styles.replyContainer} key={index}>
                             <View style={styles.replyHeadContainer}>
                                 <View style={styles.replyProfileContainer}>
                                     <View style={styles.replyProfileImageContainer}>
                                         <Image style={styles.replyProfileImage}
                                         source={require('@assets/Images/Guinguin_Face.png')}/>
                                     </View>
-                                    <Text style={styles.replyProfileName}>익명{reply.id}</Text>
+                                    <Text style={styles.replyProfileName}>익명{reply.comment.commentId}</Text>
                                 </View>
-                                {/* writable 체크해서 삭제 아이콘 삽입 */}
-                                {/* <TouchableOpacity>
-                                    <Image/>
-                                </TouchableOpacity> */}
-                                {reply.isWriter?(
+                                {reply.writer.isWriter?(
                                     <TouchableOpacity
-                                    onPress={()=>setReplyId(reply.id)}>
+                                    onPress={()=>setReplyId(reply.comment.commentId)}>
                                         <Image source={require('@assets/Icons/deleteIcon.png')} style={styles.postIcon}/>
                                     </TouchableOpacity>):(<View/>)}
                             </View>
-                            <Text style={styles.replyContentText}>{reply.content}</Text>
-                            <Text style={styles.replyDate}>{reply.created_at.split('T')[0].replace(/-/g,'.')}</Text>
+                            <Text style={styles.replyContentText}>{reply.comment.content}</Text>
+                            <Text style={styles.replyDate}>{reply.comment.createdAt.split('T')[0].replaceAll('-','.')}</Text>
                         </View>
                     )                   
                 )
@@ -189,14 +86,37 @@ function Reply({replyList}){
     );
 }
 
-function WriteReply(){
+function WriteReply({postId, updateHandler}){
     const [InputReply, setInputReply]=useState("");
+
+    const submitComment = async () => {
+        const api = `/community/1/comment/${postId}`
+        const request = {
+            content: InputReply
+        }
+
+        await call(api, true, 'POST', request)
+            .then(data => {
+                console.log(data)
+                if(data.code !== 200) {
+                    console.log('Response Data:', data);
+                    new Error('Network response was not ok at fetchAllData');
+                } else {
+                    setInputReply("")
+                    updateHandler()
+                }
+            })
+            .catch(err => {
+                console.error('Fetch Error:', err);
+            })
+    }
 
     return(
         <View style={styles.replyInputContainer}>
             <TextInput
             returnKeyType='done'
             maxLength={300}
+            value={InputReply}
             onChangeText={setInputReply}
             placeholder="댓글을 입력하세요."
             placeholderTextColor={theme.color.grey1}
@@ -211,7 +131,7 @@ function WriteReply(){
             //margin={0}
             />
             <View style={styles.doneBtnContainer}>
-            <TouchableOpacity style={styles.doneBtn}>
+            <TouchableOpacity style={styles.doneBtn} onPress={submitComment}>
                 <Text style={styles.doneBtnText}>완료</Text>
             </TouchableOpacity>
             </View>
@@ -223,24 +143,74 @@ function WriteReply(){
     )
 }
 
-export default function Post({}){
+export default function Post({route}){
     const [mainPost,setMainPost]=useState({});
-    const [replyList,setReplyList]=useState([]);
+    const [replyList,setReplyList]=useState([{
+        comment: {
+            commentId: 0,
+            content: "",
+            createdAt: ""
+        },
+        writer: {
+            isWriter: false
+        }
+    }]);
+    const {id} = route.params
+    const [replyCount, setReplyCount] = useState(0)
+
+    const fetchPost = async () => {
+        const api = `/community/1/post/${id}`
+        return await call(api, true, 'GET')
+            .then(data => {
+                return data.result
+            })
+            .catch(err => {
+                console.log("Error occurred at fetchPost: " + err)
+            })
+    }
+
+    const fetchComments = async () => {
+        const api = `/community/1/comment/${id}`
+        await call(api, true, 'GET')
+            .then(data => {
+                setReplyList(data.result.commentList)
+                setReplyCount(data.result.commentListSize)
+            })
+            .catch(err => {
+                console.log("Error occurred at fetchComments: " + err)
+            })
+    }
 
     useEffect(()=>{
-        setReplyList(replies);
+        fetchPost()
+            .then(data => {
+                const reqData = {
+                    id: data.post.postId,
+                    title: data.post.title,
+                    content: data.post.content,
+                    isWriter: data.writer.isWriter,
+                    createdAt: data.post.createdAt.split('T')[0],
+                    reply: 0
+                }
+                setMainPost(reqData)
+            })
+
+        fetchComments()
+            .then(_ => {
+                console.log("fetchComments for Post")
+            })
         setMainPost(posta[0]);
     },[]);
 
     return(
         <View style={styles.background}>
             <ScrollView style={{flex:1}}>
-                <PostingView post={mainPost}/>
+                <PostingView post={mainPost} replyCount={replyCount}/>
                 <View style={styles.line}/>
                 <Reply replyList={replyList}/>
             </ScrollView>
             <View style={styles.line}/>
-            <WriteReply/>
+            <WriteReply postId={id} updateHandler={fetchComments}/>
         </View>
     )
 }
@@ -280,12 +250,6 @@ const styles=StyleSheet.create({
         fontFamily:'Pretendard-SemiBold',
         lineHeight:16,
         marginBottom:5*theme.height,
-    },
-    postDate:{
-        color:theme.color.grey1,
-        fontSize:theme.fontSizes.fontSizes12,
-        fontFamily:'Pretendard-Medium',
-        lineHeight:15,
     },
     postTitleText:{
         color:theme.color.grey2,

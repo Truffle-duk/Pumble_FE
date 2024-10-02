@@ -55,6 +55,7 @@ const color={
     grey10:"#707070",
     grey11:"#ECECEC",
     grey12:"#959595",
+    red:"#F44336"
 }
 
 export const theme={

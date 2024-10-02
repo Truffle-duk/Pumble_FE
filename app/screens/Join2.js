@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
+import {call} from "@utils/ApiService";
 
 const Join2 = () => {
     const [email, setEmail] = useState('');
@@ -10,12 +11,32 @@ const Join2 = () => {
     const navigation = useNavigation();
 
     const handleEmailSubmit = () => {
-        // 이메일 중복 확인 로직 (임시로 이메일이 특정 값일 때 에러 메시지 표시)
-        if (email === "already@used.com") {
-            setErrorMessage("이미 사용중인 이메일이에요.");
+        const emailCheckRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i
+        if (!emailCheckRegExp.test(email)) {
+            setErrorMessage("이메일 형식이 올바르지 않아요.")
         } else {
-            setErrorMessage('');
-            navigation.navigate('Join3');
+            setErrorMessage("")
+            const duplicateCheckApi = '/auth/verifyDuplicate'
+            call(duplicateCheckApi, false, 'POST', {email: email})
+                .then(data => {
+                    if (data.result.isDuplicated) {
+                        setErrorMessage("이미 사용중인 이메일이에요.");
+                    } else {
+                        const sendCodeApi = '/auth/sendCode'
+                        call(sendCodeApi, false, 'POST', {email: email})
+                            .then(data => {
+                                if (data.code === 200) {
+                                    navigation.navigate('Join3', { email: email })
+                                }
+                            })
+                            .catch(err => {
+                                console.log("Error occurred at sendCode")
+                            })
+                    }
+                })
+                .catch(err => {
+                    console.log("Error occurred at Join2")
+                })
         }
     };
 
@@ -36,6 +57,7 @@ const Join2 = () => {
                 onChangeText={(text) => setEmail(text)}
                 onFocus={() => setPlaceholderVisible(false)}
                 onBlur={() => setPlaceholderVisible(email === '')}
+                autoCapitalize='none'
             />
             {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
             <View style={styles.bottomContainer}>
@@ -70,7 +92,7 @@ const styles = StyleSheet.create({
         fontSize: theme.fontSizes.fontSizes15,
     },
     input: {
-        width: 358 * theme.width,
+        width: '100%',
         height: 52 * theme.height,
         marginTop: 30*theme.height,
         borderColor: theme.color.grey6,
@@ -81,8 +103,12 @@ const styles = StyleSheet.create({
         color: theme.color.grey10,
     },
     errorText: {
-        color: 'red',
+        color: theme.color.red,
+        marginTop: 10,
         marginBottom: 20,
+        fontSize: theme.fontSizes.fontSizes15,
+        width: '100%',
+        textAlign: 'right',
     },
     bottomContainer: {
         flex: 1,

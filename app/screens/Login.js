@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
 import * as Keychain from 'react-native-keychain';
 
-const URL="https://www.pumble.site/api/auth/signIn?provider=local"
+const URL="http://localhost:8080/api/auth/signIn?provider=local"
 
 const storeToken = async ({accessToken, refreshToken, email}) => {
     try {
@@ -14,35 +14,6 @@ const storeToken = async ({accessToken, refreshToken, email}) => {
         console.error('Error storing token:', error);
     }
 }
-
-const getAccessToken = async () => {
-    try {
-        const credentials = await Keychain.getInternetCredentials("AccessToken");
-        if (credentials) {
-            //console.log("AccessToken:", credentials.password);
-            return credentials.password; // AccessToken 반환
-        } else {
-            console.log('No access token found');
-        }
-    } catch (error) {
-        console.error('Error retrieving access token:', error);
-    }
-};
-
-const getRefreshToken = async () => {
-    try {
-        const credentials = await Keychain.getInternetCredentials("RefreshToken");
-        if (credentials) {
-            //console.log("RefreshToken:", credentials.password);
-            return credentials.password; // RefreshToken 반환
-        } else {
-            console.log('No refresh token found');
-        }
-    } catch (error) {
-        console.error('Error retrieving refresh token:', error);
-    }
-};
-
 
 const postData = async({email, passwd, navigation}) => {
     //const token = 'your_bearer_token_here'; // 사용자의 Bearer Token
@@ -62,7 +33,6 @@ const postData = async({email, passwd, navigation}) => {
         });
 
         if (!response.ok) {
-            console.log(response);
             
             Alert.alert(
                 "로그인 실패",
@@ -75,12 +45,16 @@ const postData = async({email, passwd, navigation}) => {
                 ],
                 {cancelable:true}
             );
-            throw new Error('Network response was not ok');
+            new Error('Network response was not ok');
         }
 
         const responseData = await response.json();
         console.log('Response:', responseData);
-        storeToken({accessToken:responseData.result.accessToken, refreshToken:responseData.result.refreshToken, email:email})
+        await storeToken({
+            accessToken: responseData.result.accessToken,
+            refreshToken: responseData.result.refreshToken,
+            email: email
+        })
         //console.log('Token:', getAccessToken(), getRefreshToken(
         navigation.navigate('GoHome');
 
@@ -112,6 +86,7 @@ const Login = () => {
                 multiline={false}
                 keyboardType="email-address" 
                 onChangeText={setId}
+                autoCapitalize="none"
             />
             <TextInput
                 style={styles.input}
@@ -121,6 +96,7 @@ const Login = () => {
                 secureTextEntry={true}
                 multiline={false}
                 onChangeText={setPw}
+                autoCapitalize="none"
             />
             <TouchableOpacity style={styles.signUpButton}
             //onPress={()=>navigation.navigate('GoHome')}
