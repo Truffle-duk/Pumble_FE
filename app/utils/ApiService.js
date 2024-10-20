@@ -57,7 +57,8 @@ export async function call(api, needToken, method, request) {
 
     let options = {
         headers: headers,
-        url: LOCAL_API_BASE_URL + api,
+        //url: LOCAL_API_BASE_URL + api,
+        url: API_BASE_URL + api,
         method: method,
     };
 
@@ -79,7 +80,8 @@ export async function call(api, needToken, method, request) {
             } else if (data.code && data.code === 'TOKEN4014') { //토큰 만료인 경우
                 //1. rtk로 토큰들 재발급
                 const refreshToken = await getRefreshToken()
-                const refreshApi = LOCAL_API_BASE_URL + '/auth/refresh'
+                //const refreshApi = LOCAL_API_BASE_URL + '/auth/refresh'
+                const refreshApi = API_BASE_URL + '/auth/refresh'
                 const refreshOptions = {
                     headers: headers,
                     method: 'POST',

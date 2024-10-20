@@ -2,7 +2,7 @@ import { theme } from "@assets/Theme";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Text, Button, TouchableOpacity, Image, StatusBar, ScrollView, Modal, Animated,} from 'react-native';
 
-function ProfileView({navigation}){
+function ProfileView({navigation, wallet}){
   return(
     <View style={styles.profileViewContainer}>
       <View style={styles.profileContainer}>
@@ -13,9 +13,9 @@ function ProfileView({navigation}){
         <View>
           <Text style={styles.profileNameText}>귄귄쓰 더 큐티 펭귄</Text>
           <View style={styles.profileRoleContainer}>
-            <Image source={require('@assets/Icons/crownIcon1.png')}
-              style={styles.profileRoleIcon}/>
-            <Text style={styles.profileRoleText}>회장</Text>
+            {/* <Image source={require('@assets/Icons/crownIcon1.png')}
+              style={styles.profileRoleIcon}/> */}
+            <Text style={styles.profileRoleText}>Queenguin01@gmail.com</Text>
           </View>
         </View>
       </View>
@@ -24,6 +24,11 @@ function ProfileView({navigation}){
         >
         <Text style={styles.modifyProfileText}>프로필 수정</Text>
       </TouchableOpacity>
+      <View style={styles.lineHorizontal}/>
+      <View style={styles.walletContainer}>
+        <Text style={styles.walletTitle}>내 지갑</Text>
+        <Text style={styles.walletAddress}>{wallet}</Text>
+      </View>
     </View>
   )
 }
@@ -196,9 +201,16 @@ function QuitOverlay({overlayVisible, animatedHeight, closeModal}){
 }
 
 export default function AppMyPage({navigation}){
+  const [wallet, setWallet]=useState("");
+
   const [logoutOverlayVisible, setLogoutOverlayVisible]=useState(false);
   const [quitOverlayVisible, setQuitOverlayVisible]=useState(false);
   const animatedHeight=useRef(new Animated.Value(0)).current;
+
+  useEffect(()=>{
+    setWallet("0xB1a7218C36E8fd07FC9fdE33074eDaCc5dcB4ED5")
+  },[]);
+
 
   const openLogoutModal=()=>{
     setLogoutOverlayVisible(true);
@@ -242,7 +254,7 @@ export default function AppMyPage({navigation}){
           <Text>Mypage!</Text>
         </View> */}
         <View style={styles.background}>
-          <ProfileView navigation={navigation}/>
+          <ProfileView navigation={navigation} wallet={wallet}/>
           {/* <MyPageBanner/>
           <View style={styles.lineHorizontal}/>
           <CheckPBHistory navigation={navigation}/>
@@ -270,7 +282,7 @@ const styles=StyleSheet.create({
     borderWidth:1,
     borderColor:theme.color.background,
     paddingTop:15*theme.height,
-    paddingBottom:10*theme.height,
+    paddingBottom:15*theme.height,
     paddingHorizontal:15*theme.width,
   },
   profileContainer:{
@@ -367,6 +379,24 @@ const styles=StyleSheet.create({
   mypageBannerTextContainer:{
     marginLeft:25*theme.width,
     flexDirection:'row',
+  },
+  walletContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    marginTop:15*theme.height
+  },
+  walletTitle:{
+    fontFamily:'Pretendard-Bold',
+    fontSize:theme.fontSizes.fontSizes15,
+    color:theme.color.grey10,
+    lineHeight:22*theme.height,
+    marginRight:10*theme.width
+  },
+  walletAddress:{
+    fontFamily:'Pretendard-Regular',
+    fontSize:theme.fontSizes.fontSizes12,
+    color:theme.color.grey1,
+    lineHeight:22*theme.height,
   },
   mypageBannerText:{
     fontFamily:'Pretendard-Medium',

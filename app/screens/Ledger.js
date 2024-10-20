@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from "react";
-import {ActivityIndicator, Image, ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, { useEffect, useRef, useState } from "react";
+import {ActivityIndicator, Image, ScrollView, StyleSheet, Text, View, Modal, Animated} from 'react-native';
 import {theme} from "@assets/Theme";
 import "@ethersproject/shims";
 import {ethers} from "ethers";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 /*// 배포 서버 연결
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
@@ -74,10 +75,90 @@ async function getPastEvents(groupId) {
     }
 }*/
 
-function Ledger2(){
+//사진 띄우기용 모달
+function ReceiptOverlay({overlayVisible, animatedHeight, closeModal, imageuri}){
+  
+    return(
+      <Modal
+        transparent={true}
+        visible={overlayVisible}
+        animationType="None"
+        onRequestClose={closeModal}
+      >
+        <TouchableOpacity onPress={closeModal} activeOpacity={1} style={styles.overlayBackground}>
+          <Animated.View style={styles.overlayContainer}>
+            <View style={styles.overlayHeaderContainer}>
+              <View style={styles.overlayHeaderTextContainer}>
+                <Text style={styles.overlayHeaderText}>증빙용 영수증</Text>
+              </View>
+                
+              <TouchableOpacity onPress={closeModal} >
+                <Image source={require("@assets/Icons/closeIcon.png")}
+                  style={styles.overlayHeaderIcon}
+                  />
+              </TouchableOpacity>
+            </View>
+            {/* <View style={styles.quitOverlayContainer}>
+              <Image source={require("@assets/Images/Guinguin_Sad.png")}
+                style={styles.quitOverlayImage}/>
+              <Text style={styles.quitOverlayMainText}>정말 삭제하시겠어요?</Text>
+              <Text style={styles.quitOverlayDetailText}>더 즐거운 모임 활동이 당신을 기다려요</Text>
+            </View>
+            <TouchableOpacity onPress={closeModal}
+              style={styles.maintainBtn}>
+              <Text style={styles.maintainBtnText}>모임 유지하기</Text>
+            </TouchableOpacity>
+            <View style={styles.quitBtnContainer}>
+              <TouchableOpacity style={styles.quitBtn}
+                onPress={()=>navigation.navigate('ConfirmPW')}>
+                <Text style={styles.quitBtnText}>모임 삭제하기</Text>
+              </TouchableOpacity>
+            </View>             */}
+            <View style={{alignItems:'center', justifyContent:'center'}}>
+                <Image
+                    source={{ uri: imageuri }}
+                    style={styles.receiptImage}
+                    resizeMode="contain"
+                />
+            </View>
+            
+          </Animated.View>
+        </TouchableOpacity>
+  
+      </Modal>
+    )
+  }
+
+function Ledger2({navigation}){
     const [balance, setBalance]=useState(0);
     const [datas,setDatas]=useState([]);
     const [transactionIdx, setTransactionIdx] = useState(0);
+
+    //dummy auth
+    const [auth, setAuth]=useState("Manager");
+
+    //영수증 사진용 모달
+    const [receiptOverlayVisible, setReceiptOverlayVisible]=useState(false);
+    const animatedHeight=useRef(new Animated.Value(0)).current;
+    const [receiptImageUri, setReceiptImageUri]= useState("")
+
+    const openReceiptModal=({uri})=>{
+        setReceiptOverlayVisible(true);
+        setReceiptImageUri(uri);
+        Animated.timing(animatedHeight, {
+            toValue: 500, // 모달의 높이
+            duration: 0, // 애니메이션 지속 시간
+            useNativeDriver: false
+        }).start();
+    };
+  
+    const closeReceiptModal = () => {
+      Animated.timing(animatedHeight, {
+        toValue: 500,
+        duration: 0,
+        useNativeDriver: false
+      }).start(() => setReceiptOverlayVisible(false));
+    };
 
     /*useEffect(() => {
         const initialize = async () => {
@@ -204,12 +285,28 @@ function Ledger2(){
                                             : <Text style={styles.amountText}>-{Number(data.args[4]).toLocaleString()}원</Text>}
                                         {/* 영수증디테일이 빈 문자열이면 체크 아이콘 회색,아니면 메인컬러 */}
                                         {/* {data.receiptDetails===""?<Image />} */}
-                                        <Image
+                                        {/* <Image
                                             source= {data.args[8]==="" ? require("../assets/Icons/receiptCheckIcon_Inactive.png")
                                                 :require("../assets/Icons/receiptCheckIcon_Active.png")
                                             }
                                             style={styles.iconStyle}
-                                        />
+                                        /> */}
+                                        {data.args[8]==="" ? 
+                                        (auth === "user" ? 
+                                          <Image source={require("../assets/Icons/receiptCheckIcon_Inactive.png")} style={styles.iconStyle}/> 
+                                          : <View style={{flexDirection:'row'}}>
+                                              <Image source={require("../assets/Icons/receiptCheckIcon_Inactive.png")} style={styles.iconStyle}/>
+                                              <TouchableOpacity onPress={()=>navigation.navigate('AddReceipt', navigation={navigation})}>
+                                                <Image source={require("@assets/Icons/addsquareIcon.png")} style={styles.iconStyle}/>
+                                              </TouchableOpacity>
+                                            </View>
+                                        )
+                                        : <TouchableOpacity onPress={()=>openReceiptModal(data.args[8])}>
+                                            <Image source={require("../assets/Icons/receiptCheckIcon_Active.png")} style={styles.iconStyle}/>
+                                        </TouchableOpacity>
+
+                                        }
+
                                     </View>
                                     
                                 </View>
@@ -219,7 +316,7 @@ function Ledger2(){
                 }
             </View>
             
-
+            <ReceiptOverlay overlayVisible={receiptOverlayVisible}  animatedHeight={animatedHeight} closeModal={closeReceiptModal} imageuri={receiptImageUri}/>
         </ScrollView>
         
         );
@@ -334,6 +431,49 @@ const styles = StyleSheet.create({
         fontSize:theme.fontSizes.fontSizes15,
         color:theme.color.grey2,
     },
+    overlayBackground:{
+        flex:1, 
+        justifyContent: 'flex-end', // 하단 정렬
+        backgroundColor: 'rgba(0,0,0,0.2)',
+      },
+      overlayContainer:{
+        backgroundColor:theme.color.white,
+        borderTopLeftRadius:15,
+        borderTopRightRadius:15,
+        paddingHorizontal:15*theme.width,
+        paddingBottom:50*theme.height,
+        //justifyContent:'center',
+        //alignItems:'center'
+        //height:600*theme.height
+      },
+      overlayHeaderContainer:{
+        flexDirection:'row',
+        marginBottom:7*theme.height,
+        height:68*theme.height,
+        justifyContent:'space-between',
+        //backgroundColor:'red'
+      },
+      overlayHeaderTextContainer:{
+        flex:1,
+        justifyContent:'center',
+        marginLeft:24*theme.width,
+        alignItems:'center',
+        //backgroundColor:'blue'
+      },
+      overlayHeaderText:{
+        //justifyContent:'center'
+        fontSize:theme.fontSizes.fontSizes20,
+        fontFamily:"Pretendard-SemiBold",
+        color:theme.color.black,
+      },
+      overlayHeaderIcon:{
+        height:24*theme.height*theme.width,
+        width:24*theme.width*theme.height,
+        marginTop:15*theme.height,
+      },
+      receiptImage:{
+        width:300*theme.width,
+      }
   
 })
 

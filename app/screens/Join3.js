@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
         fontSize: theme.fontSizes.fontSizes36,
         textAlign: 'center',
         width: 36*theme.width, // 코드 입력 칸 크기 조정
-        paddingVertical: 10,
+        paddingVertical: 10 *theme.width,
     },
     timerContainer:{
         width:70*theme.width,

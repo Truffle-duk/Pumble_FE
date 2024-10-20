@@ -29,6 +29,12 @@ import CreateGroup from '@screens/CreateGroup';
 import ManageMyGroup from '@screens/ManageMyGroup';
 import AppModifyProfile from '@screens/AppModifyProfile';
 
+import ChangeGroupPW from "@screens/ChangeGroupPW";
+import ConfirmPW from "@screens/ConfirmPW";
+
+//Manager Page
+import AddReceipt_M from "@screens/AddReceipt_M";
+
 import Store2 from '@screens/Store2';
 import ItemDetail from "@screens/ItemDetail";
 
@@ -337,6 +343,15 @@ const StackNavigator = ({route}) => {
 
             <Stack.Screen name="JoinGroup" component={JoinGroup} options={{headerShown: false}}/>
             <Stack.Screen name="CreateGroup" component={CreateGroup} options={{headerShown: false}}/>
+            <Stack.Screen name='ChangeGroupPW' component={ChangeGroupPW} options={{
+                header:(props)=><CustomHeader {...props} title={"모임 비밀번호 변경"}/>
+            }}/>
+            <Stack.Screen name='ConfirmPW' component={ConfirmPW} options={{
+                header:(props)=><CustomHeader {...props} title={"모임 삭제"}/>
+            }}/>
+            <Stack.Screen name='AddReceipt' component={AddReceipt_M} options={{
+                            header:(props)=><CustomHeader {...props} title={"거래 상세"}/>
+                        }}/>
         </Stack.Navigator>
         </>
 
