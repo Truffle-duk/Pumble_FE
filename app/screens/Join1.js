@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: theme.color.white,
-        padding : 20
+        padding : 20 
     },
     title: {
         marginTop : 30*theme.height,

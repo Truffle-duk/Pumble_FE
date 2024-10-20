@@ -153,21 +153,25 @@ const styles = StyleSheet.create({
     inputBox: {
         borderWidth: 1,
         borderColor: theme.color.grey6,
+        height: 52 * theme.height,
         borderRadius: 5,
         paddingHorizontal: 20*theme.width,
-        paddingVertical: 14*theme.width,
+        //paddingVertical: 14*theme.width,
         fontSize: theme.fontSizes.fontSizes16,
+        fontFamily: 'Pretendard-SemiBold',
         backgroundColor: theme.color.background,
         color: theme.color.grey10,
     },
     helperText: {
         color: theme.color.grey6,
         fontSize: theme.fontSizes.fontSizes12,
+        fontFamily: 'Pretendard-Medium',
         marginTop: 5 * theme.height,
     },
     errorText: {
         color: theme.color.red,
         fontSize: theme.fontSizes.fontSizes12,
+        fontFamily: 'Pretendard-Medium',
         marginTop: 5 * theme.height,
     },
     button: {

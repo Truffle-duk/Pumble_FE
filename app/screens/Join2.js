@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
     },
     errorText: {
         color: theme.color.red,
-        marginTop: 10,
-        marginBottom: 20,
+        marginTop: 10 *theme.height,
+        marginBottom: 20 *theme.height,
         fontSize: theme.fontSizes.fontSizes15,
         width: '100%',
         textAlign: 'right',

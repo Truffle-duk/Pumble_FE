@@ -4,7 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
 import * as Keychain from 'react-native-keychain';
 
-const URL="http://localhost:8080/api/auth/signIn?provider=local"
+//const URL="http://localhost:8080/api/auth/signIn?provider=local"
+const URL="https://www.pumble.site/api/auth/signIn?provider=local"
 
 const storeToken = async ({accessToken, refreshToken, email}) => {
     try {
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
         borderColor: theme.color.grey6,
         borderWidth: 1,
         borderRadius: 5,
-        paddingLeft: 20*theme.width,
+        paddingHorizontal: 20*theme.width,
         marginTop: 20 * theme.height,
         backgroundColor: theme.color.background,
         fontFamily: 'Pretendard-SemiBold',
