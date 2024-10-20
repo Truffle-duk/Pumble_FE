@@ -5,6 +5,8 @@ import "@ethersproject/shims";
 import {ethers} from "ethers";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
+import { GroupCall } from "@utils/GroupService";
+
 /*// 배포 서버 연결
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
 
