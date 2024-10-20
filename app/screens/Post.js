@@ -3,6 +3,7 @@ import { theme } from "@assets/Theme";
 import { StyleSheet, View, Text, Button, TouchableOpacity, Image, ScrollView, TextInput } from 'react-native';
 import Keychain from "react-native-keychain";
 import {call} from "@utils/ApiService";
+import { GroupCall } from "@utils/GroupService";
 
 
 const posta=[
@@ -17,7 +18,7 @@ const posta=[
 ]
   
 
-function PostingView({post, replyCount}){
+function PostingView({post, replyCount, fetchDeletePost}){
     const [postId, setPostId]=useState(post.id);
 
     return(
@@ -29,7 +30,7 @@ function PostingView({post, replyCount}){
                 </View>
                 <View>
                     <Text style={styles.postProfileText}>익명</Text>
-                    <Text style={styles.postDate}>{post.createdAt.replaceAll('-', '.')}</Text>
+                    <Text style={styles.postDate}>{post.createdAt}</Text>
                 </View>
             </View>
             <Text style={styles.postTitleText}>{post.title}</Text>
@@ -41,7 +42,7 @@ function PostingView({post, replyCount}){
                     <Text style={styles.postReplyText}>{replyCount}</Text>
                 </View>
                 {post.isWriter ? (
-                    <TouchableOpacity onPress={()=>setPostId(post.id)}>
+                    <TouchableOpacity onPress={fetchDeletePost}>
                         <Image source={require('@assets/Icons/deleteIcon.png')} style={styles.postIcon}/>
                     </TouchableOpacity>):(<View/>)}
             </View>
@@ -143,7 +144,7 @@ function WriteReply({postId, updateHandler}){
     )
 }
 
-export default function Post({route}){
+export default function Post({route, navigation}){
     const [mainPost,setMainPost]=useState({});
     const [replyList,setReplyList]=useState([{
         comment: {
@@ -157,6 +158,12 @@ export default function Post({route}){
     }]);
     const {id} = route.params
     const [replyCount, setReplyCount] = useState(0)
+    const [gid, setGid]= useState(1)
+    
+    useEffect(()=>{
+        setGid(GroupCall("GID"))
+        //밑에 그룹 id 다 적용시켜^^
+    },[])
 
     const fetchPost = async () => {
         const api = `/community/1/post/${id}`
@@ -178,6 +185,18 @@ export default function Post({route}){
             })
             .catch(err => {
                 console.log("Error occurred at fetchComments: " + err)
+            })
+    }
+    const fetchDeletePost = async () => {
+        const api = `/community/1/post/${id}`
+        return await call(api, true, 'DELETE')
+            .then(data => {
+                alert('글이 삭제됐습니다.')
+                navigation.navigate('Community')
+                return data.result                
+            })
+            .catch(err => {
+                console.log("Error occurred at fetchDeletePost: " + err)
             })
     }
 
@@ -205,7 +224,7 @@ export default function Post({route}){
     return(
         <View style={styles.background}>
             <ScrollView style={{flex:1}}>
-                <PostingView post={mainPost} replyCount={replyCount}/>
+                <PostingView post={mainPost} replyCount={replyCount} fetchDeletePost={fetchDeletePost}/>
                 <View style={styles.line}/>
                 <Reply replyList={replyList}/>
             </ScrollView>
