@@ -5,6 +5,7 @@ import Keychain from "react-native-keychain";
 import {call} from "@utils/ApiService";
 
 const Store = ({ navigation }) => {
+    const [isAdminMode, setIsAdminMode] = useState(true); // 관리자 모드 상태를 관리
     const dummy = [
         {
             image: 'https://pumble-s3.s3.ap-northeast-2.amazonaws.com/store/4dde93d405a1086fb5f025fa183fc445.png',
@@ -115,6 +116,24 @@ const Store = ({ navigation }) => {
                     </View>
                 </View>
             </ScrollView>
+
+            {/* 관리자 모드 버튼 */}
+                        {isAdminMode && (
+                            <>
+                                <TouchableOpacity
+                                    style={[styles.adminButton, styles.addButton]}
+                                    onPress={() => navigation.navigate('Store_Add')}
+                                >
+                                    <Image source={require('../assets/Icons/add.png')} style={styles.adminIcon} />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.adminButton, styles.checkButton]}
+                                    onPress={() => navigation.navigate('Store_Check')}
+                                >
+                                    <Image source={require('../assets/Icons/check.png')} style={styles.adminIcon} />
+                                </TouchableOpacity>
+                            </>
+                        )}
         </View>
     );
 };
@@ -208,6 +227,24 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: theme.color.black,
         alignSelf: 'flex-start',
+    },
+    adminButton: {
+        position: 'absolute',
+        right: 20 * theme.width,
+        width: 60 * theme.width,
+        height: 60 * theme.height,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    addButton: {
+        bottom: 97 * theme.height,
+    },
+    checkButton: {
+        bottom: 97 * theme.height + 60,
+    },
+    adminIcon: {
+        width: 60 * theme.width,
+        height: 60 * theme.height,
     },
 });
 
