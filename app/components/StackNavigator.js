@@ -38,6 +38,9 @@ import AddReceipt_M from "@screens/AddReceipt_M";
 import Store2 from '@screens/Store2';
 import ItemDetail from "@screens/ItemDetail";
 
+import Store_Add from '@screens/Store_Add';
+import Store_Check from '@screens/Store_Check';
+
 const Stack = createNativeStackNavigator();
 
 function SwitchOverlay({overlayVisible, animatedHeight, closeModal, navigation, alert}){
@@ -324,6 +327,15 @@ const StackNavigator = ({route}) => {
             <Stack.Screen name="Store2" component={Store2} options={{
                             header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
                         }}/>
+
+            <Stack.Screen name="Store_Add" component={Store_Add} options={{
+                            header:(props)=><CustomHeader {...props} title={"상품 등록"}/>
+                        }}/>
+            <Stack.Screen name="Store_Check" component={Store_Check} options={{
+                            header:(props)=><CustomHeader {...props} title={"상품 수령 확인"}/>
+                        }}/>
+
+
             <Stack.Screen name="ItemDetail" component={ItemDetail} options={{
                 header:(props)=><CustomHeader {...props} title={"리워드 스토어"}/>
             }}/>

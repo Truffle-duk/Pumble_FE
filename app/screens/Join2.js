@@ -25,9 +25,9 @@ const Join2 = () => {
                         const sendCodeApi = '/auth/sendCode'
                         call(sendCodeApi, false, 'POST', {email: email})
                             .then(data => {
-                                if (data.code === 200) {
+                                //if (data.code === 200) {
                                     navigation.navigate('Join3', { email: email })
-                                }
+                                //}
                             })
                             .catch(err => {
                                 console.log("Error occurred at sendCode")
