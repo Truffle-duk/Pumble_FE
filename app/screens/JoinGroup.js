@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { call } from '@utils/ApiService';
 import { theme } from "@assets/Theme";
 
 const JoinGroup = () => {
@@ -10,8 +11,27 @@ const JoinGroup = () => {
     const isButtonDisabled = meetingCode.trim() === '';
 
     const handleCompletePress = () => {
-        alert("참여 완료", "모임에 성공적으로 참여하였습니다!")
-        navigation.navigate('GoHome');
+        if (!isButtonDisabled) {
+            const checkMeetingCode = '/home/group/join'
+            const joincode = {
+                code: meetingCode,
+            }
+            call(checkMeetingCode, true, 'POST', joincode)
+                .then(async data => {
+                    if (data.code === 200) {
+                        const userAuth="member"
+                        const gid=data.result.groupId
+                        //await Keychain.setInternetCredentials("GroupInfo", userAuth, gid);// 어떻게...?
+                        alert("참여 완료", "모임에 성공적으로 참여하였습니다!")
+                        navigation.navigate('GoHome');
+                        //navigation.navigate('Start', { nickname: nickname });
+                        //setArePasswordsSame(true);
+                    }
+                })
+        } else {
+            alert('모임코드를 다시 확인해주세요!');
+        }
+        
     };
 
     return (
