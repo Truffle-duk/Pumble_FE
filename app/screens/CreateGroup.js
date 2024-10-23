@@ -46,7 +46,7 @@ const CreateGroup = () => {
                     if (data.code === 200) {
                         const userAuth="leader"
                         const gid=data.result.newGroupId
-                        await Keychain.setInternetCredentials("GroupInfo", userAuth, gid);
+                        //await Keychain.setInternetCredentials("GroupInfo", userAuth, gid);
                         alert("생성 완료", "모임이 성공적으로 참여하였습니다!")
                         navigation.navigate('GoHome');
                         //navigation.navigate('Start', { nickname: nickname });

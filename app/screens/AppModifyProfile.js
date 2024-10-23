@@ -2,7 +2,7 @@ import { theme } from "@assets/Theme";
 import React, {useState, useEffect} from "react";
 import { StyleSheet, View, Text, Button, TouchableOpacity, Image, TextInput } from 'react-native';
 //import { launchImageLibrary } from 'react-native-image-picker';
-
+import { call } from "@utils/ApiService";
 
 function ModifyProfileImage(){
 
@@ -41,7 +41,7 @@ function ModifyProfileImage(){
   )
 }
 
-function ModifyProfileName({name, setName}){
+function ModifyProfileName({name, setName, checkNewNickname, prevName}){
   return(
     <View style={styles.profileModifyNameContainer}>
       <View style={styles.profileModifyNameTextContainer}>
@@ -49,10 +49,11 @@ function ModifyProfileName({name, setName}){
           <TextInput
             returnKeyType='done'
             maxLength={10}
-            //value={Name}
+            value={name}
             onChangeText={setName}
-            placeholder={name}            
+            placeholder={prevName}            
             style={styles.profileModifyNameInputText}
+            onEndEditing={checkNewNickname}
           />
         </View>
         
@@ -66,27 +67,75 @@ function ModifyProfileName({name, setName}){
   )
 }
 
-function SaveBtn(){
+function SaveBtn({handleChangeProfile}){
   return(
-    <TouchableOpacity style={styles.saveBtn}>
+    <TouchableOpacity style={styles.saveBtn}
+      onPress={handleChangeProfile}>
       <Text style={styles.saveBtnText}>저장</Text>
     </TouchableOpacity>
   )
 }
 
 export default function AppModifyProfile(){
-  const [imageUri, setImageUri] = useState("");
+  //const [imageUri, setImageUri] = useState("");
   const [nickname, setNickname] = useState("");
+  const [isValidNickname, setIsValidNickname] = useState(false);
+  const [prevName, setPrevName]=useState("귄귄쓰");
+  
+
+  const getProfile = async () => {
+    const api = '/user';
+  
+    try {
+      // 비동기 호출을 대기 (await)하여 데이터를 받아옴
+      const data = await call(api, true, 'GET');
+  
+      if (data.code === 200) {
+        setPrevName(data.result.nickname);
+        //setEmail(data.result.email);
+      }
+  
+    } catch (error) {
+      // 에러 처리 (필요한 경우)
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+
+  const handleChangeProfile = () => {
+    const changeNickname = '/user/nickname'
+    const changeNicknameRequest = {
+        nickname: nickname,
+    }  
+
+    if(isValidNickname){
+      call(changeNickname, true, 'PATCH', changeNicknameRequest)
+          .then(data => {
+            if (data.code === 200) {
+              //navigation.navigate('Start', { nickname: nickname });
+              alert('닉네임이 변경되었습니다.');
+              //navigation.goBack();
+            }
+        })
+    } else {
+      alert('공백은 들어갈 수 없습니다. 다시 한 번 확인해주세요.');
+    }
+  }
 
   useEffect(()=>{
-    setNickname("귄귄쓰")
+    //setNickname("귄귄쓰")
+    getProfile();
   },[])
 
+  const checkNewNickname = () => {
+    //const passwordRegExp = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,}$/
+    setIsValidNickname(nickname!=="");
+  }
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor:theme.color.white }}>
-          <ModifyProfileImage imageUri={imageUri} setImageUri={setImageUri}/>
-          <ModifyProfileName name={nickname} setName={setNickname}/>
-          <SaveBtn/>
+          <ModifyProfileImage />
+          <ModifyProfileName name={nickname} setName={setNickname} checkNewNickname={checkNewNickname} prevName={prevName}/>
+          <SaveBtn handleChangeProfile={handleChangeProfile}/>
         </View>
       );
   }

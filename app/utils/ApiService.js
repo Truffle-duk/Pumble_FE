@@ -44,7 +44,7 @@ const updateTokens = async (accessToken, refreshToken) => {
     }
 }
 
-export async function call(api, needToken, method, request) {
+export async function call(api, needToken, method, request, isMultipart=false) {
     let headers = await new Headers({
         "Content-Type": "application/json",
     })
@@ -54,6 +54,9 @@ export async function call(api, needToken, method, request) {
         token = await getAccessToken()
         headers.append("Authorization", "Bearer " + token)
     }
+    // if(isMultipart){
+    //     headers.set("Content-Type", "multipart/form-data");
+    // }
 
     let options = {
         headers: headers,
@@ -63,6 +66,9 @@ export async function call(api, needToken, method, request) {
     };
 
     if (request) {
+        if (isMultipart){
+            options.body = request
+        }
         options.body = JSON.stringify(request);
     }
 

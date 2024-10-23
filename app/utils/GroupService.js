@@ -17,7 +17,8 @@ const getAuth = async () => {
     try {
         const credentials = await Keychain.getInternetCredentials("GroupInfo");
         if (credentials) {
-            return credentials.username; // 역할 반환
+            const username = await credentials.username;
+            return username// 역할 반환
         } else {
             console.log('No Auth found');
         }
