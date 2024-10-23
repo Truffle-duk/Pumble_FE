@@ -29,6 +29,9 @@ const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
 
+//dummy
+const userAuth="leader"
+
 //날짜 세기
 const getDateDifference = (date1, date2) => {
     const mDate1 = moment(date1);
@@ -432,7 +435,7 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
 }
 
 
-export default function Event() {
+export default function Event({navigation}) {
     const [user, setUser] = useState("정귄귄");
     const [datas, setDatas] = useState([]);
     const [thisMonthDatas, setThisMonthDatas] = useState([]);
@@ -528,6 +531,9 @@ export default function Event() {
             <EventList thisMonthEvents={thisMonthDatas} openModal={openModal}/>
             <EventOverlay overlayVisible={overlayVisible} animatedHeight={animatedHeight} closeModal={closeModal}
                           overlayData={overlayData} updateHandler={updateData}/>
+            {userAuth==="leader"&&<TouchableOpacity style={styles.writeBtn} onPress={()=>navigation.navigate('AddEvent')}>
+                    <Image source={require('@assets/Icons/writePen.png')} style={styles.writeIcon}/>
+                </TouchableOpacity>}
         </ScrollView>
     );
 }
@@ -861,6 +867,23 @@ const styles = StyleSheet.create({
         fontFamily: 'Pretendard-Medium',
         fontSize: theme.fontSizes.fontSizes14,
         color: theme.color.white,
+    },    
+    writeBtn:{
+        position:'absolute',
+        bottom:92,
+        right:25,
+        //left:'50%',
+        //transform: [{ translateX: -110*theme.width/2 }],
+        alignItems:'center',
+        justifyContent:'center',
+        height:60*theme.width*theme.height,
+        width:60*theme.width*theme.height,
+        borderRadius:15,
+        backgroundColor:theme.color.main,
+    },
+    writeIcon:{
+        width:35*theme.width*theme.height,
+        height:35*theme.width*theme.height,
     }
 
 })
