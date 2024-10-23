@@ -2,6 +2,8 @@ import { theme } from "@assets/Theme";
 import { Link } from "@react-navigation/native";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Text, Button, TouchableOpacity, Image, StatusBar, ScrollView, Modal, Animated, Alert} from 'react-native';
+import { call } from "@utils/ApiService";
+
 
 const myGroupList=[
     {
@@ -39,7 +41,7 @@ function MyGroup({groups, navigation}){
                 ):(
                     groups.map((group, index)=>
                         <View style={styles.groupContainer}>
-                            <Text style={styles.groupNameText}>{group.Name}</Text>
+                            <Text style={styles.groupNameText}>{group.name}</Text>
                             <TouchableOpacity
                             onPress={()=>navigation.navigate('ManageMyGroup')}>
                                 <Image source={require("@assets/Icons/settingsIcon.png")}
@@ -66,9 +68,9 @@ function LinkedGroup({groups, quitGroupAlert}){
                 ):(
                     groups.map((group, index)=>
                         <View style={styles.groupContainer}>
-                            <Text style={styles.groupNameText}>{group.Name}</Text>
+                            <Text style={styles.groupNameText}>{group.name}</Text>
                             <TouchableOpacity
-                            onPress={()=>quitGroupAlert(group.Name)}>
+                            onPress={()=>quitGroupAlert(group.group_id)}>
                                 <Image source={require("@assets/Icons/logoutIcon.png")}
                                 style={styles.quitIcon}/>
                             </TouchableOpacity>
@@ -85,7 +87,28 @@ export default function AppManageGroup({navigation}){
     const [linkedGroups,setLinkedGroups]=useState([]);
     const [quitGroup, setQuitGroup]=useState("");
 
-    const quitAlert=({groupName})=>{
+    const [groupList, setGroupList] = useState([{"group_id": 0, "name": ""}])
+    const [currentGroupId, setCurrentGroupId] = useState(0)
+    const [groupIdList, setGroupIdList] = useState([])
+
+    const handleGroup = async () => {
+        const api = '/user/group';
+      
+        try {
+          // 비동기 호출을 대기 (await)하여 데이터를 받아옴
+          const data = await call(api, true, 'GET');
+      
+          if (data.code === 200) {
+            setMyGroups(data.result.myGroup)
+            setLinkedGroups(data.result.connectedGroup)
+          }
+        } catch (error) {
+          // 에러 처리 (필요한 경우)
+          console.error('Error fetching profile:', error);
+        }
+      };
+
+    const quitAlert=({gid})=>{
         Alert.alert(
             "모임 탈퇴하기",
             "모임을 탈퇴하겠어요?",
@@ -97,17 +120,32 @@ export default function AppManageGroup({navigation}){
                 },
                 {
                     text:"네, 탈퇴할래요", 
-                    onPress: () => setQuitGroup(groupName)
+                    onPress: ()=>fetchDeleteGroup(gid)
                 },
             ],
             {cancelable:true}
         );
     };
 
+    const fetchDeleteGroup = async ({gid}) => {
+        const api = `/group/${gid}/delete`
+        return await call(api, true, 'DELETE')
+            .then(data => {
+                alert('탈퇴하였습니다!')
+                navigation.navigate('Home')
+                return data.result                
+            })
+            .catch(err => {
+                console.log("Error occurred at fetchDeletePost: " + err)
+            })
+      }
+
     useEffect(()=>{
-        setMyGroups(myGroupList);
-        setLinkedGroups(linkedGroupList);
+        // setMyGroups(myGroupList);
+        // setLinkedGroups(linkedGroupList);
+        handleGroup();
     },[])
+
     return(
         <ScrollView contentContainerStyle={styles.background}>
             <MyGroup groups={myGroups} navigation={navigation}/>
