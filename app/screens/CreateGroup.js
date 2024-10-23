@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { call } from '@utils/ApiService';
 import { theme } from "@assets/Theme";
@@ -59,7 +59,7 @@ const CreateGroup = () => {
     }
 
     return (
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
             <TouchableOpacity
             onPress={()=>navigation.goBack()}>
                 <Image source={require('@assets/Icons/backArrow2.png')}
@@ -110,13 +110,14 @@ const CreateGroup = () => {
             >
                 <Text style={styles.buttonText}>생성하기</Text>
             </TouchableOpacity>
-        </View>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        //flex: 1,
+        height:theme.height*844,
         padding: 20,
         backgroundColor: '#fff'
     },
@@ -165,7 +166,7 @@ const styles = StyleSheet.create({
     button: {
         position: 'absolute',
         left: 16 * theme.width,
-        bottom: 107 * theme.height,
+        bottom: 153 * theme.height,
         //paddingVertical: 15,
         alignItems: 'center',
         justifyContent:'center',

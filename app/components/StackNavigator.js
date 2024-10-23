@@ -34,6 +34,7 @@ import ConfirmPW from "@screens/ConfirmPW";
 
 //Manager Page
 import AddReceipt_M from "@screens/AddReceipt_M";
+import AddEvent_M from '@screens/AddEvent_M';
 
 import Store2 from '@screens/Store2';
 import ItemDetail from "@screens/ItemDetail";
@@ -394,6 +395,9 @@ const StackNavigator = ({route}) => {
                 }}/>
                 <Stack.Screen name='AddReceipt' component={AddReceipt_M} options={{
                     header: (props) => <CustomHeader {...props} title={"거래 상세"}/>
+                }}/>
+                <Stack.Screen name='AddEvent' component={AddEvent_M} options={{
+                    header:(props)=><CustomHeader {...props} title={"일정 등록"}/>
                 }}/>
             </Stack.Navigator>
         </>

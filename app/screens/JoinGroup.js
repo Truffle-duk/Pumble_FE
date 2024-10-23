@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { call } from '@utils/ApiService';
 import { theme } from "@assets/Theme";
@@ -35,7 +35,7 @@ const JoinGroup = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
             <TouchableOpacity
             onPress={()=>navigation.goBack()}>
                 <Image source={require('@assets/Icons/backArrow2.png')}
@@ -69,13 +69,14 @@ const JoinGroup = () => {
             </TouchableOpacity>
             </View>
             
-        </View>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        //flex: 1,
+        height:theme.height*844,
         padding: 16*theme.width,
 
         backgroundColor: 'white',
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         //justifyContent:'center',
         alignItems:'center',
-        bottom: 107 * theme.height,
+        bottom: 153 * theme.height,
         left:16*theme.width,
     },
     button: {                
