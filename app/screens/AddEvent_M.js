@@ -43,7 +43,7 @@ function EventNameInput({setTitle}){
     const [eventName, setEventName]=useState("")
     
     return(
-        <View style={{marginBottom:20*theme.height}}>
+        <View style={{marginBottom:25*theme.height}}>
             <Text style={styles.inputTitle}>일정 이름</Text>
             <View style={styles.inputBox}>
                 <TextInput
@@ -55,12 +55,26 @@ function EventNameInput({setTitle}){
                         style={styles.inputText}
                         scrollEnabled={true}
                         multiline={false} // 여러 줄 입력을 허용하려면 true로 설정
-                        textAlignVertical="top"
+                        //textAlignVertical="top"
                         textAlign="left"
                         lineHeight={22} // 줄 간격을 설정
                         //height={42*theme.height}
                         />
             </View>
+            {/* <TextInput
+                        returnKeyType='done'
+                        maxLength={30}
+                        onChangeText={setTitle}
+                        placeholder="일정의 이름을 입력해주세요"
+                        placeholderTextColor={theme.color.grey1}
+                        style={styles.inputText}
+                        scrollEnabled={true}
+                        multiline={false} // 여러 줄 입력을 허용하려면 true로 설정
+                        //textAlignVertical="top"
+                        textAlign="left"
+                        lineHeight={22} // 줄 간격을 설정
+                        //height={42*theme.height}
+                        /> */}
         </View>
     )
 }
@@ -69,7 +83,7 @@ function EventPlaceInput({setPlace}){
     const [eventPlace, setEventPlace]=useState("")
     
     return(
-        <View style={{marginBottom:20*theme.height}}>
+        <View style={{marginBottom:25*theme.height}}>
             <Text style={styles.inputTitle}>일정 장소</Text>
             <View style={styles.inputBox}>
                 <TextInput
@@ -81,7 +95,7 @@ function EventPlaceInput({setPlace}){
                         style={styles.inputText}
                         scrollEnabled={true}
                         multiline={false} // 여러 줄 입력을 허용하려면 true로 설정
-                        textAlignVertical="top"
+                        //textAlignVertical="top"
                         textAlign="left"
                         lineHeight={22} // 줄 간격을 설정
                         //height={42*theme.height}
@@ -209,7 +223,7 @@ function EventContentInput({setDescription}){
     const [eventContent, setEventContent]=useState("")    
     
     return(
-        <View style={{marginBottom:20*theme.height}}>
+        <View style={{marginBottom:25*theme.height}}>
             <Text style={styles.inputTitle}>활동 내용</Text>
             <View style={styles.inputBox2}>
                 <TextInput
@@ -221,7 +235,7 @@ function EventContentInput({setDescription}){
                         style={styles.inputText}
                         scrollEnabled={true}
                         multiline={true} // 여러 줄 입력을 허용하려면 true로 설정
-                        textAlignVertical="top"
+                        //textAlignVertical="top"
                         textAlign="left"
                         lineHeight={22} // 줄 간격을 설정
                         //height={42*theme.height}
@@ -236,9 +250,9 @@ function EventToken({setReward}){
 
     return(
         <View style={styles.tokenView}>
-            <Text style={styles.inputTitle}>지급할 토큰:</Text>
+            <Text style={styles.inputTitle2}>지급할 토큰:</Text>
             <View style={{alignItems:'flex-end'}}>
-                <View style={{flexDirection:'row', justifyContent:'center', marginRight:5*theme.width}}>
+                <View style={{flexDirection:'row', alignItems:'center', marginRight:5*theme.width}}>
                     <TextInput
                         returnKeyType='done'
                         keyboardType="numeric"
@@ -249,7 +263,7 @@ function EventToken({setReward}){
                         style={styles.inputText2}
                         scrollEnabled={true}
                         multiline={false} // 여러 줄 입력을 허용하려면 true로 설정
-                        textAlignVertical="top"
+                        textAlignVertical="auto"
                         textAlign="Right"
                         lineHeight={22} // 줄 간격을 설정
                         //height={42*theme.height}
@@ -266,9 +280,9 @@ function EventToken({setReward}){
 function EventMaxPeople({setMaxPeople}){
     return(
         <View style={styles.tokenView}>
-            <Text style={styles.inputTitle}>최대 인원수:</Text>
+            <Text style={styles.inputTitle2}>최대 인원수:</Text>
             <View style={{alignItems:'flex-end'}}>
-                <View style={{flexDirection:'row', justifyContent:'center', marginRight:5*theme.width}}>
+                <View style={{flexDirection:'row', alignItems:'center', marginRight:5*theme.width}}>
                     <TextInput
                         returnKeyType='done'
                         keyboardType="numeric"
@@ -279,7 +293,7 @@ function EventMaxPeople({setMaxPeople}){
                         style={styles.inputText2}
                         scrollEnabled={true}
                         multiline={false} // 여러 줄 입력을 허용하려면 true로 설정
-                        textAlignVertical="top"
+                        textAlignVertical="auto"
                         textAlign="Right"
                         lineHeight={22} // 줄 간격을 설정
                         //height={42*theme.height}
@@ -297,7 +311,7 @@ function EventCodeInput({setECode}){
     const [eventCode, setEventCode]=useState("")
     
     return(
-        <ScrollView contentContainerStyle={{marginBottom:20*theme.height}}>
+        <ScrollView contentContainerStyle={{marginBottom:25*theme.height}}>
             <Text style={styles.inputTitle}>인증코드</Text>
             <View style={styles.inputBox}>
                 <TextInput
@@ -310,7 +324,7 @@ function EventCodeInput({setECode}){
                         style={styles.inputText}
                         scrollEnabled={false}
                         multiline={false} // 여러 줄 입력을 허용하려면 true로 설정
-                        textAlignVertical="top"
+                        //textAlignVertical="top"
                         textAlign="left"
                         lineHeight={22} // 줄 간격을 설정
                         //height={42*theme.height}
@@ -468,24 +482,24 @@ function AddEvent_M({navigation}){
             <EventNameInput setTitle={setTitle}/>
             <EventPlaceInput setPlace={setPlace}/>
             {/* <EventDateInput startDate={startDate} setStartDate={setStartDate} startTime={startTime} setStartTime={setStartTime} endDate={endDate} setEndDate={setEndDate} endTime={endTime} setEndTime={setEndTime}/>  */}
-            <View style={{marginBottom:20*theme.height}}>
+            <View style={{marginBottom:25*theme.height}}>
                 <Text style={styles.inputTitle}>일정 기간</Text>
                 <View style={styles.inputBox3}>
-                    <View style={{flexDirection:'row', alignContent:'center'}}>
-                        <TouchableOpacity onPress={onPressStartDate}>
-                            <Text>{startDate===""?dateString:startDate}</Text>
+                    <View style={{flexDirection:'row', alignItems:'center'}}>
+                        <TouchableOpacity onPress={onPressStartDate} style={{marginRight:5*theme.width}}>
+                            <Text style={styles.dateText}>{startDate===""?dateString:startDate}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={onPressStartTime}>                            
-                            <Text>{startTime===""?timeString:startTime}</Text>
+                            <Text style={styles.timeText}>{startTime===""?timeString:startTime}</Text>
                         </TouchableOpacity>
                     </View>
-                    <View/>
-                    <View style={{flexDirection:'row', alignContent:'center'}}>
-                        <TouchableOpacity onPress={onPressEndDate}>                            
-                            <Text>{endDate===""?dateString:endDate}</Text>
+                    <Text style={styles.dateText}>-</Text>
+                    <View style={{flexDirection:'row', alignItems:'center'}}>
+                        <TouchableOpacity onPress={onPressEndDate} style={{marginRight:5*theme.width}}>                            
+                            <Text style={styles.dateText}>{endDate===""?dateString:endDate}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={onPressEndTime}>                            
-                            <Text>{endTime===""?timeString:endTime}</Text>
+                        <TouchableOpacity onPress={onPressEndTime} >                            
+                            <Text style={styles.timeText}>{endTime===""?timeString:endTime}</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -523,15 +537,30 @@ const styles=StyleSheet.create({
         paddingTop:20*theme.height,
         paddingHorizontal:16*theme.width,
     },
+    input: {
+        //width: 358 * theme.width,
+        height: 52 * theme.height,
+        //marginTop: 30*theme.height,
+        borderColor: theme.color.grey6,
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal:15*theme.width,
+        backgroundColor: theme.color.white,
+        //color: theme.color.grey10,
+        fontFamily:'Pretendard-Medium',
+        fontSize:theme.fontSizes.fontSizes16,
+        color:theme.color.grey2,
+        lineHeight:16*theme.height,
+    },
     inputText:{
         fontFamily:'Pretendard-Medium',
         fontSize:theme.fontSizes.fontSizes16,
         color:theme.color.grey2,
-        lineHeight:22*theme.height,
-        alignItems:'center',
-        justifyContent:'center',
-        paddingVertical:9,
-        margin:0,
+        lineHeight:16*theme.height,
+        //alignItems:'baseline',
+        //justifyContent:'center',
+        paddingVertical:0,
+        //marginVertical:3,
         //marginHorizontal:20*theme.width,
         //marginTop:5*theme.height,
         //marginBottom:5*theme.height,
@@ -542,8 +571,8 @@ const styles=StyleSheet.create({
         fontSize:theme.fontSizes.fontSizes16,
         color:theme.color.grey2,
         lineHeight:22*theme.height,
-        //alignContent:'center',
-        justifyContent:'center',
+        alignItems:'center',
+        //justifyContent:'center',
         paddingVertical:0,
         margin:0,
         //marginHorizontal:20*theme.width,
@@ -555,15 +584,23 @@ const styles=StyleSheet.create({
         fontFamily:'Pretendard-SemiBold',
         fontSize:theme.fontSizes.fontSizes16,
         color:theme.color.grey10,
-        lineHeight:22*theme.height,
+        lineHeight:16*theme.height,
         marginLeft:4*theme.width,
         marginBottom:10*theme.height,
+    },
+    inputTitle2:{
+        fontFamily:'Pretendard-SemiBold',
+        fontSize:theme.fontSizes.fontSizes16,
+        color:theme.color.grey10,
+        lineHeight:16*theme.height,
+        marginLeft:4*theme.width,
+        //marginBottom:10*theme.height,
     },
     inputBox:{
         height:40*theme.height,
         fontSize: theme.fontSizes.fontSizes9,
         paddingHorizontal:15*theme.width,
-        alignContent:'center',
+        justifyContent:'center',
         borderColor:theme.color.grey1,
         borderWidth:1,
         borderRadius:15
@@ -589,7 +626,7 @@ const styles=StyleSheet.create({
         borderRadius:15
     },
     tokenView:{
-        marginBottom:20*theme.height,
+        marginBottom:25*theme.height,
         flexDirection:'row',
         justifyContent:'space-between',
         alignItems:'center',
@@ -603,7 +640,7 @@ const styles=StyleSheet.create({
         fontFamily:'Pretendard-Medium',
         fontSize:theme.fontSizes.fontSizes16,
         color:theme.color.grey1,
-        lineHeight:22*theme.height,
+        lineHeight:16*theme.height,
         marginLeft:2*theme.width,
     },
     doneBtn:{
@@ -621,6 +658,16 @@ const styles=StyleSheet.create({
         fontFamily:'Pretendard-SemiBold',
         fontSize:theme.fontSizes.fontSizes18,
         color: theme.color.white,
+    },
+    dateText:{
+        fontFamily:'Pretendard-Medium',
+        fontSize:theme.fontSizes.fontSizes16,
+        color:theme.color.grey1,
+    },
+    timeText:{
+        fontFamily:'Pretendard-Medium',
+        fontSize:theme.fontSizes.fontSizes14,
+        color:theme.color.grey1,
     }
 
 })
