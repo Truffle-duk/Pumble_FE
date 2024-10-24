@@ -17,7 +17,8 @@ const getAuth = async () => {
     try {
         const credentials = await Keychain.getInternetCredentials("GroupInfo");
         if (credentials) {
-            return credentials.username; // RefreshToken 반환
+            const username = await credentials.username;
+            return username// 역할 반환
         } else {
             console.log('No Auth found');
         }
@@ -26,12 +27,23 @@ const getAuth = async () => {
     }
 };
 
-export async function GroupCall(method){
+export async function GroupCall(method, groupIdList){
     if(method==="GID"){
-        gid= await getGID()
-        return gid
+        const savedGroupId = await getGID()
+
+        if (groupIdList) {
+
+            if (groupIdList.some(groupId => groupId.toString() === savedGroupId)) {
+                return savedGroupId
+            } else {
+                return groupIdList[0]
+            }
+
+        } else {
+            return savedGroupId
+        }
+
     }else{
-        auth= await getAuth()
-        return auth
+        return await getAuth()
     }
 }
