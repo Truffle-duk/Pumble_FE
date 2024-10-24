@@ -1,10 +1,75 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
+import * as Keychain from 'react-native-keychain';
+
+//const URL="http://localhost:8080/api/auth/signIn?provider=local"
+const URL="https://www.pumble.site/api/auth/signIn?provider=local"
+
+const storeToken = async ({accessToken, refreshToken, email}) => {
+    try {
+        await Keychain.setInternetCredentials("AccessToken", email, accessToken);
+        await Keychain.setInternetCredentials("RefreshToken", email, refreshToken);
+    } catch (error) {
+        console.error('Error storing token:', error);
+    }
+}
+
+const postData = async({email, passwd, navigation}) => {
+    //const token = 'your_bearer_token_here'; // 사용자의 Bearer Token
+    const data = {
+        "email": email,
+        "password": passwd
+    };
+
+    try {
+        const response = await fetch(URL, {
+            method: 'POST',
+            headers: {
+                //'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+
+            Alert.alert(
+                "로그인 실패",
+                "이메일 혹은 비밀번호를 다시 확인해주세요.",
+                [
+                    {
+                        text:"확인",
+                        style:'cancel'
+                    }
+                ],
+                {cancelable:true}
+            );
+            new Error('Network response was not ok');
+        }
+
+        const responseData = await response.json();
+        console.log('Response:', responseData);
+        await storeToken({
+            accessToken: responseData.result.accessToken,
+            refreshToken: responseData.result.refreshToken,
+            email: email
+        })
+        //console.log('Token:', getAccessToken(), getRefreshToken(
+        navigation.navigate('GoHome');
+
+    } catch (error){
+        console.error('Error:', error);
+    }
+};
+
 
 const Login = () => {
     const navigation = useNavigation();
+
+    const [id, setId]= useState("");
+    const [pw,setPw]=useState("");
 
     const handleSignUpPress = () => {
         navigation.navigate('Join1');
@@ -16,21 +81,33 @@ const Login = () => {
 
             <TextInput
                 style={styles.input}
-                placeholder="아이디/이메일"
+                value={id}
+                placeholder="이메일"
                 placeholderTextColor={theme.color.grey1}
+                multiline={false}
+                keyboardType="email-address"
+                onChangeText={setId}
+                autoCapitalize="none"
             />
             <TextInput
                 style={styles.input}
+                value={pw}
                 placeholder="비밀번호"
                 placeholderTextColor={theme.color.grey1}
                 secureTextEntry={true}
+                multiline={false}
+                onChangeText={setPw}
+                autoCapitalize="none"
             />
-            <TouchableOpacity style={styles.signUpButton}>
+            <TouchableOpacity style={styles.signUpButton}
+                //onPress={()=>navigation.navigate('GoHome')}
+                              onPress={()=>postData({email:id, passwd:pw, navigation:navigation})}
+            >
                 <Text style={styles.signUpButtonText}>로그인 하기</Text>
             </TouchableOpacity>
 
             <View style={styles.footerLinks}>
-                <TouchableOpacity>
+                <TouchableOpacity >
                     <Text style={styles.footerLinkText}>비밀번호 찾기</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleSignUpPress}>
@@ -74,12 +151,12 @@ const styles = StyleSheet.create({
         borderColor: theme.color.grey6,
         borderWidth: 1,
         borderRadius: 5,
-
+        paddingHorizontal: 20*theme.width,
         marginTop: 20 * theme.height,
-        backgroundColor: theme.color.grey6,
+        backgroundColor: theme.color.background,
         fontFamily: 'Pretendard-SemiBold',
         fontSize: theme.fontSizes.fontSizes16,
-        color: theme.color.grey1,
+        color: theme.color.grey10,
     },
     signUpButton: {
         width: 358 * theme.width,
@@ -88,7 +165,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 20* theme.height,
+        marginBottom: 30* theme.height,
         marginTop: 20 * theme.height,
     },
     signUpButtonText: {
@@ -100,7 +177,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: 260 * theme.width,
-        marginBottom: 30,
+        marginBottom: 50*theme.height,
     },
     footerLinkText: {
         color: theme.color.grey1,
@@ -111,7 +188,7 @@ const styles = StyleSheet.create({
         fontSize: theme.fontSizes.fontSizes14,
         fontFamily: 'Pretendard-Medium',
         color: theme.color.grey2,
-        marginBottom: 10,
+        marginBottom: 20*theme.height,
     },
     socialLoginButtons: {
         flexDirection: 'row',
