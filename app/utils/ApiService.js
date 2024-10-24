@@ -44,7 +44,7 @@ const updateTokens = async (accessToken, refreshToken) => {
     }
 }
 
-export async function call(api, needToken, method, request, isMultipart=false) {
+export async function call(api, needToken, method, request/*, isMultipart=false*/) {
     let headers = await new Headers({
         "Content-Type": "application/json",
     })
@@ -66,9 +66,9 @@ export async function call(api, needToken, method, request, isMultipart=false) {
     };
 
     if (request) {
-        if (isMultipart){
+        /*if (isMultipart){
             options.body = request
-        }
+        }*/
         options.body = JSON.stringify(request);
     }
 

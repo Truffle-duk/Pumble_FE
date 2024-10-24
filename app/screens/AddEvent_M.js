@@ -3,7 +3,41 @@ import { StyleSheet, View, Text, Button, TouchableOpacity, ScrollView, Alert, Ac
 import { theme } from "@assets/Theme";
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { call } from "@utils/ApiService";
+import {ethers} from "ethers";
 
+/*// 배포 서버 연결
+const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
+const privateKey = "0x06c533a9eec3b772fee66a58c8fd584426b8a097534d5a10d887e7e23b3f56e7"
+const wallet = new ethers.Wallet(privateKey, provider)
+const eventContractAddress = "0xFFdd28D4E521AED50f0ADF45C2D5C8b141aad2A7"
+const eventContractABI = [
+    "event EventTokenRecords(string indexed hGroupId, uint256 indexed hTimestamp, uint256 indexed hUserId, uint256 userId, uint256 timestamp, uint256 eventId, uint256 tokenNum)",
+    "function createEvent(uint256 _eventId, uint256 _maxPpl, uint256 _reward)",
+    "function distributeTokens(uint256 _eventId, uint256 _amount, string memory _groupId, uint256 _userId)",
+    "function eventOver(uint256 _eventId) public returns (string memory)"
+]
+const eventContract = new ethers.Contract(eventContractAddress, eventContractABI, wallet)
+
+const createEventBlock = async (eventId, maxPeople, reward) => {
+    try {
+        console.log(eventId)
+        console.log(maxPeople)
+        console.log(reward)
+
+        const txResponse = await eventContract.createEvent(eventId, maxPeople, reward)
+        console.log(`Transaction hash: ${txResponse.hash}`);
+
+        // 트랜잭션 영수증 대기
+        const receipt = await txResponse.wait();
+        console.log(`Transaction confirmed in block: ${receipt.blockNumber}`);
+        console.log(receipt)
+
+        return "Success!"
+    } catch (e) {
+        console.log(e)
+        console.log('error here')
+    }
+}*/
 
 function EventNameInput({setTitle}){
     const [eventName, setEventName]=useState("")
@@ -98,30 +132,30 @@ function EventDateInput({startDate, setStartDate, startTime, setStartTime, endDa
 
     const onConfirm = (selectedDate) => { // 날짜 또는 시간 선택 시
         setVisible(false); // 모달 close
-        if(mode == 'startDate'){
-            const dateStr=selectDate.toLocaleDateString('ko-KR', {
+        if(mode === 'startDate'){
+            const dateStr= selectedDate.toLocaleDateString('ko-KR', {
                   year: 'numeric', 
                   month: '2-digit',
                   day: '2-digit'
             });
             setStartDate(dateStr);    
-        }else if(mode == 'startTime'){
-            const timeStr=selectDate.toLocaleTimeString('ko-KR', {
+        }else if(mode === 'startTime'){
+            const timeStr= selectedDate.toLocaleTimeString('ko-KR', {
                   hour: '2-digit',
                   minute: '2-digit',
                   second: undefined, // 초를 제외
                   hour12: false,     // 24시간제를 사용하려면 true 대신 false
                 });
             setStartTime(timeStr); 
-        }else if(mode == 'endDate'){
-            const dateStr=selectDate.toLocaleDateString('ko-KR', {
+        }else if(mode === 'endDate'){
+            const dateStr= selectedDate.toLocaleDateString('ko-KR', {
                       year: 'numeric', 
                       month: '2-digit',
                       day: '2-digit'
                 });
             setEndDate(dateStr); 
         }else{
-            const timeStr=selectDate.toLocaleTimeString('ko-KR', {
+            const timeStr= selectedDate.toLocaleTimeString('ko-KR', {
                       hour: '2-digit',
                       minute: '2-digit',
                       second: undefined, // 초를 제외
@@ -143,19 +177,19 @@ function EventDateInput({startDate, setStartDate, startTime, setStartTime, endDa
             <View style={styles.inputBox3}>
                 <View style={{flexDirection:'row', alignContent:'center'}}>
                     <TouchableOpacity onPress={onPressStartDate}>
-                        <Text>{startDate===""? {dateString}: {startDate}}</Text>
+                        <Text>{ startDate==="" ? dateString : startDate }</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={onPressStartTime}>
-                        <Text>{startTime===""?{timeString}:{startTime}}</Text>
+                        <Text>{ startTime===""? timeString : startTime }</Text>
                     </TouchableOpacity>
                 </View>
                 <View/>
                 <View style={{flexDirection:'row', alignContent:'center'}}>
                     <TouchableOpacity onPress={onPressEndDate}>
-                        <Text>{startDate===""? {dateString}: {endDate}}</Text>
+                        <Text>{ startDate===""? dateString: endDate }</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={onPressEndTime}>
-                        <Text>{startTime===""?{timeString}:{endTime}}</Text>
+                        <Text>{ startTime==="" ? timeString : endTime }</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -305,41 +339,44 @@ function AddEvent_M({navigation}){
 
     const isFormComplete= title !=="" && place !== "" && description!=="" && ecode !== "" && reward !== 0 && maxPeople !== 0;
 
-    const handleCompletePress = () => {
-        const fStartDateStr=startDate.replace(/\./g, '-').replace(/(\d{4})-(\d{2})-(\d{2})/, '$1-$2-$3');
-        const fStartDate=`${fStartDateStr} ${startTime}`;
-        const fEndDateStr=endDate.replace(/\./g, '-').replace(/(\d{4})-(\d{2})-(\d{2})/, '$1-$2-$3');
-        const fEndDate=`${fEndDateStr} ${endTime}`;
+    const handleCompletePress = async () => {
+        const startDateSplit=startDate.replaceAll(" ", "").split(".")
+        const fStartDate=`${startDateSplit[0]}-${startDateSplit[1]}-${startDateSplit[2]}T${startTime}`;
+        const endDateSplit=endDate.replaceAll(" ", "").split(".")
+        const fEndDate=`${endDateSplit[0]}-${endDateSplit[1]}-${endDateSplit[2]}T${endTime}`;
         
         if (isFormComplete) {
             const api = '/event/1'
             const request = {
                 title: title,
-                startDate: fStartDate,
-                endDate: fEndDate,
+                startDate: new Date(fStartDate),
+                endDate: new Date(fEndDate),
                 place: place,
                 description: description,
                 code: ecode,
                 maxPeople: maxPeople,
                 reward:reward,
-                groupId: groupId,
             }
-            call(api, true, 'POST', request)
-                .then(async data => {
-                    if (data.code === 200) {
-                        // const userAuth="member"
-                        // const gid=data.result.groupId
-                        //await Keychain.setInternetCredentials("GroupInfo", userAuth, gid);// 어떻게...?
-                        alert("일정 생성 완료!")
-                        //navigation.navigate('GoHome');
-                        //navigation.navigate('Start', { nickname: nickname });
-                        //setArePasswordsSame(true);
-                    }else{
-                        console.log(data.code)
-                    }
-                })
-        } else {
 
+            const eventId = await call(api, true, 'POST', request)
+                            .then(data => {
+                                if (data.code === 200) {
+                                    return data.result.eventId
+                                }else{
+                                    console.log(data.code)
+                                }
+                            })
+
+            /*await createEventBlock(eventId, maxPeople, reward)
+                .then(log => {
+                    if (log === "Success!") {
+                        alert("일정 생성 완료!")
+                    } else {
+                        alert("블록체인 기록 과정에서 문제가 발생했습니다.")
+                    }
+                })*/
+
+        } else {
             alert('폼을 다시 확인해주세요!');
         }
         
@@ -491,7 +528,7 @@ const styles=StyleSheet.create({
         fontSize:theme.fontSizes.fontSizes16,
         color:theme.color.grey2,
         lineHeight:22*theme.height,
-        //alignContent:'center',
+        alignItems:'center',
         justifyContent:'center',
         paddingVertical:9,
         margin:0,
@@ -524,8 +561,8 @@ const styles=StyleSheet.create({
     },
     inputBox:{
         height:40*theme.height,
+        fontSize: theme.fontSizes.fontSizes9,
         paddingHorizontal:15*theme.width,
-        //alignItems:'center',
         alignContent:'center',
         borderColor:theme.color.grey1,
         borderWidth:1,
