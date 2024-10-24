@@ -14,7 +14,7 @@ import {
 import {theme} from "@assets/Theme";
 
 import {Calendar} from "react-native-calendars";
-import moment from "moment";
+import moment, {max} from "moment";
 
 import {Dimensions} from 'react-native';
 import {ThemeProvider, useNavigation} from '@react-navigation/native';
@@ -30,7 +30,7 @@ const screenHeight = Dimensions.get('screen').height;
 
 
 //dummy
-const userAuth="leader"
+const userAuth = "staff"
 
 //날짜 세기
 const getDateDifference = (date1, date2) => {
@@ -41,44 +41,39 @@ const getDateDifference = (date1, date2) => {
 
 /*// 배포 서버 연결
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
-const privateKey = "0xd177d022ae1e8a21e4b2ea1fdffd0708290ca3f76843acc59297c54074974d38"
+const privateKey = "0x06c533a9eec3b772fee66a58c8fd584426b8a097534d5a10d887e7e23b3f56e7"
 const wallet = new ethers.Wallet(privateKey, provider)
-const eventContractAddress = "0x619e6e3BB15FEA84fA6ADCF86E834538906F3259"
+const eventContractAddress = "0xFFdd28D4E521AED50f0ADF45C2D5C8b141aad2A7"
 const eventContractABI = [
-  "event EventTokenRecords(string indexed hGroupId, uint256 indexed hTimestamp, uint256 indexed hUserId, uint256 userId, uint256 timestamp, uint256 eventId, uint256 tokenNum)",
-  "function createEvent(uint256 _eventId, uint256 _maxPpl, uint256 _reward)",
-  "function distributeTokens(uint256 _eventId, uint256 _amount, string memory _groupId, uint256 _userId)",
-  "function eventOver(uint256 _eventId) public returns (string memory)"
+    "event EventTokenRecords(string indexed hGroupId, uint256 indexed hTimestamp, uint256 indexed hUserId, uint256 userId, uint256 timestamp, uint256 eventId, uint256 tokenNum)",
+    "function createEvent(uint256 _eventId, uint256 _maxPpl, uint256 _reward)",
+    "function distributeTokens(uint256 _eventId, uint256 _amount, string memory _groupId, uint256 _userId)",
+    "function eventOver(uint256 _eventId) public returns (string memory)"
 ]
 const eventContract = new ethers.Contract(eventContractAddress, eventContractABI, wallet)
 
 const attendEvent = async (eventId, amount, groupId, groupUserId) => {
-  try {
-    const balance = await provider.getBalance("0xFC2326Df4AFA4A744661e537044Dd52200F9A2B3");
-    console.log(balance)
-    console.log(eventId)
-    console.log(amount)
-    console.log(groupId)
-    console.log(groupUserId)
+    try {
+        const balance = await provider.getBalance("0xA8433D7304AD461f7824d405241e467e8462282e");
+        console.log(balance)
+        console.log(eventId)
+        console.log(amount)
+        console.log(groupId)
+        console.log(groupUserId)
 
-    // 가스 한도 및 가격 설정
-    const gasLimit = 210000; // 일반적인 트랜잭션 가스 한도
-    const gasPrice = ethers.parseUnits('3', 'gwei'); // 10 gwei
+        const amountInWei = ethers.parseEther(amount.toString())
+        console.log(amountInWei.toString())
+        const txResponse = await eventContract.distributeTokens(eventId, amountInWei, groupId.toString(), groupUserId)
+        console.log(`Transaction hash: ${txResponse.hash}`);
 
-    const txResponse = await eventContract.distributeTokens(eventId, amount, groupId.toString(), groupUserId, {
-      gasLimit: gasLimit,
-      gasPrice: gasPrice
-    })
-    console.log(`Transaction hash: ${txResponse.hash}`);
-
-    // 트랜잭션 영수증 대기
-    const receipt = await txResponse.wait();
-    console.log(`Transaction confirmed in block: ${receipt.blockNumber}`);
-    console.log(receipt)
-  } catch (e) {
-    console.log(e)
-    console.log('error here')
-  }
+        // 트랜잭션 영수증 대기
+        const receipt = await txResponse.wait();
+        console.log(`Transaction confirmed in block: ${receipt.blockNumber}`);
+        console.log(receipt)
+    } catch (e) {
+        console.log(e)
+        console.log('error here')
+    }
 }*/
 
 function Top({user, thisMonthEvent}) {
@@ -319,28 +314,16 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
 
     const submitCode = async (id, submitCode, reward, groupId, groupUserId) => {
         await setCode("")
-        const URL = `http://localhost:8080/api/event/1/join/${id}`
-        const token = await getAccessToken();
-        try {
-            const response = await fetch(URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({code: submitCode})
-            });
-
-            if (!response.ok) {
-                console.log('Response Data:', response);
-                new Error('Network response was not ok at fetchAllData');
-            } else {
-                alert("해당 일정에 참여 신청이 되었습니다.")
-            }
-
-        } catch (error) {
-            console.error('Fetch Error:', error);
+        const api = `/event/1/join/${id}`
+        const request = {
+            code: submitCode
         }
+        await call(api, true, "POST", request)
+            .then(data => {
+                if (data.result.attendeeId) {
+                    console.log("Successfully Joined.")
+                }
+            }).catch(err => console.log("Error at JoinEvent API, ", err))
 
         /*await attendEvent(id, reward, groupId, groupUserId)
             .then(_ => {
@@ -348,7 +331,7 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
               closeModal()
               updateHandler()
             })
-            .catch(error => console.log(error))*/
+            .catch(error => console.log("Error at JoinEvent Blockchain, ", error))*/
     }
 
     return (
@@ -531,7 +514,8 @@ export default function Event({navigation}) {
             <EventList thisMonthEvents={thisMonthDatas} openModal={openModal}/>
             <EventOverlay overlayVisible={overlayVisible} animatedHeight={animatedHeight} closeModal={closeModal}
                           overlayData={overlayData} updateHandler={updateData}/>
-            {userAuth==="leader"&&<TouchableOpacity style={styles.writeBtn} onPress={()=>navigation.navigate('AddEvent')}>
+            {userAuth === "staff" &&
+                <TouchableOpacity style={styles.writeBtn} onPress={() => navigation.navigate('AddEvent')}>
                     <Image source={require('@assets/Icons/writePen.png')} style={styles.writeIcon}/>
                 </TouchableOpacity>}
         </ScrollView>
@@ -867,23 +851,23 @@ const styles = StyleSheet.create({
         fontFamily: 'Pretendard-Medium',
         fontSize: theme.fontSizes.fontSizes14,
         color: theme.color.white,
-    },    
-    writeBtn:{
-        position:'absolute',
-        bottom:92,
-        right:25,
+    },
+    writeBtn: {
+        position: 'absolute',
+        bottom: 92,
+        right: 25,
         //left:'50%',
         //transform: [{ translateX: -110*theme.width/2 }],
-        alignItems:'center',
-        justifyContent:'center',
-        height:60*theme.width*theme.height,
-        width:60*theme.width*theme.height,
-        borderRadius:15,
-        backgroundColor:theme.color.main,
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 60 * theme.width * theme.height,
+        width: 60 * theme.width * theme.height,
+        borderRadius: 15,
+        backgroundColor: theme.color.main,
     },
-    writeIcon:{
-        width:35*theme.width*theme.height,
-        height:35*theme.width*theme.height,
+    writeIcon: {
+        width: 35 * theme.width * theme.height,
+        height: 35 * theme.width * theme.height,
     }
 
 })

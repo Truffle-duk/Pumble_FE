@@ -61,7 +61,7 @@ function SwitchOverlay({overlayVisible, animatedHeight, closeModal, navigation, 
     }, []);
 
     useEffect(() => {
-        console.log(`groupIdList: ${groupIdList}`)
+        //console.log(`groupIdList: ${groupIdList}`)
         GroupCall("GID", groupIdList)
             .then((result) => {
                 if (result === 'No GID token found') {
