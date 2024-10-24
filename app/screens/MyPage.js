@@ -1,21 +1,30 @@
 import { theme } from "@assets/Theme";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Text, Button, TouchableOpacity, Image, StatusBar, ScrollView, Modal, Animated,} from 'react-native';
+import { call } from "@utils/ApiService";
+import { GroupCall } from '@utils/GroupService';
+import Keychain from "react-native-keychain";
 
-function ProfileView({navigation}){
+function ProfileView({navigation, name, imageUri, Auth, pb, qty}){
   return(
     <View style={styles.profileViewContainer}>
       <View style={styles.profileContainer}>
         <View style={styles.profileImageContainer}>
-          <Image source={require('@assets/Images/Guinguin_Face.png')}
+        {imageUri?<Image 
+            //source={require('@assets/Images/Guinguin_Face.png')}
+            source={{uri: JSON.stringify(imageUri)}}
             style={styles.profileImage}/>
+            : <Image 
+            source={require('@assets/Images/Guinguin_Face.png')}
+            //source={{uri: profile.profileImage}}
+            style={styles.profileImage}/>}
         </View>
         <View>
-          <Text style={styles.profileNameText}>귄귄쓰 더 큐티 펭귄</Text>
+          <Text style={styles.profileNameText}>{name}</Text>
           <View style={styles.profileRoleContainer}>
             <Image source={require('@assets/Icons/crownIcon1.png')}
               style={styles.profileRoleIcon}/>
-            <Text style={styles.profileRoleText}>회장</Text>
+            <Text style={styles.profileRoleText}>{Auth}</Text>
           </View>
         </View>
       </View>
@@ -27,12 +36,12 @@ function ProfileView({navigation}){
       <View style={styles.lineHorizontal}/>
       <View style={styles.profileDetailContainer}>
         <View style={styles.profileDetailTextContainer}>
-          <Text style={styles.profileDetailNumText}>45 PB</Text>
+          <Text style={styles.profileDetailNumText}>{pb} PB</Text>
           <Text style={styles.profileDetailText}>보유 PB</Text>
         </View>
         <View style={styles.lineVertical}/>
         <View style={styles.profileDetailTextContainer}>
-          <Text style={styles.profileDetailNumText}>9개</Text>
+          <Text style={styles.profileDetailNumText}>{qty}개</Text>
           <Text style={styles.profileDetailText}>구매 상품</Text>
         </View>
       </View>
@@ -85,10 +94,10 @@ function ManageGroup({openLogoutOverlay, openQuitOverlay}){
   return(
     <View style={styles.mypageCheckDetailContainer}>
       <Text style={styles.mypageCheckDetailTitle}>모임 관리</Text>
-      <TouchableOpacity style={styles.mypageCheckDetailNavigate}
+      {/* <TouchableOpacity style={styles.mypageCheckDetailNavigate}
         onPress={()=>openLogoutOverlay()}>
         <Text style={styles.mypageCheckDetailNavigateText}>로그아웃</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <TouchableOpacity style={styles.mypageCheckDetailNavigate}
         onPress={()=>openQuitOverlay()}>
         <Text style={styles.mypageCheckDetailNavigateText}>이 모임 탈퇴하기</Text>
@@ -138,7 +147,7 @@ function LogoutOverlay({overlayVisible, animatedHeight, closeModal}){
   );
 }
 
-function QuitOverlay({overlayVisible, animatedHeight, closeModal}){
+function QuitOverlay({overlayVisible, animatedHeight, closeModal, fetchDeleteGroup}){
   const [isQuit,setIsQuit]=useState(false);
 
   return(
@@ -173,7 +182,7 @@ function QuitOverlay({overlayVisible, animatedHeight, closeModal}){
           </TouchableOpacity>
           <View style={styles.quitBtnContainer}>
             <TouchableOpacity style={styles.quitBtn}
-              onPress={()=>setIsQuit(true)}>
+              onPress={fetchDeleteGroup}>
               <Text style={styles.quitBtnText}>모임 탈퇴하기</Text>
             </TouchableOpacity>
           </View>            
@@ -188,6 +197,44 @@ export default function MyPage({navigation}){
   const [logoutOverlayVisible, setLogoutOverlayVisible]=useState(false);
   const [quitOverlayVisible, setQuitOverlayVisible]=useState(false);
   const animatedHeight=useRef(new Animated.Value(0)).current;
+
+  const [nickname, setNickname]=useState("귄귄쓰");
+  const [auth, setAuth]=useState("Member");
+  const [profileImage, setProfileImage]=useState("");
+  const [pbBalance, setPbBalance]=useState(0);
+  const [qty, setQty]=useState(0);
+
+  const [gid, setGid]=useState(1)
+
+  const handleProfile = async () => {
+    const api = '/group/1/profile';
+  
+    try {
+      // 비동기 호출을 대기 (await)하여 데이터를 받아옴
+      const data = await call(api, true, 'GET');
+  
+      if (data.code === 200) {
+        setNickname(data.result.nickname);
+        setProfileImage(data.result.profile_image);
+        setPbBalance(data.result.token);
+        setQty(data.result.goods_count);
+      }
+  
+      // Auth 설정
+      const userauth= await GroupCall('Auth');
+      setAuth(userauth);
+  
+    } catch (error) {
+      // 에러 처리 (필요한 경우)
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  
+  useEffect (()=>{
+    handleProfile();
+    
+  },[])
 
   const openLogoutModal=()=>{
     setLogoutOverlayVisible(true);
@@ -223,6 +270,19 @@ export default function MyPage({navigation}){
     }).start(() => setQuitOverlayVisible(false));
   };
 
+  const fetchDeleteGroup = async () => {
+    const api = `/group/1`
+    return await call(api, true, 'DELETE')
+        .then(data => {
+            alert('탈퇴하였습니다!')
+            navigation.navigate('Home')
+            return data.result                
+        })
+        .catch(err => {
+            console.log("Error occurred at fetchDeletePost: " + err)
+        })
+  }
+
     return (
       <>
         {/* <StatusBar
@@ -231,7 +291,7 @@ export default function MyPage({navigation}){
           <Text>Mypage!</Text>
         </View> */}
         <ScrollView contentContainerStyle={styles.background}>
-          <ProfileView navigation={navigation}/>
+          <ProfileView navigation={navigation} name={nickname} imageUri={profileImage} Auth={auth} pb={pbBalance} qty={qty}/>
           <MyPageBanner/>
           <View style={styles.lineHorizontal}/>
           <CheckPBHistory navigation={navigation}/>
@@ -240,7 +300,7 @@ export default function MyPage({navigation}){
           <View style={styles.lineHorizontal}/>
           <ManageGroup openLogoutOverlay={openLogoutModal} openQuitOverlay={openQuitModal}/>
           <LogoutOverlay overlayVisible={logoutOverlayVisible} animatedHeight={animatedHeight} closeModal={closeLogoutModal}/>
-          <QuitOverlay overlayVisible={quitOverlayVisible}  animatedHeight={animatedHeight} closeModal={closeQuitModal}/>
+          <QuitOverlay overlayVisible={quitOverlayVisible}  animatedHeight={animatedHeight} closeModal={closeQuitModal} fetchDeleteGroup={fetchDeleteGroup}/>
         </ScrollView>
       </>
       );

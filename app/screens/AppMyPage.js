@@ -1,8 +1,12 @@
 import { theme } from "@assets/Theme";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Text, Button, TouchableOpacity, Image, StatusBar, ScrollView, Modal, Animated,} from 'react-native';
+import { call } from "@utils/ApiService";
+import { GroupCall } from '@utils/GroupService';
+import Keychain from "react-native-keychain";
 
-function ProfileView({navigation, wallet}){
+
+function ProfileView({navigation, wallet, name, email}){
   return(
     <View style={styles.profileViewContainer}>
       <View style={styles.profileContainer}>
@@ -11,11 +15,11 @@ function ProfileView({navigation, wallet}){
             style={styles.profileImage}/>
         </View>
         <View>
-          <Text style={styles.profileNameText}>귄귄쓰 더 큐티 펭귄</Text>
+          <Text style={styles.profileNameText}>{name}</Text>
           <View style={styles.profileRoleContainer}>
             {/* <Image source={require('@assets/Icons/crownIcon1.png')}
               style={styles.profileRoleIcon}/> */}
-            <Text style={styles.profileRoleText}>Queenguin01@gmail.com</Text>
+            <Text style={styles.profileRoleText}>{email}</Text>
           </View>
         </View>
       </View>
@@ -154,7 +158,7 @@ function LogoutOverlay({overlayVisible, animatedHeight, closeModal}){
   );
 }
 
-function QuitOverlay({overlayVisible, animatedHeight, closeModal}){
+function QuitOverlay({overlayVisible, animatedHeight, closeModal, userDisable}){
   const [isQuit,setIsQuit]=useState(false);
 
   return(
@@ -189,7 +193,7 @@ function QuitOverlay({overlayVisible, animatedHeight, closeModal}){
           </TouchableOpacity>
           <View style={styles.quitBtnContainer}>
             <TouchableOpacity style={styles.quitBtn}
-              onPress={()=>setIsQuit(true)}>
+              onPress={userDisable}>
               <Text style={styles.quitBtnText}>탈퇴하기</Text>
             </TouchableOpacity>
           </View>            
@@ -207,8 +211,41 @@ export default function AppMyPage({navigation}){
   const [quitOverlayVisible, setQuitOverlayVisible]=useState(false);
   const animatedHeight=useRef(new Animated.Value(0)).current;
 
+  const [nickname, setNickname]=useState("귄귄쓰");
+  const [email, setEmail]=useState("guinguin@pumble.com")
+
+  const handleProfile = async () => {
+    const api = '/user';
+  
+    try {
+      // 비동기 호출을 대기 (await)하여 데이터를 받아옴
+      const data = await call(api, true, 'GET');
+  
+      if (data.code === 200) {
+        setNickname(data.result.nickname);
+        setEmail(data.result.email);
+      }
+  
+    } catch (error) {
+      // 에러 처리 (필요한 경우)
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  const handleUserDisable=()=>{
+    const api = '/user'
+    call(api, true, 'PATCH')
+        .then(async data => {
+            if (data.code === 200) {
+                alert('계정을 탈퇴했습니다.');               
+            }
+        })
+  }
+
+
   useEffect(()=>{
     setWallet("0xB1a7218C36E8fd07FC9fdE33074eDaCc5dcB4ED5")
+    handleProfile();
   },[]);
 
 
@@ -254,7 +291,7 @@ export default function AppMyPage({navigation}){
           <Text>Mypage!</Text>
         </View> */}
         <View style={styles.background}>
-          <ProfileView navigation={navigation} wallet={wallet}/>
+          <ProfileView navigation={navigation} wallet={wallet} name={nickname} email={email}/>
           {/* <MyPageBanner/>
           <View style={styles.lineHorizontal}/>
           <CheckPBHistory navigation={navigation}/>
@@ -264,7 +301,7 @@ export default function AppMyPage({navigation}){
           <View style={styles.lineHorizontal}/>
           <ManageAccount openLogoutOverlay={openLogoutModal} openQuitOverlay={openQuitModal}/>
           <LogoutOverlay overlayVisible={logoutOverlayVisible} animatedHeight={animatedHeight} closeModal={closeLogoutModal}/>
-          <QuitOverlay overlayVisible={quitOverlayVisible}  animatedHeight={animatedHeight} closeModal={closeQuitModal}/>
+          <QuitOverlay overlayVisible={quitOverlayVisible}  animatedHeight={animatedHeight} closeModal={closeQuitModal} userDisable={handleUserDisable}/>
         </View>
       </>
       );
