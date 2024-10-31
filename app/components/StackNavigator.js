@@ -45,6 +45,8 @@ import {GroupCall} from "@utils/GroupService";
 import Store_Add from '@screens/Store_Add';
 import Store_Check from '@screens/Store_Check';
 
+import NoticeWrite from "@screens/NoticeWrite";
+
 const Stack = createNativeStackNavigator();
 
 function SwitchOverlay({overlayVisible, animatedHeight, closeModal, navigation, alert, groupNameHandler}) {
@@ -408,6 +410,9 @@ const StackNavigator = ({route}) => {
                 }}/>
                 <Stack.Screen name='AddEvent' component={AddEvent_M} options={{
                     header:(props)=><CustomHeader {...props} title={"일정 등록"}/>
+                }}/>
+                <Stack.Screen name='NoticeWrite' component={NoticeWrite} options={{
+                    header:(props)=><CustomHeader {...props} title={"공지 작성"}/>
                 }}/>
             </Stack.Navigator>
         </>

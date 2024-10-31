@@ -15,12 +15,12 @@ function ManageMember({navigation}){
     )
 }
 
-function ManageGroup({navigation, openDeleteGroupOverlay}){
+function ManageGroup({navigation, openDeleteGroupOverlay, gid}){
     return(
       <View style={styles.mypageCheckDetailContainer}>
         <Text style={styles.mypageCheckDetailTitle}>내 모임 관리</Text>
         <TouchableOpacity style={styles.mypageCheckDetailNavigate}
-          onPress={()=>navigation.navigate('ChangeGroupPW')}
+          onPress={()=>navigation.navigate('ChangeGroupPW', {gid: gid})}
           >
           <Text style={styles.mypageCheckDetailNavigateText}>모임 비밀번호 변경하기</Text>
         </TouchableOpacity>
@@ -33,7 +33,7 @@ function ManageGroup({navigation, openDeleteGroupOverlay}){
     )
 }
 
-function DeleteGroupOverlay({overlayVisible, animatedHeight, closeModal, navigation}){
+function DeleteGroupOverlay({overlayVisible, animatedHeight, closeModal, navigation, gid}){
   const [isDelete,setIsDelete]=useState(false);
 
   return(
@@ -68,7 +68,7 @@ function DeleteGroupOverlay({overlayVisible, animatedHeight, closeModal, navigat
           </TouchableOpacity>
           <View style={styles.quitBtnContainer}>
             <TouchableOpacity style={styles.quitBtn}
-              onPress={()=>navigation.navigate('ConfirmPW')}>
+              onPress={()=>navigation.navigate('ConfirmPW', {gid: gid})}>
               <Text style={styles.quitBtnText}>모임 삭제하기</Text>
             </TouchableOpacity>
           </View>            
@@ -79,9 +79,11 @@ function DeleteGroupOverlay({overlayVisible, animatedHeight, closeModal, navigat
   )
 }
 
-export default function ManageMyGroup({navigation}){
+export default function ManageMyGroup({route, navigation}){
     const [deleteGroupOverlayVisible, setDeleteGroupOverlayVisible]=useState(false);
     const animatedHeight=useRef(new Animated.Value(0)).current;
+
+    const {gid} = route.params
 
     const openDeleteGroupModal=()=>{
       setDeleteGroupOverlayVisible(true);
@@ -104,8 +106,8 @@ export default function ManageMyGroup({navigation}){
         <View style={styles.background}>
             <ManageMember navigation={navigation}/>
             <View style={styles.lineHorizontal}/>
-            <ManageGroup navigation={navigation} openDeleteGroupOverlay={openDeleteGroupModal}/>
-            <DeleteGroupOverlay overlayVisible={deleteGroupOverlayVisible}  animatedHeight={animatedHeight} closeModal={closeDeleteGroupModal} navigation={navigation}/>
+            <ManageGroup navigation={navigation} openDeleteGroupOverlay={openDeleteGroupModal} gid={gid}/>
+            <DeleteGroupOverlay overlayVisible={deleteGroupOverlayVisible}  animatedHeight={animatedHeight} closeModal={closeDeleteGroupModal} navigation={navigation} gid={gid}/>
 
         </View>
     )

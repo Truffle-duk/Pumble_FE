@@ -49,6 +49,7 @@ const CreateGroup = () => {
                         //await Keychain.setInternetCredentials("GroupInfo", userAuth, gid);
                         alert("생성 완료", "모임이 성공적으로 참여하였습니다!")
                         navigation.navigate('GoHome');
+                        navigation.goBack();
                         //navigation.navigate('Start', { nickname: nickname });
                         //setArePasswordsSame(true);
                     }

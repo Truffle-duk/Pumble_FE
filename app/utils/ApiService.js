@@ -77,11 +77,13 @@ export async function call(api, needToken, method, request/*, isMultipart=false*
             if (response.ok || response.status === 401) {
                 return response.json()
             } else { //TODO: 200 이외의 코드 처리
+                console.log(response)
                 throw Error(response)
             }
         })
         .then(async (data) => {
-            if (data.code && data.code === 200) {
+            //if (data.code && data.code === 200) 
+            if (data.code) {
                 return data
             } else if (data.code && data.code === 'TOKEN4014') { //토큰 만료인 경우
                 //1. rtk로 토큰들 재발급

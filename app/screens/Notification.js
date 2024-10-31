@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
 import * as Keychain from 'react-native-keychain';
 import {call} from "@utils/ApiService";
 
-const isAdmin = false; // 관리자 모드를 제어하는 플래그
+const isAdmin = true; // 관리자 모드를 제어하는 플래그
 
 const Notification = () => {
     const navigation = useNavigation();
@@ -31,6 +31,25 @@ const Notification = () => {
         navigation.navigate('NoticeWrite');
     };
 
+    const handleDeletePress =async (noticeId) => {
+        //console.log(noticeId)
+        const dapi=`/community/1/notice/${noticeId}`
+        //const dapi=`/community/1/notice/12`
+        return await call(dapi, true, 'DELETE')
+            .then(data => {
+                console.log(data)
+                if(data.code === 200){
+                    alert('공지가 삭제되었습니다.');
+                }else{
+                    alert("공지 삭제를 실패했습니다.")
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                console.log("Error occurred at delete notification")
+            })
+    }
+
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -47,14 +66,28 @@ const Notification = () => {
                     <Text>공지가 없어요..ㅜㅜ</Text>
                 ):(
                     notiList.map((notice,index) => (
-                        <TouchableOpacity key={notice.noticeId} style={styles.noticeItem} onPress={() => handleNoticePress(notice.notice.noticeId)}>
+                        <TouchableOpacity //key={notice.noticeId} 
+                            key={index} style={styles.noticeItem} onPress={() => handleNoticePress(notice.notice.noticeId)}>
                             <View style={styles.noticeContent}>
-                                <View style={styles.noticeTextContainer}>
+                                {/* <View style={styles.noticeTextContainer}>
                                     <Text style={styles.noticeTitle}>{notice.notice.title}</Text>
                                     <Text style={styles.noticeAuthor}>{notice.writer.nickname}</Text>
                                     <Text style={styles.noticeDate}>{notice.notice.createdAt.split('T')[0]}</Text>
                                 </View>
-                                <Image source={require('../assets/Icons/arrow-Right.png')} style={styles.arrowIcon} />
+                                <Image source={require('../assets/Icons/arrow-Right.png')} style={styles.arrowIcon} /> */}
+                                <View style={styles.noticeTextContainer}>
+                                    <Text style={styles.noticeTitle}>{notice.notice.title}</Text>
+                                    <Image source={require('../assets/Icons/arrow-Right.png')} style={styles.arrowIcon} />
+                                </View>
+                                <Text style={styles.noticeAuthor}>{notice.writer.nickname}</Text>
+                                <View style={styles.noticeTextContainer}>
+                                    <Text style={styles.noticeDate}>{notice.notice.createdAt.split('T')[0]}</Text>
+                                    {isAdmin&&(
+                                        <TouchableOpacity onPress={()=>handleDeletePress(notice.notice.noticeId)}>
+                                            <Image source={require('@assets/Icons/trash.png')} style={styles.trashIcon}/>
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
                             </View>
                         </TouchableOpacity>
                     ))
@@ -65,7 +98,7 @@ const Notification = () => {
             {/* 관리자 모드일 때 글쓰기 버튼 표시 */}
             {isAdmin && (
                 <TouchableOpacity style={styles.writeButton} onPress={handleWritePress}>
-                    <Image source={require('../assets/Icons/write.png')} style={styles.writeIcon} />
+                    <Image source={require('../assets/Icons/writePen.png')} style={styles.writeIcon} />
                 </TouchableOpacity>
             )}
         </View>
@@ -87,16 +120,16 @@ const styles = StyleSheet.create({
         paddingBottom: 77 * theme.height,
     },
     scrollContainer: {
-        paddingHorizontal: 16,
-        paddingBottom: 20,
+        paddingHorizontal: 16*theme.width,
+        paddingBottom: 20*theme.height,
     },
     mainNotice: {
         backgroundColor: convertHexToRGBA(theme.color.main, 0.07),
         borderRadius: 15,
-        paddingVertical: 10,
-        paddingHorizontal: 15,
-        marginTop: 15,
-        marginBottom: 15,
+        paddingVertical: 10*theme.height,
+        paddingHorizontal: 15*theme.width,
+        marginVertical: 15*theme.height,
+        //marginBottom: 15,
         flexDirection: 'row',
         alignItems: 'center',
     },
@@ -106,9 +139,9 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     megaphoneIcon: {
-        width: 20,
-        height: 20,
-        marginRight: 10,
+        width: 20*theme.width*theme.height,
+        height: 20*theme.width*theme.height,
+        marginRight: 10*theme.width,
     },
     mainNoticeText: {
         fontFamily: 'Pretendard-Medium',
@@ -117,13 +150,14 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     arrowDownIcon: {
-        width: 15 * theme.width,
-        height: 15 * theme.height,
+        width: 15 * theme.width*theme.height,
+        height: 15 * theme.height*theme.width,
     },
     noticeItem: {
         backgroundColor: theme.color.white,
         borderRadius: 15,
-        padding: 15,
+        paddingVertical: 20*theme.height,
+        paddingHorizontal:15*theme.width,
         marginBottom: 10,
         // 그림자 추가
         shadowColor: theme.color.black,
@@ -136,45 +170,59 @@ const styles = StyleSheet.create({
         elevation: 3, // Android용 그림자
     },
     noticeContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        //flexDirection: 'row',
+        //alignItems: 'center',
+        //justifyContent: 'space-between',
     },
     noticeTextContainer: {
-        flex: 1,
+        //flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     noticeTitle: {
         fontFamily: 'Pretendard-SemiBold',
         fontSize: theme.fontSizes.fontSizes18,
         color: theme.color.grey2,
+        lineHeight:20
     },
     noticeAuthor: {
         fontFamily: 'Pretendard-Medium',
         fontSize: theme.fontSizes.fontSizes14,
         color: theme.color.grey10,
+        marginTop:10*theme.height,
+        marginBottom:5*theme.height,
+        lineHeight:15
     },
     noticeDate: {
         fontFamily: 'Pretendard-Medium',
         fontSize: theme.fontSizes.fontSizes14,
         color: theme.color.grey10,
+        lineHeight:15
     },
     arrowIcon: {
-        width: 15 * theme.width,
-        height: 15 * theme.height,
+        width: 15 * theme.width*theme.height,
+        height: 15 * theme.height*theme.width,
     },
     writeButton: {
         position: 'absolute',
-        right: 20,
-        bottom: 20,
+        right: 20*theme.width,
+        bottom: 97*theme.height,
         backgroundColor: theme.color.main,
         padding: 10,
-        borderRadius: 50,
-        elevation: 5,
+        borderRadius: 15,
+        justifyContent:'center',
+        alignItems:'center'
+        //elevation: 5,
     },
     writeIcon: {
-        width: 24,
-        height: 24,
+        width: 35*theme.width*theme.height,
+        height: 35*theme.width*theme.height,
     },
+    trashIcon:{
+        width: 20*theme.width*theme.height,
+        height: 20*theme.width*theme.height,
+    }
 });
 
 export default Notification;

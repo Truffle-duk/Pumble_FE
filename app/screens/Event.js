@@ -9,7 +9,8 @@ import {
     Image,
     Modal,
     Animated,
-    TextInput
+    TextInput,
+    Alert
 } from 'react-native';
 import {theme} from "@assets/Theme";
 
@@ -143,7 +144,7 @@ function EventCard({lastEvent, upcomingEvent}) {
     )
 }
 
-function EventCalendar({data}) {
+function EventCalendar({data, openCalendarModal}) {
     //캘린더 로컬화
     LocaleConfig.locales['kr'] = {
         monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
@@ -155,6 +156,18 @@ function EventCalendar({data}) {
     LocaleConfig.defaultLocale = 'kr';
 
     const [headerMonth, setHeaderMonth] = useState(moment().format('YYYY-MM'));
+
+    const handleEvent=(day)=>{
+        if (eventDate.hasOwnProperty(day.dateString)){
+            //console.log(data)
+            const matchingEvent = data.filter(data => data.startDate.startsWith(day.dateString));
+            const eventIds = matchingEvent.map(event => event.eventId);
+            console.log(matchingEvent);
+            if(userAuth !== "member"){
+                openCalendarModal(matchingEvent);
+            }
+        }
+    }
 
     const eventDate = data.reduce((acc, event) => {
         const dateAndTime = event.startDate.split('T')
@@ -213,6 +226,7 @@ function EventCalendar({data}) {
                 //캘린더 일정 표시
                 markedDates={eventDate}
                 //onDayPress={(day)=>navigation.navigate('Store')} //이거 하려면 이동하려는 페이지가 navigate 연결 되어있어야함
+                onDayPress={(day)=>handleEvent(day)}
 
             />
         </View>
@@ -295,8 +309,15 @@ function EventList({thisMonthEvents, openModal}) {
 function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, updateHandler}) {
     const [code, setCode] = useState("")
     //TODO: 여러 일에 걸친 일정 반영 필요
-    const overlayDataDate = overlayData.startDate.split('T')[0];
-    const overlayDataTime = parseInt(overlayData.startDate.split('T')[1].substring(0, 2));
+    //const overlayDataDate = overlayData.startDate.split('T')[0];
+    //const overlayDataTime = parseInt(overlayData.startDate.split('T')[1].substring(0, 2));
+    const overlayDataDate = !Array.isArray(overlayData) && overlayData?.startDate
+        ? overlayData.startDate.split('T')[0]
+        : '';
+
+    const overlayDataTime = !Array.isArray(overlayData) && overlayData?.startDate
+        ? parseInt(overlayData.startDate.split('T')[1].substring(0, 2))
+        : 0;
 
     const getAccessToken = async () => {
         try {
@@ -417,9 +438,143 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
     )
 }
 
+function EventCalendarOverlay({overlayVisible, animatedHeight, closeModal, overlayData}) {
+    const [code, setCode] = useState("")
+    //TODO: 여러 일에 걸친 일정 반영 필요
+    console.log("overlay데이타:" , overlayData)
+    const overlayDataDate = !Array.isArray(overlayData) && overlayData?.startDate
+        ? overlayData.startDate.split('T')[0]
+        : '';
+
+    const overlayDataTime = !Array.isArray(overlayData) && overlayData?.startDate
+        ? parseInt(overlayData.startDate.split('T')[1].substring(0, 2))
+        : 0;
+
+    // const submitCode = async (id, submitCode, reward, groupId, groupUserId) => {
+    //     await setCode("")
+    //     const api = `/event/1/join/${id}`
+    //     const request = {
+    //         code: submitCode
+    //     }
+    //     await call(api, true, "POST", request)
+    //         .then(data => {
+    //             if (data.result.attendeeId) {
+    //                 console.log("Successfully Joined.")
+    //             }
+    //         }).catch(err => console.log("Error at JoinEvent API, ", err))
+
+    //     /*await attendEvent(id, reward, groupId, groupUserId)
+    //         .then(_ => {
+    //           alert(`${reward} PB를 받았어요!`)
+    //           closeModal()
+    //           updateHandler()
+    //         })
+    //         .catch(error => console.log("Error at JoinEvent Blockchain, ", error))*/
+    // }
+    const deleteEvent = () => {
+        const api = `/event/1/delete/${overlayData.eventId}`
+        call(api, true, "DELETE")
+            .then(data=> {
+                if(data.code === 200) {
+                    console.log("Event delete success")
+                    alert("일정이 삭제되었습니다.")
+                }
+            }).catch(err => console.log("Error at DeleteEvent API, ", err))
+            console.log(overlayData.eventId)
+    }
+
+    const eventDone = () => {
+        const api = `/event/1/done/${overlayData.eventId}`
+        call(api, true, "PATCH")
+            .then(data=> {
+                if(data.code === 200) {
+                    console.log("Event done success")
+                    alert("일정이 종료되었습니다.")
+                }
+            }).catch(err => console.log(overlayData.eventId, "Error at Done Event done API, ", err))
+        console.log(overlayData.eventId)
+    }
+
+    return (
+        <Modal
+            transparent={true}
+            visible={overlayVisible}
+            animationType="None"
+            onRequestClose={closeModal}
+        >
+            <TouchableOpacity onPress={closeModal} activeOpacity={1} style={styles.overlayBackground}>
+                <Animated.View style={styles.overlayContainer}>
+                    <View style={styles.overlayHeaderContainer}>
+                        <View style={styles.overlayHeaderTextContainer}>
+                            <Text style={styles.overlayHeaderText}>{overlayData.title}</Text>
+                        </View>
+
+                        <TouchableOpacity onPress={closeModal}>
+                            <Image source={require("@assets/Icons/closeIcon.png")}
+                                   style={styles.overlayHeaderIcon}
+                            />
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.overlayInfoContainer}>
+                        <Image source={require("@assets/Icons/dateIcon.png")}
+                               style={styles.overlayInfoIcon}
+                        />
+                        <Text style={styles.overlayInfoText}>{overlayDataDate}</Text>
+                        <Text
+                            style={styles.overlayInfoTimeDetailText}>{overlayDataTime < 10 ? `0${overlayDataTime}:00` : `${overlayDataTime}:00`}~{overlayDataTime < 8 ? `0${overlayDataTime + 2}:00` : `${overlayDataTime + 2}:00`}</Text>
+                    </View>
+                    <View style={styles.overlayLine}/>
+                    <View style={styles.overlayInfoContainer}>
+                        <Image source={require("@assets/Icons/placeIcon.png")}
+                               style={styles.overlayInfoIcon}
+                        />
+                        <Text style={styles.overlayInfoText}>{overlayData.place}</Text>
+                    </View>
+                    <View style={styles.overlayLine}/>
+                    <View style={styles.overlayInfoDetailContainer}>
+                        <Image source={require("@assets/Icons/pinIcon.png")}
+                               style={styles.overlayInfoIcon}
+                        />
+                        <View>
+                            <Text style={styles.overlayInfoText}>활동 내용</Text>
+                            <Text style={styles.overlayInfoDetailText}>{overlayData.description}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.overlayInputContainer}>
+                        {/* <View style={styles.overlayInputCodeContainer}>
+                            <TextInput
+                                returnKeyType='done'
+                                keyboardType="numeric"
+                                maxLength={6}
+                                value={code}
+                                onChangeText={setCode}
+                                placeholder="참여 코드를 입력하세요"
+                                style={styles.overlayInputCodeText}
+                            />
+                        </View>
+                        <TouchableOpacity style={styles.overlayInputBtn}
+                                          onPress={() => submitCode(overlayData.eventId, code, overlayData.reward, 1, 1)}>
+                            <Text style={styles.overlayInputBtnText}>입력</Text>
+                        </TouchableOpacity> */}
+                        <TouchableOpacity onPress={() => deleteEvent()} style={styles.deleteBtn}>
+                            <Text style={styles.deleteBtnText}>일정 삭제</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => eventDone()} style={styles.doneBtn}>
+                            <Text style={styles.doneBtnText}>일정 종료</Text>
+                        </TouchableOpacity>
+                    </View>
+
+
+                </Animated.View>
+            </TouchableOpacity>
+        </Modal>
+    )
+}
+
 
 export default function Event({navigation}) {
-    const [user, setUser] = useState("정귄귄");
+    const [user, setUser] = useState("-");
     const [datas, setDatas] = useState([]);
     const [thisMonthDatas, setThisMonthDatas] = useState([]);
     const [lastEvents, setLastEvents] = useState({title: "", DDay: ""});
@@ -436,6 +591,7 @@ export default function Event({navigation}) {
         "status": ""
     })
     const animatedHeight = useRef(new Animated.Value(0)).current;
+    const [calendarOverlayVisible, setCalendarOverlayVisible] = useState(false);
 
     useEffect(() => {
         // 모든 행사 불러오기
@@ -465,6 +621,14 @@ export default function Event({navigation}) {
             .catch(err => {
                 console.log("Error occurred at firstUseEffect3" + err)
             })
+        
+        const nameApi='/group/1/profile';
+        call(nameApi, true, 'GET')
+            .then(data =>{
+                if (data.code === 200){
+                    setUser(data.result.nickname);
+                }
+            })            
     }, []);
 
     const fetchMonthlyEvent = async () => {
@@ -506,14 +670,34 @@ export default function Event({navigation}) {
         }).start(() => setOverlayVisible(false));
     };
 
+    const openCalendarModal = (data) => {
+        setCalendarOverlayVisible(true);
+        setOverlayData(data[0]);
+        Animated.timing(animatedHeight, {
+            toValue: 300, // 모달의 높이
+            duration: 0, // 애니메이션 지속 시간
+            useNativeDriver: false
+        }).start();
+    };
+
+    const closeCalendarModal = () => {
+        Animated.timing(animatedHeight, {
+            toValue: 300,
+            duration: 0,
+            useNativeDriver: false
+        }).start(() => setCalendarOverlayVisible(false));
+    };
+
     return (
         <ScrollView contentContainerStyle={styles.background}>
             <Top user={user} thisMonthEvent={thisMonthDatas}/>
             <EventCard lastEvent={lastEvents} upcomingEvent={upcomingEvents}/>
-            <EventCalendar data={datas}/>
+            <EventCalendar data={datas} openCalendarModal={openCalendarModal}/>
             <EventList thisMonthEvents={thisMonthDatas} openModal={openModal}/>
             <EventOverlay overlayVisible={overlayVisible} animatedHeight={animatedHeight} closeModal={closeModal}
                           overlayData={overlayData} updateHandler={updateData}/>
+            <EventCalendarOverlay overlayVisible={calendarOverlayVisible} animatedHeight={animatedHeight} closeModal={closeCalendarModal}
+                        overlayData={overlayData}/>
             {userAuth === "staff" &&
                 <TouchableOpacity style={styles.writeBtn} onPress={() => navigation.navigate('AddEvent')}>
                     <Image source={require('@assets/Icons/writePen.png')} style={styles.writeIcon}/>
@@ -868,6 +1052,34 @@ const styles = StyleSheet.create({
     writeIcon: {
         width: 35 * theme.width * theme.height,
         height: 35 * theme.width * theme.height,
-    }
+    },
+    doneBtn:{
+        justifyContent:'center',
+        alignItems:'center',
+        backgroundColor:theme.color.main,
+        borderRadius:5,
+        height:40*theme.height,
+        width:171*theme.width,
+    },
+    doneBtnText:{
+        fontFamily: 'Pretendard-SemiBold',
+        fontSize: theme.fontSizes.fontSizes15,
+        color: theme.color.white,
+    },
+    deleteBtn:{
+        justifyContent:'center',
+        alignItems:'center',
+        backgroundColor:theme.color.white,
+        borderRadius:5,
+        borderWidth:1,
+        borderColor:theme.color.grey1,
+        height:40*theme.height,
+        width:171*theme.width,
+    },
+    deleteBtnText:{
+        fontFamily: 'Pretendard-SemiBold',
+        fontSize: theme.fontSizes.fontSizes15,
+        color: theme.color.grey1,
+    },
 
 })

@@ -1,36 +1,59 @@
 import { theme } from "@assets/Theme";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity, Image, StatusBar, ScrollView, Modal, Animated,} from 'react-native';
+import { call } from "@utils/ApiService";
 
-
-export default function ConfirmPW({navigation}){
+export default function ConfirmPW({route, navigation}){
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [arePasswordsSame, setArePasswordsSame] = useState(true)
 
     const [arePasswordRight, setArePasswordsRight] = useState(false); //기존 패스워드가 맞는지
 
+    const {gid}=route.params
     const isFormComplete = password !== '' && confirmPassword !== '';
 
-    //나중에 연결~^^
-    // const handleCheckPw = () => {
-    //     if (isFormComplete && arePasswordsSame) {
-    //         const checkPwApi = '/group/1/password'
-    //         const checkPwRequest = {
-    //             password: password,
-    //         }
-    //         call(checkPwApi, true, 'POST', checkPwRequest)
-    //             .then(data => {
-    //                 if (data.code === 200) {
-    //                     //navigation.navigate('Start', { nickname: nickname });
-    //                     setArePasswordsRight(true);
-    //                 }
-    //             })
-    //     } else {
-    //         alert('패스워드를 다시 확인해주세요!');
-    //     }
-    // };
+    
+    const handleCheckPw = () => {
+        //console.log(gid, " ", password, " ", confirmPassword, " ", isFormComplete, " ", arePasswordsSame)
+        if (isFormComplete && arePasswordsSame) {
+            //console.log(gid, " ", password, " ", confirmPassword, " ", isFormComplete, " ", arePasswordsSame)
+            const checkPwApi = `/group/${gid}/password`
+            const checkPwRequest = {
+                password: password,
+            }
+            call(checkPwApi, true, 'POST', checkPwRequest)
+                .then(async data => {
+                    if (data.code === 200) {
+                        //navigation.navigate('Start', { nickname: nickname });
+                        setArePasswordsRight(true);
+                    }else{
+                        console.log(gid)
+                    }
+                })
+        } else {
+            alert('패스워드를 다시 확인해주세요!');
+        }
+    };
 
+    const handleDeleteGroup = () => {
+        handleCheckPw()
+        if (arePasswordRight) {
+            const api=`/group/${gid}/delete`
+            const request={
+                password: password
+            }
+            call(api, true, 'DELETE', request)
+                .then(data => {
+                    if (data.code === 200){
+                        alert('모임이 삭제되었습니다!');
+                        navigation.goBack();
+                    }else{
+                        alert('삭제 과정에서 오류가 발생했습니다 :(');
+                    }
+                })
+        }
+    }
     // const handleChangePw = () => {
     //     if (isFormComplete && isValidPassword && arePasswordsSame) {
     //         const changePwApi = '/auth/signUp'
@@ -96,7 +119,7 @@ export default function ConfirmPW({navigation}){
 
             <TouchableOpacity
                 style={[styles.button, !isFormComplete && styles.buttonDisabled]}
-                //onPress={handleCheckPw}
+                onPress={handleDeleteGroup}
                 disabled={!isFormComplete}
             >
                 <Text style={styles.buttonText}>모임 삭제하기</Text>

@@ -39,56 +39,63 @@ const createEventBlock = async (eventId, maxPeople, reward) => {
     }
 }*/
 
-function EventNameInput({setTitle}){
+function EventNameInput({title, setTitle}){
     const [eventName, setEventName]=useState("")
     
     return(
         <View style={{marginBottom:25*theme.height}}>
             <Text style={styles.inputTitle}>일정 이름</Text>
-            <View style={styles.inputBox}>
+            {/* <View style={styles.inputBox}>
                 <TextInput
-                        returnKeyType='done'
-                        maxLength={30}
-                        onChangeText={setTitle}
-                        placeholder="일정의 이름을 입력해주세요"
-                        placeholderTextColor={theme.color.grey1}
-                        style={styles.inputText}
-                        scrollEnabled={true}
-                        multiline={false} // 여러 줄 입력을 허용하려면 true로 설정
-                        //textAlignVertical="top"
-                        textAlign="left"
-                        lineHeight={22} // 줄 간격을 설정
-                        //height={42*theme.height}
-                        />
-            </View>
-            {/* <TextInput
-                        returnKeyType='done'
-                        maxLength={30}
-                        onChangeText={setTitle}
-                        placeholder="일정의 이름을 입력해주세요"
-                        placeholderTextColor={theme.color.grey1}
-                        style={styles.inputText}
-                        scrollEnabled={true}
-                        multiline={false} // 여러 줄 입력을 허용하려면 true로 설정
-                        //textAlignVertical="top"
-                        textAlign="left"
-                        lineHeight={22} // 줄 간격을 설정
-                        //height={42*theme.height}
-                        /> */}
+                    style={styles.inputText}
+                    value={title}
+                    placeholder="일정의 이름을 입력해주세요"
+                    placeholderTextColor={theme.color.grey1}
+                    multiline={false}
+                    onChangeText={setTitle}
+                    autoCapitalize="none"
+                    returnKeyType='done'
+                    maxLength={30}                        
+                    scrollEnabled={true}
+                    // 여러 줄 입력을 허용하려면 true로 설정
+                    //textAlignVertical="top"
+                    //textAlign="left"
+                    //lineHeight={22} // 줄 간격을 설정
+                    //height={42*theme.height}
+                    />
+            </View> */}
+            <TextInput
+                style={styles.input}
+                value={title}
+                placeholder="일정의 이름을 입력해주세요"
+                placeholderTextColor={theme.color.grey1}
+                multiline={false}
+                onChangeText={setTitle}
+                autoCapitalize="none"
+                returnKeyType='done'
+                maxLength={30}                        
+                scrollEnabled={true}
+                // 여러 줄 입력을 허용하려면 true로 설정
+                //textAlignVertical="top"
+                //textAlign="left"
+                //lineHeight={22} // 줄 간격을 설정
+                //height={42*theme.height}
+                />
         </View>
     )
 }
 
-function EventPlaceInput({setPlace}){
+function EventPlaceInput({place, setPlace}){
     const [eventPlace, setEventPlace]=useState("")
     
     return(
         <View style={{marginBottom:25*theme.height}}>
             <Text style={styles.inputTitle}>일정 장소</Text>
-            <View style={styles.inputBox}>
+            {/* <View style={styles.inputBox}>
                 <TextInput
                         returnKeyType='done'
                         maxLength={30}
+                        value={place}
                         onChangeText={setPlace}
                         placeholder="일정의 장소를 입력해주세요"
                         placeholderTextColor={theme.color.grey1}
@@ -100,7 +107,25 @@ function EventPlaceInput({setPlace}){
                         lineHeight={22} // 줄 간격을 설정
                         //height={42*theme.height}
                         />
-            </View>
+            </View> */}
+            <TextInput
+                    style={styles.input}
+                    value={place}
+                    //onChangeText={setPlace}
+                    placeholder="일정의 장소을 입력해주세요"
+                    placeholderTextColor={theme.color.grey1}
+                    multiline={false}
+                    onChangeText={setPlace}
+                    autoCapitalize="none"
+                    returnKeyType='done'
+                    maxLength={30}                        
+                    scrollEnabled={true}
+                    // 여러 줄 입력을 허용하려면 true로 설정
+                    //textAlignVertical="top"
+                    //textAlign="left"
+                    //lineHeight={22} // 줄 간격을 설정
+                    //height={42*theme.height}
+                    />
         </View>
     )
 }
@@ -219,16 +244,16 @@ function EventDateInput({startDate, setStartDate, startTime, setStartTime, endDa
     )
 }
 
-function EventContentInput({setDescription}){
+function EventContentInput({description, setDescription}){
     const [eventContent, setEventContent]=useState("")    
     
     return(
         <View style={{marginBottom:25*theme.height}}>
             <Text style={styles.inputTitle}>활동 내용</Text>
-            <View style={styles.inputBox2}>
+            {/* <View style={styles.inputBox2}>
                 <TextInput
                         returnKeyType='done'
-                        maxLength={30}
+                        maxLength={300}
                         onChangeText={setDescription}
                         placeholder="활동에 대한 내용을 입력해주세요"
                         placeholderTextColor={theme.color.grey1}
@@ -240,12 +265,30 @@ function EventContentInput({setDescription}){
                         lineHeight={22} // 줄 간격을 설정
                         //height={42*theme.height}
                         />
-            </View>
+            </View> */}
+            <TextInput
+                    style={styles.input2}
+                    value={description}
+                    //onChangeText={setPlace}
+                    placeholder="활동에 대한 내용을 입력해주세요"
+                    placeholderTextColor={theme.color.grey1}
+                    multiline={true}
+                    onChangeText={setDescription}
+                    autoCapitalize="none"
+                    returnKeyType='done'
+                    maxLength={300}                        
+                    scrollEnabled={true}
+                    // 여러 줄 입력을 허용하려면 true로 설정
+                    textAlignVertical="top"
+                    //textAlign="left"
+                    //lineHeight={22} // 줄 간격을 설정
+                    //height={42*theme.height}
+                    />
         </View>
     )
 }
 
-function EventToken({setReward}){
+function EventToken({reward, setReward}){
     const [eventToken, setEventToken]=useState(0)
 
     return(
@@ -257,6 +300,7 @@ function EventToken({setReward}){
                         returnKeyType='done'
                         keyboardType="numeric"
                         maxLength={4}
+                        value={reward}
                         onChangeText={setReward}
                         placeholder="0"
                         placeholderTextColor={theme.color.grey1}
@@ -277,7 +321,7 @@ function EventToken({setReward}){
     )
 }
 
-function EventMaxPeople({setMaxPeople}){
+function EventMaxPeople({maxPeople, setMaxPeople}){
     return(
         <View style={styles.tokenView}>
             <Text style={styles.inputTitle2}>최대 인원수:</Text>
@@ -287,6 +331,7 @@ function EventMaxPeople({setMaxPeople}){
                         returnKeyType='done'
                         keyboardType="numeric"
                         maxLength={4}
+                        value={maxPeople}
                         onChangeText={setMaxPeople}
                         placeholder="0"
                         placeholderTextColor={theme.color.grey1}
@@ -307,13 +352,13 @@ function EventMaxPeople({setMaxPeople}){
     )
 }
 
-function EventCodeInput({setECode}){
+function EventCodeInput({ecode, setECode}){
     const [eventCode, setEventCode]=useState("")
     
     return(
         <ScrollView contentContainerStyle={{marginBottom:25*theme.height}}>
             <Text style={styles.inputTitle}>인증코드</Text>
-            <View style={styles.inputBox}>
+            {/* <View style={styles.inputBox}>
                 <TextInput
                         returnKeyType='done'
                         maxLength={6}
@@ -329,7 +374,25 @@ function EventCodeInput({setECode}){
                         lineHeight={22} // 줄 간격을 설정
                         //height={42*theme.height}
                         />
-            </View>
+            </View> */}
+            <TextInput
+                    style={styles.input}
+                    value={ecode}
+                    //onChangeText={setPlace}
+                    placeholder="일정의 장소을 입력해주세요"
+                    placeholderTextColor={theme.color.grey1}
+                    multiline={false}
+                    onChangeText={setECode}
+                    autoCapitalize="none"
+                    returnKeyType='done'
+                    maxLength={30}                        
+                    scrollEnabled={true}
+                    // 여러 줄 입력을 허용하려면 true로 설정
+                    //textAlignVertical="top"
+                    //textAlign="left"
+                    //lineHeight={22} // 줄 간격을 설정
+                    //height={42*theme.height}
+                    />
         </ScrollView>
     )
 }
@@ -479,8 +542,8 @@ function AddEvent_M({navigation}){
 
     return(
         <ScrollView contentContainerStyle={styles.background}>
-            <EventNameInput setTitle={setTitle}/>
-            <EventPlaceInput setPlace={setPlace}/>
+            <EventNameInput title={title} setTitle={setTitle}/>
+            <EventPlaceInput place={place} setPlace={setPlace}/>
             {/* <EventDateInput startDate={startDate} setStartDate={setStartDate} startTime={startTime} setStartTime={setStartTime} endDate={endDate} setEndDate={setEndDate} endTime={endTime} setEndTime={setEndTime}/>  */}
             <View style={{marginBottom:25*theme.height}}>
                 <Text style={styles.inputTitle}>일정 기간</Text>
@@ -506,10 +569,10 @@ function AddEvent_M({navigation}){
                 </View>
                 
             </View>
-            <EventContentInput setDescription={setDescription}/>
-            <EventToken setReward={setReward}/>
-            <EventMaxPeople setMaxPeople={setMaxPeople}/>
-            <EventCodeInput setECode={setECode}/>
+            <EventContentInput description={description} setDescription={setDescription}/>
+            <EventToken reward={reward} setReward={setReward}/>
+            <EventMaxPeople maxPeople={maxPeople} setMaxPeople={setMaxPeople}/>
+            <EventCodeInput ecode={ecode} setECode={setECode}/>
 
             <TouchableOpacity style={styles.doneBtn}
                 onPress={handleCompletePress}>
@@ -539,11 +602,11 @@ const styles=StyleSheet.create({
     },
     input: {
         //width: 358 * theme.width,
-        height: 52 * theme.height,
+        height: 46 * theme.height,
         //marginTop: 30*theme.height,
-        borderColor: theme.color.grey6,
+        borderColor: theme.color.grey1,
         borderWidth: 1,
-        borderRadius: 5,
+        borderRadius: 15,
         paddingHorizontal:15*theme.width,
         backgroundColor: theme.color.white,
         //color: theme.color.grey10,
@@ -551,6 +614,23 @@ const styles=StyleSheet.create({
         fontSize:theme.fontSizes.fontSizes16,
         color:theme.color.grey2,
         lineHeight:16*theme.height,
+        paddingVertical:0,
+    },
+    input2: {
+        //width: 358 * theme.width,
+        height: 108 * theme.height,
+        //marginTop: 30*theme.height,
+        borderColor: theme.color.grey1,
+        borderWidth: 1,
+        borderRadius: 15,
+        paddingHorizontal:15*theme.width,
+        backgroundColor: theme.color.white,
+        //color: theme.color.grey10,
+        fontFamily:'Pretendard-Medium',
+        fontSize:theme.fontSizes.fontSizes16,
+        color:theme.color.grey2,
+        lineHeight:16*theme.height,
+        paddingVertical:10*theme.height,
     },
     inputText:{
         fontFamily:'Pretendard-Medium',

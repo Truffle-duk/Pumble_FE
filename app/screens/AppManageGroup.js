@@ -43,7 +43,7 @@ function MyGroup({groups, navigation}){
                         <View style={styles.groupContainer}>
                             <Text style={styles.groupNameText}>{group.name}</Text>
                             <TouchableOpacity
-                            onPress={()=>navigation.navigate('ManageMyGroup')}>
+                            onPress={()=>navigation.navigate('ManageMyGroup', {gid:group.group_id})} key={index}>
                                 <Image source={require("@assets/Icons/settingsIcon.png")}
                                 style={styles.settingIcon}/>
                             </TouchableOpacity>

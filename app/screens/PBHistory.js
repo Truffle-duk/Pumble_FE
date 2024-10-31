@@ -119,15 +119,21 @@ export default function PBHistory(){
     return (
         // <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         // </View>
-        <ScrollView contentContainerStyle={styles.background}>
-          <PBBalenceCard balence={PBbalence}/>
-          <PBHistoryList histories={PBhistory}/>
-        </ScrollView>
+        <View style={styles.background}>
+          <ScrollView 
+          //contentContainerStyle={styles.background}
+          >
+            <PBBalenceCard balence={PBbalence}/>
+            <PBHistoryList histories={PBhistory}/>
+          </ScrollView>
+        </View>
+        
       );
   }
 
 const styles=StyleSheet.create({
   background:{
+    flex:1,
     backgroundColor:theme.color.white,
     paddingTop:30*theme.height,
     paddingHorizontal:16*theme.width,

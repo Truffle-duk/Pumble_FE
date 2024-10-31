@@ -1,34 +1,60 @@
 import { theme } from "@assets/Theme";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity, Image, StatusBar, ScrollView, Modal, Animated,} from 'react-native';
+import { call } from "@utils/ApiService";
 
-export default function ChangeGroupPW({navigation}){
+export default function ChangeGroupPW({route, navigation}){
     const [password, setPassword] = useState('');
     const [newPw, setNewPw] = useState('');
     const [isValidPassword, setIsValidPassword] = useState(false);
 
     const [arePasswordsSame, setArePasswordsSame] = useState(false); //기존 패스워드가 맞는지
 
+    const {gid}=route.params;
+
     const isFormComplete = password !== '' && newPw !== '';
 
     //나중에 연결~^^
-    // const handleCheckPw = () => {
-    //     if (isFormComplete) {
-    //         const checkPwApi = '/group/1/password'
-    //         const checkPwRequest = {
-    //             password: password,
-    //         }
-    //         call(checkPwApi, true, 'POST', checkPwRequest)
-    //             .then(data => {
-    //                 if (data.code === 200) {
-    //                     //navigation.navigate('Start', { nickname: nickname });
-    //                     setArePasswordsSame(true);
-    //                 }
-    //             })
-    //     } else {
-    //         alert('기존 패스워드를 다시 확인해주세요!');
-    //     }
-    // };
+    const handleCheckPw = () => {
+        if (isFormComplete) {
+            const checkPwApi = `/group/${gid}/password`
+            const checkPwRequest = {
+                password: password,
+            }
+            call(checkPwApi, true, 'POST', checkPwRequest)
+                .then(data => {
+                    if (data.code === 200) {
+                        //navigation.navigate('Start', { nickname: nickname });
+                        setArePasswordsSame(true);
+                        console.log("성공, ", arePasswordsSame, gid)
+                    }
+                })
+        } else {
+            alert('기존 패스워드를 다시 확인해주세요!');
+        }
+    };
+
+    const handleChangePw = () => {
+        handleCheckPw()
+        if (arePasswordsSame) {
+            const api=`/group/${gid}/password`
+            const request={
+                newPassword: newPw
+            }
+            call(api, true, 'PATCH', request)
+                .then(async data => {
+                    console.log(newPw)
+                    if (data.code === 200){
+                        alert('모임의 패스워드가 변경되었습니다!');
+                        navigation.goBack();
+                    }else{
+                        alert('패스워드 변경 과정에서 오류가 발생했습니다 :(');
+                    }
+                }).catch(err => {
+                    console.log(err)
+                })
+        }
+    }
 
     // const handleChangePw = () => {
     //     if (isFormComplete && isValidPassword && arePasswordsSame) {
@@ -90,7 +116,7 @@ export default function ChangeGroupPW({navigation}){
 
             <TouchableOpacity
                 style={[styles.button, !isFormComplete && styles.buttonDisabled]}
-                //onPress={handleChangePw}
+                onPress={handleChangePw}
                 disabled={!isFormComplete}
             >
                 <Text style={styles.buttonText}>변경하기</Text>
