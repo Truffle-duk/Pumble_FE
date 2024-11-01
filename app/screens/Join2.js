@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { theme } from "@assets/Theme";
+import React, {useState} from 'react';
+import {View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Image} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {theme} from "@assets/Theme";
 import {call} from "@utils/ApiService";
 
 const Join2 = () => {
@@ -11,41 +11,42 @@ const Join2 = () => {
     const navigation = useNavigation();
 
     const handleEmailSubmit = () => {
-        const emailCheckRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i
-        if (!emailCheckRegExp.test(email)) {
-            setErrorMessage("이메일 형식이 올바르지 않아요.")
-        } else {
-            setErrorMessage("")
-            const duplicateCheckApi = '/auth/verifyDuplicate'
-            call(duplicateCheckApi, false, 'POST', {email: email})
-                .then(data => {
-                    if (data.result.isDuplicated) {
-                        setErrorMessage("이미 사용중인 이메일이에요.");
-                    } else {
-                        const sendCodeApi = '/auth/sendCode'
-                        call(sendCodeApi, false, 'POST', {email: email})
-                            .then(data => {
-                                //if (data.code === 200) {
-                                    navigation.navigate('Join3', { email: email })
-                                //}
-                            })
-                            .catch(err => {
-                                console.log("Error occurred at sendCode")
-                            })
-                    }
-                })
-                .catch(err => {
-                    console.log("Error occurred at Join2")
-                })
+            const emailCheckRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i
+            if (!emailCheckRegExp.test(email)) {
+                setErrorMessage("이메일 형식이 올바르지 않아요.")
+            } else {
+                setErrorMessage("")
+                const duplicateCheckApi = '/auth/verifyDuplicate'
+                call(duplicateCheckApi, false, 'POST', {email: email})
+                    .then(data => {
+                        if (data.result.isDuplicated) {
+                            setErrorMessage("이미 사용중인 이메일이에요.");
+                        } else {
+                            const sendCodeApi = '/auth/sendCode'
+                            call(sendCodeApi, false, 'POST', {email: email})
+                                .then(data => {
+                                    if (data.code === 200) {
+                                        navigation.navigate('Join3', {email: email})
+                                    }
+                                })
+                                .catch(err => {
+                                    console.log("Error occurred at sendCode: ", err)
+                                })
+                        }
+                    })
+                    .catch(err => {
+                        console.log("Error occurred at Join2")
+                    })
+            }
         }
-    };
+    ;
 
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
             <TouchableOpacity
-            onPress={()=>navigation.goBack()}>
+                onPress={() => navigation.goBack()}>
                 <Image source={require('@assets/Icons/backArrow2.png')}
-                style={styles.backIcon}/>
+                       style={styles.backIcon}/>
             </TouchableOpacity>
             <Text style={styles.title}>이메일 인증하기</Text>
             <Text style={styles.subtitle}>인증을 위해 유효한 이메일을 입력해주세요</Text>
@@ -62,7 +63,7 @@ const Join2 = () => {
             {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
             <View style={styles.bottomContainer}>
                 <TouchableOpacity
-                    style={[styles.button, { backgroundColor: email ? theme.color.main : theme.color.grey6, }]}
+                    style={[styles.button, {backgroundColor: email ? theme.color.main : theme.color.grey6,}]}
                     onPress={handleEmailSubmit}
                     disabled={!email}
                 >
@@ -77,16 +78,16 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: theme.color.white,
-        padding:20,
+        padding: 20,
     },
     title: {
-        marginTop : 30*theme.height,
+        marginTop: 30 * theme.height,
         color: theme.color.grey2,
         fontFamily: 'Pretendard-Bold',
         fontSize: theme.fontSizes.fontSizes26,
     },
     subtitle: {
-        marginTop : 15*theme.height,
+        marginTop: 15 * theme.height,
         color: theme.color.grey1,
         fontFamily: 'Pretendard-Medium',
         fontSize: theme.fontSizes.fontSizes15,
@@ -94,18 +95,18 @@ const styles = StyleSheet.create({
     input: {
         width: '100%',
         height: 52 * theme.height,
-        marginTop: 30*theme.height,
+        marginTop: 30 * theme.height,
         borderColor: theme.color.grey6,
         borderWidth: 1,
         borderRadius: 5,
-        paddingLeft:20*theme.width,
+        paddingLeft: 20 * theme.width,
         backgroundColor: theme.color.background,
         color: theme.color.grey10,
     },
     errorText: {
         color: theme.color.red,
-        marginTop: 10 *theme.height,
-        marginBottom: 20 *theme.height,
+        marginTop: 10,
+        marginBottom: 20,
         fontSize: theme.fontSizes.fontSizes15,
         width: '100%',
         textAlign: 'right',
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
 
         alignItems: 'center',
         borderRadius: 5,
-        width: 358*theme.width,
+        width: 358 * theme.width,
         height: 50 * theme.height,
         justifyContent: 'center', // 버튼 안의 텍스트를 가운데 정렬
 
@@ -130,10 +131,9 @@ const styles = StyleSheet.create({
         fontFamily: 'Pretendard-SemiBold',
         fontSize: theme.fontSizes.fontSizes18,
     },
-    backIcon:{
-        width:26*theme.height*theme.width,
-        height:26*theme.height*theme.width,
+    backIcon: {
+        width: 26 * theme.height * theme.width,
+        height: 26 * theme.height * theme.width,
     }
 });
-
 export default Join2;

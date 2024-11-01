@@ -37,15 +37,16 @@ const Join1 = () => {
     return (
         <View style={styles.container}>
             <TouchableOpacity
-            onPress={()=>navigation.goBack()}>
+                onPress={()=>navigation.goBack()}>
                 <Image source={require('@assets/Icons/backArrow2.png')}
-                style={styles.backIcon}/>
+                       style={styles.backIcon}/>
             </TouchableOpacity>
             <Text style={styles.title}>약관 동의하기</Text>
             <View style={styles.checkboxContainer}>
                 <CheckBox
                     value={termsChecked}
                     onValueChange={() => handleIndividualCheck(setTermsChecked, termsChecked)}
+                    tintColors={{ true: theme.color.main, false: theme.color.grey6 }} // 색상 추가
                     onTintColor={theme.color.main}
                     onCheckColor={theme.color.main}
                 />
@@ -55,6 +56,7 @@ const Join1 = () => {
                 <CheckBox
                     value={privacyChecked}
                     onValueChange={() => handleIndividualCheck(setPrivacyChecked, privacyChecked)}
+                    tintColors={{ true: theme.color.main, false: theme.color.grey6 }} // 색상 추가
                     onTintColor={theme.color.main}
                     onCheckColor={theme.color.main}
                 />
@@ -64,6 +66,7 @@ const Join1 = () => {
                 <CheckBox
                     value={ageChecked}
                     onValueChange={() => handleIndividualCheck(setAgeChecked, ageChecked)}
+                    tintColors={{ true: theme.color.main, false: theme.color.grey6 }} // 색상 추가
                     onTintColor={theme.color.main}
                     onCheckColor={theme.color.main}
                 />
@@ -73,6 +76,7 @@ const Join1 = () => {
                 <CheckBox
                     value={allChecked}
                     onValueChange={handleAllChecked}
+                    tintColors={{ true: theme.color.main, false: theme.color.main }} // 색상 추가
                     onTintColor={theme.color.main}
                     onCheckColor={theme.color.main}
                 />
@@ -98,7 +102,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: theme.color.white,
-        padding : 20 
+        padding : 20
     },
     title: {
         marginTop : 30*theme.height,

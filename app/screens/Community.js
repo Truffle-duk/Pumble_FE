@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {theme} from "@assets/Theme";
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {call} from "@utils/ApiService";
@@ -67,7 +67,7 @@ export default function Community({navigation}) {
     const [hasMore, setHasMore] = useState(false);   //isLast항목 참고
 
     useFocusEffect(
-        React.useCallback(() => {
+        useCallback(() => {
             postListUpdateHandler()
                 .then(_ => {
                     console.log("Update Post List")

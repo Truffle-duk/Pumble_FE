@@ -17,7 +17,7 @@ export default function ConfirmPW({route, navigation}){
     const handleCheckPw = () => {
         //console.log(gid, " ", password, " ", confirmPassword, " ", isFormComplete, " ", arePasswordsSame)
         if (isFormComplete && arePasswordsSame) {
-            //console.log(gid, " ", password, " ", confirmPassword, " ", isFormComplete, " ", arePasswordsSame)
+            console.log(gid, " ", password, " ", confirmPassword, " ", isFormComplete, " ", arePasswordsSame)
             const checkPwApi = `/group/${gid}/password`
             const checkPwRequest = {
                 password: password,

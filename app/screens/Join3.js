@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { theme } from "@assets/Theme";
+import React, {useState, useRef, useEffect} from 'react';
+import {View, Text, TextInput, TouchableOpacity, StyleSheet, Image} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {theme} from "@assets/Theme";
+import {call} from "@utils/ApiService";
 
-const Join3 = () => {
-    const navigation = useNavigation();
-
+const Join3 = ({route}) => {
+    const navigation = useNavigation()
     // 입력된 6자리 코드 상태
     const [code, setCode] = useState(['', '', '', '', '', '']);
     const [isTimerActive, setIsTimerActive] = useState(true);
@@ -46,9 +46,19 @@ const Join3 = () => {
 
     const handleVerification = () => {
         if (isCodeComplete && isTimerActive) {
-            setIsVerified(true);  // 인증을 성공한 것으로 처리
-            alert('인증 성공!');
-            navigation.navigate('Join4'); // 인증 성공 시 다음 페이지로 이동
+            const inputCode = parseInt(code.join(''))
+            const verifyApi = '/auth/verifyEmail'
+            const email = route.params.email
+            call(verifyApi, false, 'POST', {email: email, code: inputCode})
+                .then(data => {
+                    if (data.result.isMatched) {
+                        setIsVerified(true);  // 인증을 성공한 것으로 처리
+                        alert('인증 성공!');
+                        navigation.navigate('Join4', {email: email}); // 인증 성공 시 다음 페이지로 이동
+                    } else {
+                        alert('인증 코드가 맞지 않거나 시간이 만료되었습니다.');
+                    }
+                })
         } else {
             alert('인증 코드가 맞지 않거나 시간이 만료되었습니다.');
         }
@@ -56,6 +66,11 @@ const Join3 = () => {
 
     return (
         <View style={styles.container}>
+            <TouchableOpacity
+                onPress={() => navigation.goBack()}>
+                <Image source={require('@assets/Icons/backArrow2.png')}
+                       style={styles.backIcon}/>
+            </TouchableOpacity>
             <Text style={styles.title}>인증 코드 입력하기</Text>
             <Text style={styles.subtitle}>인증을 위해 전송된 코드를 입력해주세요</Text>
 
@@ -72,12 +87,15 @@ const Join3 = () => {
                     />
                 ))}
             </View>
+            <View style={{alignItems: 'center'}}>
+                <View style={styles.timerContainer}>
+                    <Text style={styles.timer}>
+                        {Math.floor(timeLeft / 60)}:{('0' + (timeLeft % 60)).slice(-2)} {/* 00:00 형식 */}
+                    </Text>
+                </View>
+            </View>
 
-            <Text style={styles.timer}>
-                {Math.floor(timeLeft / 60)}:{('0' + (timeLeft % 60)).slice(-2)} {/* 00:00 형식 */}
-            </Text>
 
-            {/* 두 줄 텍스트를 View로 감싸고 중앙 정렬 */}
             <View style={styles.instructionContainer}>
                 <Text style={styles.instruction}>- 유효 시간이 지났을 경우 인증 메일을 다시 보내주세요.</Text>
                 <Text style={styles.instruction}>- 하루동안 5번까지 새로운 인증 코드를 받을 수 있습니다.</Text>
@@ -86,7 +104,7 @@ const Join3 = () => {
             <TouchableOpacity
                 style={[
                     styles.button,
-                    { backgroundColor: isCodeComplete && isTimerActive ? theme.color.main : theme.color.grey1 },
+                    {backgroundColor: isCodeComplete && isTimerActive ? theme.color.main : theme.color.grey1},
                 ]}
                 onPress={handleVerification}
                 disabled={!isCodeComplete || !isTimerActive}  // 숫자 6개 미완성 또는 타이머가 0이면 버튼 비활성화
@@ -101,16 +119,16 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: theme.color.white,
-        padding:20,
+        padding: 20,
     },
     title: {
-        marginTop : 76*theme.height,
+        marginTop: 30 * theme.height,
         color: theme.color.grey2,
         fontFamily: 'Pretendard-Bold',
         fontSize: theme.fontSizes.fontSizes26,
     },
     subtitle: {
-        marginTop : 15*theme.height,
+        marginTop: 15 * theme.height,
         color: theme.color.grey1,
         fontFamily: 'Pretendard-Medium',
         fontSize: theme.fontSizes.fontSizes15,
@@ -118,29 +136,37 @@ const styles = StyleSheet.create({
     codeContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 30*theme.height,
+        marginBottom: 30 * theme.height,
+        marginHorizontal: 20 * theme.width,
     },
     codeInput: {
-        marginTop: 60*theme.height,
+        marginTop: 60 * theme.height,
         borderBottomWidth: 2,
         borderColor: theme.color.grey1,
         color: theme.color.grey2,
         fontFamily: 'Roboto-Bold',
         fontSize: theme.fontSizes.fontSizes36,
         textAlign: 'center',
-        width: 50*theme.width, // 코드 입력 칸 크기 조정
+        width: 36 * theme.width, // 코드 입력 칸 크기 조정
         paddingVertical: 10,
+    },
+    timerContainer: {
+        width: 70 * theme.width,
+        height: 32 * theme.height,
+        borderRadius: 5,
+        backgroundColor: theme.color.mainOpacity10,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     timer: {
         fontFamily: 'Roboto-Medium',
         fontSize: theme.fontSizes.fontSizes20,
         color: theme.color.main,
-        textAlign: 'center',
-
+        //textAlign: 'center',
     },
     instructionContainer: {
-        marginTop: 50*theme.height,
-        alignItems: 'center', // 두 줄 텍스트 중앙 정렬
+        marginTop: 50 * theme.height,
+        alignItems: 'flex-start',
     },
     instruction: {
         fontFamily: 'Pretendard-Medium',
@@ -151,9 +177,10 @@ const styles = StyleSheet.create({
     button: {
         position: 'absolute',
         bottom: 70 * theme.height,
-        left: 16*theme.width,
-        paddingVertical: 15,
+        left: 16 * theme.width,
+        //paddingVertical: 15,
         alignItems: 'center',
+        justifyContent: 'center',
         borderRadius: 5,
         width: 358 * theme.width,
         height: 50 * theme.height,
@@ -166,6 +193,10 @@ const styles = StyleSheet.create({
     buttonDisabled: {
         backgroundColor: theme.color.grey1,
     },
+    backIcon: {
+        width: 26 * theme.height * theme.width,
+        height: 26 * theme.height * theme.width,
+    }
 
 });
 

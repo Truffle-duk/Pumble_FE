@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {ActivityIndicator, Image, ScrollView, StyleSheet, Text, View, Modal, Animated} from 'react-native';
 import {theme} from "@assets/Theme";
 import "@ethersproject/shims";
@@ -6,14 +6,15 @@ import {ethers} from "ethers";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 import { GroupCall } from "@utils/GroupService";
+import {useFocusEffect} from "@react-navigation/native";
 
-/*// 배포 서버 연결
-const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
+// 배포 서버 연결
+/*const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
 
-const ledgerContractAddress = "0x7C16D9c5db44302a9b0aed4066EB4Aa77FA59f6d"
+const ledgerContractAddress = "0x6B6e79D22B6ED962e80ae0ec2D4C0b8CCd5ed517"
 const ledgerContractABI = [
-    "event TransactionCreated(string indexed hGroupId, string groupId, uint256 transactionIndex, bool isDeposit, uint256 amount, string counterparty, string description, uint256 timestamp, string receiptDetails)",
-    "event RetrieveBalance(string indexed hGroupId, string groupId, uint256 balance)",
+    "event TransactionCreated(string indexed hGroupId, string indexed category, string groupId, uint256 transactionIndex, bool isDeposit, uint256 amount, string counterparty, string description, uint256 timestamp, string receiptDetails)",
+    "event RetrieveBalance(string indexed hGroupId, string indexed category, string groupId, uint256 balance)",
     "function createGroup(string memory _groupId, string memory _name)",
     "function recordDeposit(string memory _groupId, uint256 _amount, string memory _counterparty, string memory _description)",
     "function recordWithdrawal(string memory _groupId, uint256 _amount, string memory _counterparty, string memory _description)",
@@ -22,16 +23,15 @@ const ledgerContractABI = [
 const ledgerContract = new ethers.Contract(ledgerContractAddress, ledgerContractABI, provider)
 
 async function getBalance(groupId) {
-    const hGroupIdHash = ethers.id(groupId); // keccak256 해시
-
     // 필터 설정
     const filter = {
         address: ledgerContractAddress,
         fromBlock: 'latest',
         toBlock: 'latest',
         topics: [
-            ethers.id("RetrieveBalance(string,string,uint256)"), // 이벤트 시그니처
-            hGroupIdHash
+            ethers.id("RetrieveBalance(string,string,string,uint256)"), // 이벤트 시그니처
+            ethers.id(groupId),
+            ethers.id("ledger")
         ]
     };
 
@@ -51,6 +51,7 @@ async function getBalance(groupId) {
 
 async function getPastEvents(groupId) {
     const hGroupIdHash = ethers.id(groupId); // keccak256 해시
+    const hCategory = ethers.id("ledger")
 
     // 필터 설정
     const filter = {
@@ -58,8 +59,9 @@ async function getPastEvents(groupId) {
         fromBlock: 0,
         toBlock: 'latest',
         topics: [
-            ethers.id("TransactionCreated(string,string,uint256,bool,uint256,string,string,uint256,string)"), // 이벤트 시그니처
-            hGroupIdHash
+            ethers.id("TransactionCreated(string,string,string,uint256,bool,uint256,string,string,uint256,string)"), // 이벤트 시그니처
+            hGroupIdHash,
+            hCategory
         ]
     };
 
@@ -162,52 +164,55 @@ function Ledger2({navigation}){
       }).start(() => setReceiptOverlayVisible(false));
     };
 
-    /*useEffect(() => {
-        const initialize = async () => {
-            // 임시 지갑 생성 및 트랜잭션 전송
-            const tempWallet = ethers.Wallet.createRandom();
-            const senderWallet = new ethers.Wallet("0xfe6f622f37ad5ed4d3da49682069f27976afe19d9b53b98189a16f74ee3b151b", provider);
-            const tx = {
-                to: tempWallet.address,
-                value: ethers.parseEther("1.0")
-            };
-            try {
-                const txResponse = await senderWallet.sendTransaction(tx);
-                await txResponse.wait();
-                console.log(`Transaction hash: ${txResponse.hash}`);
-            } catch (error) {
-                console.error("Transaction failed:", error);
-            }
-
-            // 이전 거래내역 데이터 가져오기
-            getPastEvents("testuuid")
-                .then(response => {
-                    setDatas(response.reverse());
-                });
+    const initialize = async () => {
+        /*// 임시 지갑 생성 및 트랜잭션 전송
+        const tempWallet = ethers.Wallet.createRandom();
+        const senderWallet = new ethers.Wallet("0x5d225315bb68e16f4345c24697c374bcd426afcad3dfb6ec0e6d4087eddffef8", provider);
+        const tx = {
+            to: tempWallet.address,
+            value: ethers.parseEther("1.0")
         };
+        try {
+            const txResponse = await senderWallet.sendTransaction(tx);
+            await txResponse.wait();
+            console.log(`Transaction hash: ${txResponse.hash}`);
+        } catch (error) {
+            console.error("Transaction failed:", error);
+        }
 
-        initialize();
-    }, []);
+        // 이전 거래내역 데이터 가져오기
+        getPastEvents("testuuid")
+            .then(response => {
+                console.log(response)
+                setDatas(response.reverse());
+            });*/
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            initialize().then(_=>{console.log("Ledger Initialize")})
+        }, [])
+    )
 
     // 거래내역 데이터가 변할 때마다 잔액 다시 조회
-    useEffect(() => {
+    /*useEffect(() => {
         getBalance("testuuid")
             .then(response => {
                 console.log(response)
-                setBalance(Number(response[0].args[2]))
+                setBalance(Number(response[0].args[3]))
             })
             .catch(err => {
                 console.log(err)
             })
     }, [datas]);
 
-    ledgerContract.on("TransactionCreated", (hGroupId, groupId, transactionIndex, isDeposit, amount, counterparty, description, timestamp, receiptDetails, event) => {
-        console.log(event)
+    ledgerContract.on("TransactionCreated", (hGroupId, category, groupId, transactionIndex, isDeposit, amount, counterparty, description, timestamp, receiptDetails, event) => {
         setTransactionIdx(transactionIndex)
         setDatas(prevState => {
-            const eventExists = prevState.some(data => data.args[2].toString() === transactionIndex.toString());
+            const eventExists = prevState.find(data => data.args[3].toString() === transactionIndex.toString());
+            console.log(eventExists)
             if (!eventExists) {
-                return [{"args": [hGroupId, groupId, transactionIndex, isDeposit, amount, counterparty, description, timestamp, receiptDetails]}, ...prevState];
+                return [{"args": [hGroupId, category, groupId, transactionIndex, isDeposit, amount, counterparty, description, timestamp, receiptDetails]}, ...prevState];
             }
             return prevState;
         });
@@ -272,19 +277,19 @@ function Ledger2({navigation}){
                     ):(
                         datas.map((data, index)=>
                             <View key={index} style={styles.historyItemContainer}>
-                                <Text style={styles.historyItemDateText}>{formatDateForTop(data.args[7])}</Text>
+                                <Text style={styles.historyItemDateText}>{formatDateForTop(data.args[8])}</Text>
                                 <View style={styles.historyItemDetailContainer}>
                                     {/* 이미지 삽입 */}
                                     <View style={styles.historyItemViewDetail}>
                                         <View style={styles.historyItemImage}/> 
                                         <View>
-                                            <Text style={styles.counterpartyText}>{data.args[5]}</Text>
-                                            <Text style={styles.timeText}>{formatDateForBottom(data.args[7])}</Text>
+                                            <Text style={styles.counterpartyText}>{data.args[6]}</Text>
+                                            <Text style={styles.timeText}>{formatDateForBottom(data.args[8])}</Text>
                                         </View>
                                     </View>
                                     <View style={styles.historyItemViewDetail}>
-                                        {data.args[3]? <Text style={styles.amountText}>{Number(data.args[4]).toLocaleString()}원</Text>
-                                            : <Text style={styles.amountText}>-{Number(data.args[4]).toLocaleString()}원</Text>}
+                                        {data.args[4]? <Text style={styles.amountText}>{Number(data.args[5]).toLocaleString()}원</Text>
+                                            : <Text style={styles.amountText}>-{Number(data.args[5]).toLocaleString()}원</Text>}
                                         {/* 영수증디테일이 빈 문자열이면 체크 아이콘 회색,아니면 메인컬러 */}
                                         {/* {data.receiptDetails===""?<Image />} */}
                                         {/* <Image
@@ -293,7 +298,7 @@ function Ledger2({navigation}){
                                             }
                                             style={styles.iconStyle}
                                         /> */}
-                                        {data.args[8]==="" ? 
+                                        {data.args[9]==="" || index === 4?
                                         (auth === "user" ? 
                                           <Image source={require("../assets/Icons/receiptCheckIcon_Inactive.png")} style={styles.iconStyle}/> 
                                           : <View style={{flexDirection:'row'}}>
@@ -303,7 +308,7 @@ function Ledger2({navigation}){
                                               </TouchableOpacity>
                                             </View>
                                         )
-                                        : <TouchableOpacity onPress={()=>openReceiptModal(data.args[8])}>
+                                        : <TouchableOpacity onPress={()=>openReceiptModal(data.args[9])}>
                                             <Image source={require("../assets/Icons/receiptCheckIcon_Active.png")} style={styles.iconStyle}/>
                                         </TouchableOpacity>
 

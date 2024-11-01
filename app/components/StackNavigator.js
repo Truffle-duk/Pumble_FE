@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {StyleSheet, View, Text, Button, TouchableOpacity, Image, StatusBar, Modal, Animated, Alert} from 'react-native';
-import {NavigationContainer, ParamListBase, useNavigation} from '@react-navigation/native';
+import {NavigationContainer, ParamListBase, useFocusEffect, useNavigation} from '@react-navigation/native';
 import {createNativeStackNavigator, NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import {theme} from '@assets/Theme';
@@ -55,15 +55,17 @@ function SwitchOverlay({overlayVisible, animatedHeight, closeModal, navigation, 
     const [currentGroupId, setCurrentGroupId] = useState(0)
     const [groupIdList, setGroupIdList] = useState([])
 
-    useEffect(() => {
-        const api = '/home/group'
-        call(api, true, "GET")
-            .then((data) => {
-                setGroupList(data.result)
-                const ids = data.result.map(group => group.group_id)
-                setGroupIdList(ids)
-            })
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            const api = '/home/group'
+            call(api, true, "GET")
+                .then((data) => {
+                    setGroupList(data.result)
+                    const ids = data.result.map(group => group.group_id)
+                    setGroupIdList(ids)
+                })
+        }, [])
+    )
 
     useEffect(() => {
         //console.log(`groupIdList: ${groupIdList}`)

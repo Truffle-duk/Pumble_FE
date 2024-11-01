@@ -51,16 +51,16 @@ const ItemDetail = ({route}) => {
     return (
         <View style={styles.container}>
             <View style={styles.content}>
-                <View style={styles.imageContainer}>
-                    <Image source={image} style={styles.productImage} />
-                </View>
-                <View style={styles.productInfo}>
-                    <Text style={styles.categoryText}>{itemCategory}</Text>
-                    <Text style={styles.productTitle}>{product.name}</Text>
-                    <Text style={styles.productPrice}>{product.price + ' pb'}</Text>
-                    <Text style={styles.productDescription}>
-                        원두의 풍미가 가득한 스타벅스의 아메리카노를 시원하게 즐겨보세요.
-                    </Text>
+                <View>
+                    <View style={styles.imageContainer}>
+                        <Image source={image} style={styles.productImage} />
+                    </View>
+                    <View style={styles.productInfo}>
+                        <Text style={styles.categoryText}>{itemCategory}</Text>
+                        <Text style={styles.productTitle}>{product.name}</Text>
+                        <Text style={styles.productPrice}>{product.price + ' pb'}</Text>
+                        <Text style={styles.productDescription}>{product.description}</Text>
+                    </View>
                 </View>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={styles.button} onPress={toggleModal}>
@@ -105,7 +105,9 @@ const styles = StyleSheet.create({
     },
     content: {
         paddingBottom: 77 * theme.height,
-        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between"
     },
     imageContainer: {
         justifyContent: 'center',
@@ -119,7 +121,6 @@ const styles = StyleSheet.create({
         height: imageSize
     },
     productInfo: {
-        marginBottom: 30 * theme.height,
         paddingHorizontal: 20,
     },
     categoryText: {

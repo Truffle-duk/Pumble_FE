@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from "react";
+import React, {useEffect, useState, useRef, useCallback} from "react";
 import {
     StyleSheet,
     View,
@@ -18,7 +18,7 @@ import {Calendar} from "react-native-calendars";
 import moment, {max} from "moment";
 
 import {Dimensions} from 'react-native';
-import {ThemeProvider, useNavigation} from '@react-navigation/native';
+import {ThemeProvider, useFocusEffect, useNavigation} from '@react-navigation/native';
 
 //캘린더 로컬화
 import {LocaleConfig} from 'react-native-calendars';
@@ -42,21 +42,19 @@ const getDateDifference = (date1, date2) => {
 
 /*// 배포 서버 연결
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
-const privateKey = "0x06c533a9eec3b772fee66a58c8fd584426b8a097534d5a10d887e7e23b3f56e7"
+const privateKey = "0xde49fbfcea11b03f850ca72e5bafa45168963eec8811f506d59f1a4f262a75cc"
 const wallet = new ethers.Wallet(privateKey, provider)
-const eventContractAddress = "0xFFdd28D4E521AED50f0ADF45C2D5C8b141aad2A7"
+const eventContractAddress = "0xA3B55216bc84D56c45b033B11FDc1DA25722b233"
 const eventContractABI = [
-    "event EventTokenRecords(string indexed hGroupId, uint256 indexed hTimestamp, uint256 indexed hUserId, uint256 userId, uint256 timestamp, uint256 eventId, uint256 tokenNum)",
+    "event EventTokenRecords(string indexed hGroupId, uint256 indexed hTimestamp, string indexed hUserId, string userId, uint256 timestamp, uint256 eventId, uint256 tokenNum)",
     "function createEvent(uint256 _eventId, uint256 _maxPpl, uint256 _reward)",
-    "function distributeTokens(uint256 _eventId, uint256 _amount, string memory _groupId, uint256 _userId)",
+    "function distributeTokens(uint256 _eventId, uint256 _amount, string memory _groupId, string _userId)",
     "function eventOver(uint256 _eventId) public returns (string memory)"
 ]
 const eventContract = new ethers.Contract(eventContractAddress, eventContractABI, wallet)
 
 const attendEvent = async (eventId, amount, groupId, groupUserId) => {
     try {
-        const balance = await provider.getBalance("0xA8433D7304AD461f7824d405241e467e8462282e");
-        console.log(balance)
         console.log(eventId)
         console.log(amount)
         console.log(groupId)
@@ -64,7 +62,7 @@ const attendEvent = async (eventId, amount, groupId, groupUserId) => {
 
         const amountInWei = ethers.parseEther(amount.toString())
         console.log(amountInWei.toString())
-        const txResponse = await eventContract.distributeTokens(eventId, amountInWei, groupId.toString(), groupUserId)
+        const txResponse = await eventContract.distributeTokens(eventId, amountInWei, groupId.toString(), groupUserId.toString())
         console.log(`Transaction hash: ${txResponse.hash}`);
 
         // 트랜잭션 영수증 대기
@@ -157,13 +155,13 @@ function EventCalendar({data, openCalendarModal}) {
 
     const [headerMonth, setHeaderMonth] = useState(moment().format('YYYY-MM'));
 
-    const handleEvent=(day)=>{
-        if (eventDate.hasOwnProperty(day.dateString)){
+    const handleEvent = (day) => {
+        if (eventDate.hasOwnProperty(day.dateString)) {
             //console.log(data)
             const matchingEvent = data.filter(data => data.startDate.startsWith(day.dateString));
             const eventIds = matchingEvent.map(event => event.eventId);
             console.log(matchingEvent);
-            if(userAuth !== "member"){
+            if (userAuth !== "member") {
                 openCalendarModal(matchingEvent);
             }
         }
@@ -226,7 +224,7 @@ function EventCalendar({data, openCalendarModal}) {
                 //캘린더 일정 표시
                 markedDates={eventDate}
                 //onDayPress={(day)=>navigation.navigate('Store')} //이거 하려면 이동하려는 페이지가 navigate 연결 되어있어야함
-                onDayPress={(day)=>handleEvent(day)}
+                onDayPress={(day) => handleEvent(day)}
 
             />
         </View>
@@ -346,13 +344,13 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
                 }
             }).catch(err => console.log("Error at JoinEvent API, ", err))
 
-        /*await attendEvent(id, reward, groupId, groupUserId)
+        await attendEvent(id, reward, groupId, groupUserId)
             .then(_ => {
-              alert(`${reward} PB를 받았어요!`)
-              closeModal()
-              updateHandler()
+                alert(`${reward} PB를 받았어요!`)
+                closeModal()
+                updateHandler()
             })
-            .catch(error => console.log("Error at JoinEvent Blockchain, ", error))*/
+            .catch(error => console.log("Error at JoinEvent Blockchain, ", error))
     }
 
     return (
@@ -414,7 +412,7 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
                             />
                         </View>
                         <TouchableOpacity style={styles.overlayInputBtn}
-                                          onPress={() => submitCode(overlayData.eventId, code, overlayData.reward, 1, 1)}>
+                                          onPress={() => submitCode(overlayData.eventId, code, overlayData.reward, 1, 2)}>
                             <Text style={styles.overlayInputBtnText}>입력</Text>
                         </TouchableOpacity>
 
@@ -441,7 +439,7 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
 function EventCalendarOverlay({overlayVisible, animatedHeight, closeModal, overlayData}) {
     const [code, setCode] = useState("")
     //TODO: 여러 일에 걸친 일정 반영 필요
-    console.log("overlay데이타:" , overlayData)
+    console.log("overlay데이타:", overlayData)
     const overlayDataDate = !Array.isArray(overlayData) && overlayData?.startDate
         ? overlayData.startDate.split('T')[0]
         : '';
@@ -474,20 +472,20 @@ function EventCalendarOverlay({overlayVisible, animatedHeight, closeModal, overl
     const deleteEvent = () => {
         const api = `/event/1/delete/${overlayData.eventId}`
         call(api, true, "DELETE")
-            .then(data=> {
-                if(data.code === 200) {
+            .then(data => {
+                if (data.code === 200) {
                     console.log("Event delete success")
                     alert("일정이 삭제되었습니다.")
                 }
             }).catch(err => console.log("Error at DeleteEvent API, ", err))
-            console.log(overlayData.eventId)
+        console.log(overlayData.eventId)
     }
 
     const eventDone = () => {
         const api = `/event/1/done/${overlayData.eventId}`
         call(api, true, "PATCH")
-            .then(data=> {
-                if(data.code === 200) {
+            .then(data => {
+                if (data.code === 200) {
                     console.log("Event done success")
                     alert("일정이 종료되었습니다.")
                 }
@@ -593,43 +591,44 @@ export default function Event({navigation}) {
     const animatedHeight = useRef(new Animated.Value(0)).current;
     const [calendarOverlayVisible, setCalendarOverlayVisible] = useState(false);
 
-    useEffect(() => {
-        // 모든 행사 불러오기
-        const fetchAllEventApi = '/event/1/list/all'
-        call(fetchAllEventApi, true, 'GET')
-            .then(data => {
-                setDatas(data.result.events)
-            })
-            .catch(err => {
-                console.log("Error occurred at firstUseEffect1" + err)
-            })
+    useFocusEffect(
+        useCallback(() => {
+            // 모든 행사 불러오기
+            const fetchAllEventApi = '/event/1/list/all'
+            call(fetchAllEventApi, true, 'GET')
+                .then(data => {
+                    setDatas(data.result.events)
+                })
+                .catch(err => {
+                    console.log("Error occurred at firstUseEffect1" + err)
+                })
 
-        fetchMonthlyEvent()
-            .then(data => {
-                setThisMonthDatas(data.events)
-            })
-            .catch(err => {
-                console.log("Error occurred at firstUseEffect2" + err)
-            })
+            fetchMonthlyEvent()
+                .then(data => {
+                    setThisMonthDatas(data.events)
+                })
+                .catch(err => {
+                    console.log("Error occurred at firstUseEffect2" + err)
+                })
 
-        const fetchLastNextEventApi = '/event/1/lastAndNext'
-        call(fetchLastNextEventApi, true, 'GET')
-            .then(data => {
-                setUpcomingEvents(data.result.events[0])
-                setLastEvents(data.result.events[1])
-            })
-            .catch(err => {
-                console.log("Error occurred at firstUseEffect3" + err)
-            })
-        
-        const nameApi='/group/1/profile';
-        call(nameApi, true, 'GET')
-            .then(data =>{
-                if (data.code === 200){
-                    setUser(data.result.nickname);
-                }
-            })            
-    }, []);
+            const fetchLastNextEventApi = '/event/1/lastAndNext'
+            call(fetchLastNextEventApi, true, 'GET')
+                .then(data => {
+                    setUpcomingEvents(data.result.events[0])
+                    setLastEvents(data.result.events[1])
+                })
+                .catch(err => {
+                    console.log("Error occurred at firstUseEffect3" + err)
+                })
+
+            const nameApi = '/group/1/profile';
+            call(nameApi, true, 'GET')
+                .then(data => {
+                    if (data.code === 200) {
+                        setUser(data.result.nickname);
+                    }
+                })
+        }, []))
 
     const fetchMonthlyEvent = async () => {
         const api = '/event/1/list/month'
@@ -696,8 +695,9 @@ export default function Event({navigation}) {
             <EventList thisMonthEvents={thisMonthDatas} openModal={openModal}/>
             <EventOverlay overlayVisible={overlayVisible} animatedHeight={animatedHeight} closeModal={closeModal}
                           overlayData={overlayData} updateHandler={updateData}/>
-            <EventCalendarOverlay overlayVisible={calendarOverlayVisible} animatedHeight={animatedHeight} closeModal={closeCalendarModal}
-                        overlayData={overlayData}/>
+            <EventCalendarOverlay overlayVisible={calendarOverlayVisible} animatedHeight={animatedHeight}
+                                  closeModal={closeCalendarModal}
+                                  overlayData={overlayData}/>
             {userAuth === "staff" &&
                 <TouchableOpacity style={styles.writeBtn} onPress={() => navigation.navigate('AddEvent')}>
                     <Image source={require('@assets/Icons/writePen.png')} style={styles.writeIcon}/>
@@ -1053,30 +1053,30 @@ const styles = StyleSheet.create({
         width: 35 * theme.width * theme.height,
         height: 35 * theme.width * theme.height,
     },
-    doneBtn:{
-        justifyContent:'center',
-        alignItems:'center',
-        backgroundColor:theme.color.main,
-        borderRadius:5,
-        height:40*theme.height,
-        width:171*theme.width,
+    doneBtn: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: theme.color.main,
+        borderRadius: 5,
+        height: 40 * theme.height,
+        width: 171 * theme.width,
     },
-    doneBtnText:{
+    doneBtnText: {
         fontFamily: 'Pretendard-SemiBold',
         fontSize: theme.fontSizes.fontSizes15,
         color: theme.color.white,
     },
-    deleteBtn:{
-        justifyContent:'center',
-        alignItems:'center',
-        backgroundColor:theme.color.white,
-        borderRadius:5,
-        borderWidth:1,
-        borderColor:theme.color.grey1,
-        height:40*theme.height,
-        width:171*theme.width,
+    deleteBtn: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: theme.color.white,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: theme.color.grey1,
+        height: 40 * theme.height,
+        width: 171 * theme.width,
     },
-    deleteBtnText:{
+    deleteBtnText: {
         fontFamily: 'Pretendard-SemiBold',
         fontSize: theme.fontSizes.fontSizes15,
         color: theme.color.grey1,
