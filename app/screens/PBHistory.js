@@ -2,52 +2,8 @@
 import {theme} from "@assets/Theme";
 import {StyleSheet, View, Text, Button, TouchableOpacity, Image, ScrollView} from 'react-native';
 import React, {useEffect, useState} from "react";
-import {ethers} from "ethers";
+import {getPBHistory} from "@utils/BlockchainFunction";
 import {call} from "@utils/ApiService";
-
-/*const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
-
-const privateKey = "0xde49fbfcea11b03f850ca72e5bafa45168963eec8811f506d59f1a4f262a75cc"
-const wallet = new ethers.Wallet(privateKey, provider)
-const eventContractAddress = "0xA3B55216bc84D56c45b033B11FDc1DA25722b233"
-const eventContractABI = [
-    "event EventTokenRecords(string indexed hGroupId, uint256 indexed hTimestamp, string indexed hUserId, string userId, uint256 timestamp, uint256 eventId, uint256 tokenNum)",
-    "function createEvent(uint256 _eventId, uint256 _maxPpl, uint256 _reward)",
-    "function distributeTokens(uint256 _eventId, uint256 _amount, string memory _groupId, string _userId)",
-    "function eventOver(uint256 _eventId) public returns (string memory)"
-]
-const eventContract = new ethers.Contract(eventContractAddress, eventContractABI, wallet)
-
-async function getPBHistory(groupId, groupUserId) {
-    const hGroupIdHash = ethers.id(groupId.toString()); // keccak256 해시
-    const hGroupUserId = ethers.id(groupUserId.toString())
-
-    // 필터 설정
-    const filter = {
-        address: eventContractAddress,
-        fromBlock: 0,
-        toBlock: 'latest',
-        topics: [
-            ethers.id("EventTokenRecords(string,uint256,string,string,uint256,uint256,uint256)"), // 이벤트 시그니처
-            hGroupIdHash,
-            null,
-            hGroupUserId
-        ]
-    };
-
-    try {
-        const logs = await provider.getLogs(filter)
-
-        // 로그를 이벤트 객체로 디코딩
-        const iface = new ethers.Interface(eventContractABI);
-        const events = logs.map(log => iface.parseLog(log))
-
-        return events;
-    } catch (error) {
-        console.error("Error fetching token history:", error);
-        throw error;
-    }
-}*/
 
 function PBBalanceCard({balance}) {
     return (
@@ -154,8 +110,8 @@ export default function PBHistory() {
             <ScrollView
                 //contentContainerStyle={styles.background}
             >
-                <PBBalenceCard balence={PBbalence}/>
-                <PBHistoryList histories={PBhistory}/>
+                <PBBalanceCard balence={PBBalance}/>
+                <PBHistoryList />
             </ScrollView>
         </View>
 
@@ -170,7 +126,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16 * theme.width,
         paddingBottom: 77 * theme.height,
     },
-    PBBalenceCardContainer: {
+    PBBalanceCardContainer: {
         backgroundColor: theme.color.mainOpacity10,
         borderRadius: 15,
         height: 90 * theme.height,
@@ -180,23 +136,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 35 * theme.height,
     },
-    PBBalenceCardTextContainer: {
+    PBBalanceCardTextContainer: {
         flexDirection: 'column'
     },
-    PBBalenceHeadText: {
+    PBBalanceHeadText: {
         color: theme.color.grey10,
         fontSize: theme.fontSizes.fontSizes15,
         fontFamily: 'Pretendard-Medium',
         lineHeight: 15,
         marginBottom: 10 * theme.height,
     },
-    PBBalenceBalenceText: {
+    PBBalanceBalenceText: {
         color: theme.color.main,
         fontSize: theme.fontSizes.fontSizes25,
         fontFamily: 'Pretendard-Bold',
         lineHeight: 25,
     },
-    PBBalenceImage: {
+    PBBalanceImage: {
         width: 90 * theme.width * theme.height,
         height: 90 * theme.width * theme.height,
     },

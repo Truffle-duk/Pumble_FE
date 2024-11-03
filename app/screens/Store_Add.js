@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { theme } from "@assets/Theme";
-import { call } from '@utils/ApiService';
+import {call, formDataCall} from '@utils/ApiService';
 
 const category=[
     {
@@ -11,11 +11,11 @@ const category=[
     },
     {
         "name":"프렌차이즈",
-        "tag":"franchise",
+        "tag":"fast-food",
     },
     {
         "name":"상품/면제권",
-        "tag":"voucher",
+        "tag":"ticket",
     },
     {
         "name":"엔터테인",
@@ -27,62 +27,71 @@ const category=[
     },
 ]
 
-const Store_Add = () => {
+const Store_Add = ({navigation}) => {
     const [productName, setProductName] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [productPrice, setProductPrice] = useState('');
-    const [imageUri, setImageUri] = useState(null);
+    const [imageUri, setImageUri] = useState('');
     const [productCategory, setProductCategory]=useState('');
 
     const isFormComplete= productName !== "" && productDescription !== "" && productPrice !== "" && productCategory !== "";
     // 사진 선택 함수
-    const handleImagePicker = () => {
-        launchImageLibrary({ mediaType: 'photo' }, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.errorMessage) {
-                console.log('ImagePicker Error: ', response.errorMessage);
-            } else {
-                const uri = response.assets[0].uri;
-                setImageUri(uri);
-            }
-        });
+    const selectImage = () => {
+        const options = {
+            mediaType: 'photo',
+            maxWidth: 300,
+            maxHeight: 300,
+            quality: 1,
+        };
+
+        launchImageLibrary(options)
+            .then(response => {
+                if (response.didCancel) {
+                    console.log('User cancelled image picker');
+                } else if (response.error) {
+                    console.log('ImagePicker Error: ', response.error);
+                } else {
+                    const uri = response.assets[0].uri;
+                    setImageUri(uri);
+                }
+            });
     };
 
     // 이미지 삭제 함수
     const handleImageRemove = () => {
-        setImageUri(null);
+        setImageUri('');
     };
 
 
-    const handleCompletePress = () => {
-        // 상품 등록 로직
-        console.log('상품 이름:', productName);
-        console.log('상품 설명:', productDescription);
-        console.log('상품 가격:', productPrice);
-        console.log('카테고리: ', productCategory)
-        console.log('첨부된 이미지 URI:', imageUri);
-
+    const handleCompletePress = async () => {
         if (isFormComplete) {
             const api=`/store/1`
-            const request={
-                name: productName,
-                category:productCategory,
-                price: productPrice,
-                description: productDescription               
+            const formData = new FormData();
+            if (imageUri) {
+                formData.append('image', {
+                    uri: imageUri,
+                    name: `item_${productName}.jpg`,
+                    type: 'image/jpeg'
+                });
             }
-            call(api, true, 'POST', request)
-                .then(data =>{
-                    if(data.code === 200) {
+            formData.append('name', productName)
+            formData.append('price', productPrice)
+            formData.append('category', productCategory)
+            formData.append('description', productDescription)
+
+            await formDataCall(api, true, 'POST', formData)
+                .then(data => {
+                    if (data.isSuccess) {
                         alert('상품이 등록되었습니다!');
-                    }else{
+                        navigation.navigate('Store')
+                    } else {
                         alert('상품 등록을 실패하였습니다');
                     }
                 })
 
         } else {
             alert('폼을 다시 확인해주세요!');
-        }       
+        }
 
     };
 
@@ -113,7 +122,7 @@ const Store_Add = () => {
                 <ScrollView horizontal={true} contentContainerStyle={styles.categoryContaier} showsHorizontalScrollIndicator={false}>
                     {category.map((data, index)=>
                         <TouchableOpacity style={data.tag===productCategory? styles.categoryBtnSelected: styles.categoryBtn}
-                            onPress={() => setProductCategory(data.tag)}>
+                            onPress={() => setProductCategory(data.tag)} key={index}>
                             <Text style={data.tag===productCategory? styles.categoryTextSelected: styles.categoryText}>{data.name}</Text>
                        </TouchableOpacity>
                     )}
@@ -138,7 +147,7 @@ const Store_Add = () => {
 
                 <View style={styles.divider} />
 
-                <TouchableOpacity style={styles.imagePickerButton} onPress={handleImagePicker}>
+                <TouchableOpacity style={styles.imagePickerButton} onPress={selectImage}>
                     <Image
                         source={require('../assets/Icons/blackadd.png')}
                         style={styles.imageIcon}

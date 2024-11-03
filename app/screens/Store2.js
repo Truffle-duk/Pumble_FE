@@ -3,9 +3,10 @@ import {StyleSheet, View, Text, ScrollView, TouchableOpacity, Image} from 'react
 import { theme } from "@assets/Theme";
 import {call} from "@utils/ApiService";
 
-const Store2 = ({navigation}) => {
-    const [selectedTab, setSelectedTab] = useState('cafe');
+const Store2 = ({navigation, route}) => {
+    const [selectedTab, setSelectedTab] = useState(route.params.initialTab);
     const [items, setItems] = useState([])
+    console.log(route.params.initialTab)
 
     useEffect(() => {
         const api = `/store/1/list?category=${selectedTab}`

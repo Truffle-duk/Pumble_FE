@@ -16,7 +16,6 @@ import {call} from "@utils/ApiService";
 import {GroupCall} from '@utils/GroupService';
 import Keychain from "react-native-keychain";
 
-
 function ProfileView({navigation, wallet, name, email}) {
     return (
         <View style={styles.profileViewContainer}>

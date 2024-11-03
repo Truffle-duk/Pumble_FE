@@ -1,11 +1,11 @@
-import { theme } from "@assets/Theme";
+import {theme} from "@assets/Theme";
 import React, {useCallback, useEffect, useState} from "react";
-import { StyleSheet, View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
+import {StyleSheet, View, Text, Image, ScrollView, TouchableOpacity} from 'react-native';
 import Keychain from "react-native-keychain";
 import {call} from "@utils/ApiService";
 import {useFocusEffect} from "@react-navigation/native";
 
-const Store = ({ navigation }) => {
+const Store = ({navigation}) => {
     const [isAdminMode, setIsAdminMode] = useState(true); // 관리자 모드 상태를 관리
     const dummy = [
         {
@@ -54,86 +54,83 @@ const Store = ({ navigation }) => {
                     />
                 </View>
                 <View style={styles.iconRow}>
-                    <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Store2', { initialTab: 'cafe' })}>
-                        <Image source={require('../assets/Icons/coffe.png')} style={styles.icon} />
+                    <TouchableOpacity style={styles.iconContainer}
+                                      onPress={() => navigation.navigate('Store2', {initialTab: 'cafe'})}>
+                        <Image source={require('../assets/Icons/coffe.png')} style={styles.icon}/>
                         <Text style={styles.iconLabel}>커피/디저트</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Store2', { initialTab: 'fast-food' })}>
-                        <Image source={require('../assets/Icons/hamburger.png')} style={styles.icon} />
+                    <TouchableOpacity style={styles.iconContainer}
+                                      onPress={() => navigation.navigate('Store2', {initialTab: 'fast-food'})}>
+                        <Image source={require('../assets/Icons/hamburger.png')} style={styles.icon}/>
                         <Text style={styles.iconLabel}>프랜차이즈</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Store2', { initialTab: 'ticket' })}>
-                        <Image source={require('../assets/Icons/ticket.png')} style={styles.icon} />
+                    <TouchableOpacity style={styles.iconContainer}
+                                      onPress={() => navigation.navigate('Store2', {initialTab: 'ticket'})}>
+                        <Image source={require('../assets/Icons/ticket.png')} style={styles.icon}/>
                         <Text style={styles.iconLabel}>상품/면제권</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Store2', { initialTab: 'entertain' })}>
-                        <Image source={require('../assets/Icons/game.png')} style={styles.icon} />
+                    <TouchableOpacity style={styles.iconContainer}
+                                      onPress={() => navigation.navigate('Store2', {initialTab: 'entertain'})}>
+                        <Image source={require('../assets/Icons/game.png')} style={styles.icon}/>
                         <Text style={styles.iconLabel}>엔터테인</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.iconContainer} onPress={() => navigation.navigate('Store2', { initialTab: 'etc' })}>
-                        <Image source={require('../assets/Icons/shoppingbag.png')} style={styles.icon} />
+                    <TouchableOpacity style={styles.iconContainer}
+                                      onPress={() => navigation.navigate('Store2', {initialTab: 'etc'})}>
+                        <Image source={require('../assets/Icons/shoppingbag.png')} style={styles.icon}/>
                         <Text style={styles.iconLabel}>기타</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.productsSection}>
                     <View style={styles.headerContainer}>
                         <Text style={styles.sectionTitle}>최신 상품</Text>
-                        <TouchableOpacity style={styles.moreButton} onPress={() => navigation.navigate('Store2')}>
+                        <TouchableOpacity style={styles.moreButton} onPress={() => navigation.navigate('Store2', {initialTab: 'cafe'})}>
                             <Text style={styles.moreButtonText}>더보기 {">"}</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.productRow}>
-                        <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {itemId: items[0].itemId, category: items[0].category})}>
-                            {items[0].image && items[0].image !== 'null'?
-                                <Image
-                                    source={{uri: items[0].image}}
-                                    style={styles.productImage}
-                                />:
-                                <Image
-                                    source={require('@assets/Images/defaultGift.png')}
-                                    style={styles.productImage}
-                                />}
+                        <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {
+                            itemId: items[0].itemId,
+                            category: items[0].category
+                        })}>
+                            <Image
+                                source={items[0].image ? {uri: items[0].image} : require('@assets/Images/store_blank.png')}
+                                style={styles.productImage}
+                            />
                             <Text style={styles.productText}>{items[0].price + ' pb'}</Text>
                             <Text style={styles.productDescription}>{items[0].name}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {itemId: items[1].itemId, category: items[1].category})}>
-                            {items[1].image && items[1].image !== 'null'?
-                                <Image
-                                    source={{uri: items[1].image}}
-                                    style={styles.productImage}
-                                />:
-                                <Image
-                                    source={require('@assets/Images/defaultGift.png')}
-                                    style={styles.productImage}
-                                />}
+                        <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {
+                            itemId: items[1].itemId,
+                            category: items[1].category
+                        })}>
+                            <Image
+                                source={items[1].image ? {uri: items[1].image} : require('@assets/Images/store_blank.png')}
+                                style={styles.productImage}
+                            />
                             <Text style={styles.productText}>{items[1].price + ' pb'}</Text>
                             <Text style={styles.productDescription}>{items[1].name}</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.productRow}>
-                        <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {itemId: items[2].itemId, category: items[2].category})}>
-                            {items[2].image && items[2].image !== 'null'?
-                                <Image
-                                    source={{uri: items[2].image}}
-                                    style={styles.productImage}
-                                />:
-                                <Image
-                                    source={require('@assets/Images/defaultGift.png')}
-                                    style={styles.productImage}
-                                />}
+                        <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {
+                            itemId: items[2].itemId,
+                            category: items[2].category
+                        })}>
+                            <Image
+                                source={items[2].image ? {uri: items[2].image} : require('@assets/Images/store_blank.png')}
+                                style={styles.productImage}
+                            />
                             <Text style={styles.productText}>{items[2].price + ' pb'}</Text>
                             <Text style={styles.productDescription}>{items[2].name}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {itemId: items[3].itemId, category: items[3].category})}>
-                            {items[3].image && items[3].image !== 'null'?
-                                <Image
-                                    source={{uri: items[3].image}}
-                                    style={styles.productImage}
-                                />:
-                                <Image
-                                    source={require('@assets/Images/defaultGift.png')}
-                                    style={styles.productImage}
-                                />}
+                        <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {
+                            itemId: items[3].itemId,
+                            category: items[3].category
+                        })}>
+                            <Image
+                                source={items[3].image ? {uri: items[3].image} : require('@assets/Images/store_blank.png')}
+                                style={styles.productImage}
+                            />
                             <Text style={styles.productText}>{items[3].price + ' pb'}</Text>
                             <Text style={styles.productDescription}>{items[3].name}</Text>
                         </TouchableOpacity>
@@ -142,22 +139,22 @@ const Store = ({ navigation }) => {
             </ScrollView>
 
             {/* 관리자 모드 버튼 */}
-                        {isAdminMode && (
-                            <>
-                                <TouchableOpacity
-                                    style={[styles.adminButton, styles.addButton]}
-                                    onPress={() => navigation.navigate('Store_Add')}
-                                >
-                                    <Image source={require('@assets/Icons/addsquareIcon2.png')} style={styles.adminIcon} />
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={[styles.adminButton, styles.checkButton]}
-                                    onPress={() => navigation.navigate('Store_Check')}
-                                >
-                                    <Image source={require('@assets/Icons/checkIcon.png')} style={styles.adminIcon} />
-                                </TouchableOpacity>
-                            </>
-                        )}
+            {isAdminMode && (
+                <>
+                    <TouchableOpacity
+                        style={[styles.adminButton, styles.addButton]}
+                        onPress={() => navigation.navigate('Store_Add', navigation = {navigation})}
+                    >
+                        <Image source={require('@assets/Icons/addsquareIcon2.png')} style={styles.adminIcon}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.adminButton, styles.checkButton]}
+                        onPress={() => navigation.navigate('Store_Check')}
+                    >
+                        <Image source={require('@assets/Icons/checkIcon.png')} style={styles.adminIcon}/>
+                    </TouchableOpacity>
+                </>
+            )}
         </View>
     );
 };
@@ -255,23 +252,23 @@ const styles = StyleSheet.create({
     adminButton: {
         position: 'absolute',
         right: 20 * theme.width,
-        width: 60 * theme.width*theme.height,
-        height: 60 * theme.height*theme.width,
+        width: 60 * theme.width * theme.height,
+        height: 60 * theme.height * theme.width,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-        backgroundColor:theme.color.main,
+        backgroundColor: theme.color.main,
 
     },
     addButton: {
         bottom: 97 * theme.height,
     },
     checkButton: {
-        bottom: 97 * theme.height + 75 * theme.width*theme.height,
+        bottom: 97 * theme.height + 75 * theme.width * theme.height,
     },
     adminIcon: {
-        width: 35 * theme.width*theme.height,
-        height: 35 * theme.height*theme.width,
+        width: 35 * theme.width * theme.height,
+        height: 35 * theme.height * theme.width,
     },
 });
 

@@ -23,7 +23,7 @@ import {ThemeProvider, useFocusEffect, useNavigation} from '@react-navigation/na
 //캘린더 로컬화
 import {LocaleConfig} from 'react-native-calendars';
 import Keychain from "react-native-keychain";
-import {ethers} from "ethers";
+import {attendEvent, eventOver} from "@utils/BlockchainFunction";
 import {call} from "@utils/ApiService";
 
 const screenWidth = Dimensions.get('screen').width;
@@ -39,41 +39,6 @@ const getDateDifference = (date1, date2) => {
     const mDate2 = moment(date2);
     return mDate2.diff(mDate1, 'days'); // 'days'를 'hours', 'minutes' 등으로 변경 가능
 };
-
-/*// 배포 서버 연결
-const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
-const privateKey = "0xde49fbfcea11b03f850ca72e5bafa45168963eec8811f506d59f1a4f262a75cc"
-const wallet = new ethers.Wallet(privateKey, provider)
-const eventContractAddress = "0xA3B55216bc84D56c45b033B11FDc1DA25722b233"
-const eventContractABI = [
-    "event EventTokenRecords(string indexed hGroupId, uint256 indexed hTimestamp, string indexed hUserId, string userId, uint256 timestamp, uint256 eventId, uint256 tokenNum)",
-    "function createEvent(uint256 _eventId, uint256 _maxPpl, uint256 _reward)",
-    "function distributeTokens(uint256 _eventId, uint256 _amount, string memory _groupId, string _userId)",
-    "function eventOver(uint256 _eventId) public returns (string memory)"
-]
-const eventContract = new ethers.Contract(eventContractAddress, eventContractABI, wallet)
-
-const attendEvent = async (eventId, amount, groupId, groupUserId) => {
-    try {
-        console.log(eventId)
-        console.log(amount)
-        console.log(groupId)
-        console.log(groupUserId)
-
-        const amountInWei = ethers.parseEther(amount.toString())
-        console.log(amountInWei.toString())
-        const txResponse = await eventContract.distributeTokens(eventId, amountInWei, groupId.toString(), groupUserId.toString())
-        console.log(`Transaction hash: ${txResponse.hash}`);
-
-        // 트랜잭션 영수증 대기
-        const receipt = await txResponse.wait();
-        console.log(`Transaction confirmed in block: ${receipt.blockNumber}`);
-        console.log(receipt)
-    } catch (e) {
-        console.log(e)
-        console.log('error here')
-    }
-}*/
 
 function Top({user, thisMonthEvent}) {
     return (
@@ -160,7 +125,6 @@ function EventCalendar({data, openCalendarModal}) {
             //console.log(data)
             const matchingEvent = data.filter(data => data.startDate.startsWith(day.dateString));
             const eventIds = matchingEvent.map(event => event.eventId);
-            console.log(matchingEvent);
             if (userAuth !== "member") {
                 openCalendarModal(matchingEvent);
             }
@@ -288,17 +252,6 @@ function EventList({thisMonthEvents, openModal}) {
                     )
                 )
             }
-            {/*
-      <View style={styles.eventListItemContainer}>
-        <View style={styles.eventListItemDetailContainer}>
-          <View style={styles.eventListItemIcon}/>
-          <View>
-            <Text style={styles.eventListItemName}>정기 모임</Text>
-            <Text style={styles.eventListItemDate}>2024.05.30</Text>
-          </View>
-        </View>        
-        <GoToParticipate/>
-      </View> */}
         </View>
 
     )
@@ -317,20 +270,6 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
         ? parseInt(overlayData.startDate.split('T')[1].substring(0, 2))
         : 0;
 
-    const getAccessToken = async () => {
-        try {
-            const credentials = await Keychain.getInternetCredentials("AccessToken");
-            if (credentials) {
-                //console.log("AccessToken:", credentials.password);
-                return credentials.password; // AccessToken 반환
-            } else {
-                console.log('No access token found');
-            }
-        } catch (error) {
-            console.error('Error retrieving access token:', error);
-        }
-    };
-
     const submitCode = async (id, submitCode, reward, groupId, groupUserId) => {
         await setCode("")
         const api = `/event/1/join/${id}`
@@ -344,13 +283,13 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
                 }
             }).catch(err => console.log("Error at JoinEvent API, ", err))
 
-        await attendEvent(id, reward, groupId, groupUserId)
+        /*await attendEvent(id, reward, groupId, groupUserId)
             .then(_ => {
                 alert(`${reward} PB를 받았어요!`)
                 closeModal()
                 updateHandler()
             })
-            .catch(error => console.log("Error at JoinEvent Blockchain, ", error))
+            .catch(error => console.log("Error at JoinEvent Blockchain, ", error))*/
     }
 
     return (
@@ -420,26 +359,14 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
 
 
                 </Animated.View>
-                {/* <View style={theme.overlayContainer}>
-            <View style={theme.overlayHeaderContainer}>
-              <Text>정기 봉사</Text>
-              <TouchableOpacity onPress={closeModal}>
-                  <Image source={require("@assets/Icons/closeIcon.png")}
-                    style={{height:24*theme.height, width:24*theme.width}}
-                    />
-              </TouchableOpacity>
-            </View>
-          </View> */}
             </TouchableOpacity>
 
         </Modal>
     )
 }
 
-function EventCalendarOverlay({overlayVisible, animatedHeight, closeModal, overlayData}) {
-    const [code, setCode] = useState("")
+function EventCalendarOverlay({overlayVisible, animatedHeight, closeModal, overlayData, deleteHandler, doneHandler}) {
     //TODO: 여러 일에 걸친 일정 반영 필요
-    console.log("overlay데이타:", overlayData)
     const overlayDataDate = !Array.isArray(overlayData) && overlayData?.startDate
         ? overlayData.startDate.split('T')[0]
         : '';
@@ -448,49 +375,53 @@ function EventCalendarOverlay({overlayVisible, animatedHeight, closeModal, overl
         ? parseInt(overlayData.startDate.split('T')[1].substring(0, 2))
         : 0;
 
-    // const submitCode = async (id, submitCode, reward, groupId, groupUserId) => {
-    //     await setCode("")
-    //     const api = `/event/1/join/${id}`
-    //     const request = {
-    //         code: submitCode
-    //     }
-    //     await call(api, true, "POST", request)
-    //         .then(data => {
-    //             if (data.result.attendeeId) {
-    //                 console.log("Successfully Joined.")
-    //             }
-    //         }).catch(err => console.log("Error at JoinEvent API, ", err))
-
-    //     /*await attendEvent(id, reward, groupId, groupUserId)
-    //         .then(_ => {
-    //           alert(`${reward} PB를 받았어요!`)
-    //           closeModal()
-    //           updateHandler()
-    //         })
-    //         .catch(error => console.log("Error at JoinEvent Blockchain, ", error))*/
-    // }
-    const deleteEvent = () => {
-        const api = `/event/1/delete/${overlayData.eventId}`
-        call(api, true, "DELETE")
-            .then(data => {
-                if (data.code === 200) {
-                    console.log("Event delete success")
-                    alert("일정이 삭제되었습니다.")
-                }
-            }).catch(err => console.log("Error at DeleteEvent API, ", err))
-        console.log(overlayData.eventId)
+    const getEventToken = async () => {
+        const eventInfo = await call(`/event/1?id=${overlayData.eventId}`, true, "GET")
+        return eventInfo.result.remainToken
     }
 
-    const eventDone = () => {
-        const api = `/event/1/done/${overlayData.eventId}`
-        call(api, true, "PATCH")
-            .then(data => {
-                if (data.code === 200) {
-                    console.log("Event done success")
-                    alert("일정이 종료되었습니다.")
+    const deleteEvent = async () => {
+        const remainToken = await getEventToken()
+        await eventOver(overlayData.eventId, remainToken)
+            .then(result => {
+                if (result === "Success!") {
+                    const api = `/event/1/delete/${overlayData.eventId}`
+                    call(api, true, "DELETE")
+                        .then(data => {
+                            if (data.code === 200) {
+                                console.log("Event delete success")
+                                alert("일정이 삭제되었습니다.")
+                                closeModal()
+                                deleteHandler()
+                            }
+                        }).catch(err => console.log("Error at DeleteEvent API, ", err))
                 }
-            }).catch(err => console.log(overlayData.eventId, "Error at Done Event done API, ", err))
-        console.log(overlayData.eventId)
+            })
+            .catch(err => {
+                console.log("Error in deleteEvent blockchain: ", err)
+            })
+    }
+
+    const eventDone = async () => {
+        const remainToken = await getEventToken()
+        await eventOver(overlayData.eventId, remainToken)
+            .then(result => {
+                if (result === "Success!") {
+                    const api = `/event/1/done/${overlayData.eventId}`
+                    call(api, true, "PATCH")
+                        .then(data => {
+                            if (data.code === 200) {
+                                console.log("Event done success")
+                                alert("일정이 종료되었습니다.")
+                                closeModal()
+                                deleteHandler()
+                            }
+                        }).catch(err => console.log(overlayData.eventId, "Error at Done Event done API, ", err))
+                }
+            })
+            .catch(err => {
+                console.log("Error in doneEvent blockchain: ", err)
+            })
     }
 
     return (
@@ -540,27 +471,20 @@ function EventCalendarOverlay({overlayVisible, animatedHeight, closeModal, overl
                         </View>
                     </View>
                     <View style={styles.overlayInputContainer}>
-                        {/* <View style={styles.overlayInputCodeContainer}>
-                            <TextInput
-                                returnKeyType='done'
-                                keyboardType="numeric"
-                                maxLength={6}
-                                value={code}
-                                onChangeText={setCode}
-                                placeholder="참여 코드를 입력하세요"
-                                style={styles.overlayInputCodeText}
-                            />
-                        </View>
-                        <TouchableOpacity style={styles.overlayInputBtn}
-                                          onPress={() => submitCode(overlayData.eventId, code, overlayData.reward, 1, 1)}>
-                            <Text style={styles.overlayInputBtnText}>입력</Text>
-                        </TouchableOpacity> */}
-                        <TouchableOpacity onPress={() => deleteEvent()} style={styles.deleteBtn}>
-                            <Text style={styles.deleteBtnText}>일정 삭제</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => eventDone()} style={styles.doneBtn}>
-                            <Text style={styles.doneBtnText}>일정 종료</Text>
-                        </TouchableOpacity>
+                        {
+                            overlayData.status === "done"
+                                ? <TouchableOpacity onPress={closeModal} style={styles.doneInfoText}>
+                                    <Text style={styles.deleteBtnText}>종료된 일정입니다. 누르면 팝업이 닫힙니다.</Text>
+                                </TouchableOpacity>
+                                : <>
+                                    <TouchableOpacity onPress={() => deleteEvent()} style={styles.deleteBtn}>
+                                        <Text style={styles.deleteBtnText}>일정 삭제</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => eventDone()} style={styles.doneBtn}>
+                                        <Text style={styles.doneBtnText}>일정 종료</Text>
+                                    </TouchableOpacity>
+                                </>
+                        }
                     </View>
 
 
@@ -600,7 +524,7 @@ export default function Event({navigation}) {
                     setDatas(data.result.events)
                 })
                 .catch(err => {
-                    console.log("Error occurred at firstUseEffect1" + err)
+                    console.log("Error occurred at firstUseEffect1: " + err)
                 })
 
             fetchMonthlyEvent()
@@ -651,6 +575,35 @@ export default function Event({navigation}) {
             })
     }
 
+    const updateAfterDelete = () => {
+        const fetchAllEventApi = '/event/1/list/all'
+        call(fetchAllEventApi, true, 'GET')
+            .then(data => {
+                setDatas(data.result.events)
+            })
+            .catch(err => {
+                console.log("Error occurred at firstUseEffect1: " + err)
+            })
+
+        fetchMonthlyEvent()
+            .then(data => {
+                setThisMonthDatas(data.events)
+            })
+            .catch(err => {
+                console.log("Error occurred at updateData" + err)
+            })
+
+        const fetchLastNextEventApi = '/event/1/lastAndNext'
+        call(fetchLastNextEventApi, true, 'GET')
+            .then(data => {
+                setUpcomingEvents(data.result.events[0])
+                setLastEvents(data.result.events[1])
+            })
+            .catch(err => {
+                console.log("Error occurred at firstUseEffect3" + err)
+            })
+    }
+
     const openModal = (index) => {
         setOverlayVisible(true);
         setOverlayData(thisMonthDatas[index]);
@@ -697,7 +650,7 @@ export default function Event({navigation}) {
                           overlayData={overlayData} updateHandler={updateData}/>
             <EventCalendarOverlay overlayVisible={calendarOverlayVisible} animatedHeight={animatedHeight}
                                   closeModal={closeCalendarModal}
-                                  overlayData={overlayData}/>
+                                  overlayData={overlayData} deleteHandler={updateAfterDelete} doneHandler={updateData}/>
             {userAuth === "staff" &&
                 <TouchableOpacity style={styles.writeBtn} onPress={() => navigation.navigate('AddEvent')}>
                     <Image source={require('@assets/Icons/writePen.png')} style={styles.writeIcon}/>
@@ -1081,5 +1034,14 @@ const styles = StyleSheet.create({
         fontSize: theme.fontSizes.fontSizes15,
         color: theme.color.grey1,
     },
-
+    doneInfoText: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: theme.color.white,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: theme.color.grey1,
+        height: 40 * theme.height,
+        width: "100%",
+    },
 })

@@ -107,24 +107,8 @@ const Login = () => {
             </TouchableOpacity>
 
             <View style={styles.footerLinks}>
-                <TouchableOpacity >
-                    <Text style={styles.footerLinkText}>비밀번호 찾기</Text>
-                </TouchableOpacity>
                 <TouchableOpacity onPress={handleSignUpPress}>
                     <Text style={styles.footerLinkText}>회원가입 하기</Text>
-                </TouchableOpacity>
-            </View>
-
-            <Text style={styles.socialLoginText}>간편 로그인</Text>
-            <View style={styles.socialLoginButtons}>
-                <TouchableOpacity>
-                    <Image source={require('../assets/Icons/kakao.png')} style={styles.socialIcon} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Image source={require('../assets/Icons/google.png')} style={styles.socialIcon} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Image source={require('../assets/Icons/naver.png')} style={styles.socialIcon} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -174,9 +158,6 @@ const styles = StyleSheet.create({
         fontSize: theme.fontSizes.fontSizes16,
     },
     footerLinks: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: 260 * theme.width,
         marginBottom: 50*theme.height,
     },
     footerLinkText: {

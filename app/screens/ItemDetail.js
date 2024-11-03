@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity, Dimensions, Modal, Animated, TextInput} from 'react-native';
 import { theme } from "@assets/Theme";
 import {call} from "@utils/ApiService";
+import {purchaseItem} from "@utils/BlockchainFunction";
 
 const { width: screenWidth } = Dimensions.get('window');
 const imageSize = screenWidth
@@ -46,6 +47,31 @@ const ItemDetail = ({route}) => {
         setModalVisible(!isModalVisible);
     };
 
+    const buyItem = async (price) => {
+        const purchaseApi = 'store/1/purchase'
+        /*await purchaseItem("1", "2", itemId, product.price)
+            .then(log => {
+                if (log === "Success!") {
+                    call(purchaseApi, true, "PATCH", {price: price})
+                        .then(_ => {
+                            setMoney(true)
+                            setModalVisible(true)
+                        })
+                        .catch(_ => {
+                            setMoney(false)
+                            setModalVisible(false)
+                        })
+                } else {
+                    setMoney(false)
+                    setModalVisible(false)
+                }
+            })
+            .catch(_ => {
+                setMoney(false)
+                setModalVisible(false)
+            })*/
+    }
+
     const image = product.image ? {uri: `${product.image}`} : require('@assets/Images/defaultGift.png')
 
     return (
@@ -63,7 +89,7 @@ const ItemDetail = ({route}) => {
                     </View>
                 </View>
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.button} onPress={toggleModal}>
+                    <TouchableOpacity style={styles.button} onPress={() => buyItem(product.price)}>
                         <Text style={styles.buttonText}>구매하기</Text>
                     </TouchableOpacity>
                 </View>

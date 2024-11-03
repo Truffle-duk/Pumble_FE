@@ -3,45 +3,11 @@ import {ThemeProvider, useFocusEffect} from "@react-navigation/native";
 import React, {useCallback, useEffect, useState} from "react";
 import {StyleSheet, View, Text, Button, TouchableOpacity, Image, StatusBar, ScrollView} from 'react-native';
 import {Dimensions} from 'react-native';
-import {ethers} from "ethers";
 import { call } from "@utils/ApiService";
+import {getBalance} from "@utils/BlockchainFunction";
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
-
-/*const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
-const ledgerContractAddress = "0x6B6e79D22B6ED962e80ae0ec2D4C0b8CCd5ed517"
-const ledgerContractABI = ["event RetrieveBalance(string indexed hGroupId, string indexed category, string groupId, uint256 balance)"];
-
-async function getBalance(groupId) {
-    const hGroupIdHash = ethers.id(groupId); // keccak256 해시
-
-    // 필터 설정
-    const filter = {
-        address: ledgerContractAddress,
-        fromBlock: 'latest',
-        toBlock: 'latest',
-        topics: [
-            ethers.id("RetrieveBalance(string,string,string,uint256)"), // 이벤트 시그니처
-            hGroupIdHash,
-            ethers.id("ledger")
-        ]
-    };
-
-    try {
-        const logs = await provider.getLogs(filter)
-
-        // 로그를 이벤트 객체로 디코딩
-        const iface = new ethers.Interface(ledgerContractABI);
-        const events = logs.map(log => iface.parseLog(log))
-
-        return events;
-    } catch (error) {
-        console.error("Error fetching getBalance events:", error);
-        throw error;
-    }
-}*/
-
 
 function LedgerCard({navigation}) {
     const [balance, setBalance] = useState("로딩 중...")
@@ -69,7 +35,7 @@ function LedgerCard({navigation}) {
                     <Text style={styles.ledgerHeadText}>공금</Text>
                     <View style={styles.ledgerBalanceTextContainer}>
                         <Text style={styles.ledgerBalanceText}>잔액</Text>
-                        <Text style={styles.ledgerBalanceTotalText}>{balance + '원'}</Text>
+                        <Text style={styles.ledgerBalanceTotalText}>{balance === "로딩 중..." ? balance : `${balance} 원`}</Text>
                     </View>
                 </View>
                 <Image source={require("../assets/Images/Guinguin_Coin.png")}

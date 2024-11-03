@@ -164,8 +164,22 @@ function SwitchOverlay({overlayVisible, animatedHeight, closeModal, navigation, 
 //header
 function StackHeader({navigation, scene, previous}) {
     const [switchOverlayVisible, setSwitchOverlayVisible] = useState(false);
-    const [headerTitle, setHeaderTitle] = useState("고사모")
+    const [headerTitle, setHeaderTitle] = useState("")
     const animatedHeight = useRef(new Animated.Value(0)).current;
+    useFocusEffect(
+        useCallback(() => {
+            initialize()
+        }, [])
+    )
+
+    const initialize = async () => {
+        const currentGroupId = await GroupCall("GID", null)
+        const groupName = await call(`/home/group/${currentGroupId}`, true, "GET")
+            .then((response) => {
+                return response.result.groupName
+            });
+        setHeaderTitle(groupName)
+    }
     const changeHeaderHandler = (name) => {
         setHeaderTitle(name)
     }
@@ -207,7 +221,7 @@ function StackHeader({navigation, scene, previous}) {
     };
 
     return (
-        <View style={[styles.stackHeaderStyle, {height: Platform.OS==="ios"?95*theme.height:70*theme.height}]}>
+        <View style={[styles.stackHeaderStyle, {height: 70*theme.height}]}>
             <View style={styles.stackHeaderGroupContainer}>
                 <Text style={styles.headerTitle}>{headerTitle}</Text>
                 <TouchableOpacity onPress={openSwitchModal}>
@@ -231,7 +245,7 @@ function StackHeader({navigation, scene, previous}) {
 
 function CustomHeader({navigation, title}) {
     return (
-        <View style={[styles.MyPageHeader,{height: Platform.OS==="ios"?95*theme.height:70*theme.height}]}>
+        <View style={[styles.MyPageHeader,{height: 70*theme.height}]}>
             <TouchableOpacity
                 onPress={() => navigation.goBack()}>
                 <Image source={require('../assets/Icons/backArrow.png')}

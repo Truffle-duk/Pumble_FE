@@ -1,57 +1,97 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, Button, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Image } from 'react-native';
-import { theme } from "@assets/Theme";
-import { launchImageLibrary } from 'react-native-image-picker';
+import React, {useEffect, useState} from "react";
+import {
+    StyleSheet,
+    View,
+    Text,
+    Button,
+    TouchableOpacity,
+    ScrollView,
+    Alert,
+    ActivityIndicator,
+    Image
+} from 'react-native';
+import {theme} from "@assets/Theme";
+import {launchImageLibrary} from 'react-native-image-picker';
+import {addReceipt} from "@utils/BlockchainFunction";
+import {formDataCall} from "@utils/ApiService";
 
-function AddReceipt_M({navigation}){
-    const [receipt, setReceipt]=useState("");
+function AddReceipt_M({navigation, route}) {
+    const [receipt, setReceipt] = useState("");
+    const {transactionInfo} = route.params
 
     const selectImage = () => {
         const options = {
-          mediaType: 'photo',
-          maxWidth: 300,
-          maxHeight: 300,
-          quality: 1,
+            mediaType: 'photo',
+            maxWidth: 300,
+            maxHeight: 300,
+            quality: 1,
         };
-    
-        launchImageLibrary(options, response => {
-          if (response.didCancel) {
-            console.log('User cancelled image picker');
-          } else if (response.error) {
-            console.log('ImagePicker Error: ', response.error);
-          } else {
-            const uri = response.assets[0].uri;
-            setReceipt(uri);
-          }
-        });
-      };
 
-    return(
+        launchImageLibrary(options)
+            .then(response => {
+                if (response.didCancel) {
+                    console.log('User cancelled image picker');
+                } else if (response.error) {
+                    console.log('ImagePicker Error: ', response.error);
+                } else {
+                    const uri = response.assets[0].uri;
+                    setReceipt(uri);
+                }
+            });
+    };
+
+    const addReceiptHandler = async () => {
+        const formData = new FormData();
+        formData.append('image', {
+            uri: receipt,
+            name: `receipt_${Number(transactionInfo.transactionIdx)}.jpg`,
+            type: 'image/jpeg'
+        });
+        formData.append('date', formattedDate)
+
+        const api = `/ledger/1/receipt`
+        const receiptUrl = await formDataCall(api, true, 'POST', formData)
+            .then(data => {
+                if (data.isSuccess) {
+                    return data.result.receiptUrl
+                }
+            })
+
+
+        /*await addReceipt("testuuid", transactionInfo.transactionIdx, receiptUrl)
+            .then(_ => {
+                alert("영수증이 성공적으로 업로드 되었습니다.")
+                navigation.navigate('Ledger')
+            })*/
+    }
+
+    const transactionDate = new Date(Number(transactionInfo.date) * 1000)
+    const formattedDate = `${transactionDate.getFullYear()}-${String(transactionDate.getMonth() + 1).padStart(2, '0')}-${String(transactionDate.getDate()).padStart(2, '0')}`;
+    const formattedDateTime = `${transactionDate.getFullYear()}-${String(transactionDate.getMonth() + 1).padStart(2, '0')}-${String(transactionDate.getDate()).padStart(2, '0')} ${String(transactionDate.getHours()).padStart(2, '0')}:${String(transactionDate.getMinutes()).padStart(2, '0')}`;
+    return (
         <View style={styles.background}>
-            <Text style={styles.titleText}>별다방</Text>
+            <Text style={styles.titleText}>{transactionInfo.counterparty}</Text>
             <View style={styles.line}/>
             <View style={styles.contentContainer}>
                 <Text style={styles.contentTitleText}>거래 시간</Text>
-                <Text style={styles.contentNumberText}>2024-02-21 16:12</Text>
+                <Text style={styles.contentNumberText}>{formattedDateTime}</Text>
             </View>
             <View style={styles.contentContainer}>
                 <Text style={styles.contentTitleText}>거래 금액</Text>
-                <Text style={styles.contentNumberText}>45,000원</Text>
+                <Text style={styles.contentNumberText}>{`${transactionInfo.amount.toLocaleString()}원`}</Text>
             </View>
             <View style={styles.line}/>
-            <TouchableOpacity style={styles.addReceiptContainer}
-                onPress={selectImage}>
+            <TouchableOpacity style={styles.addReceiptContainer} onPress={selectImage}>
                 <Image source={require("@assets/Icons/addsquareIcon.png")} style={styles.iconStyle}/>
                 <Text style={styles.addReceiptText}>영수증 첨부하기</Text>
             </TouchableOpacity>
             <View style={styles.imageView}>
                 <Text style={styles.imageText}>{receipt}</Text>
-                <TouchableOpacity onPress={()=>setReceipt("")}>
+                <TouchableOpacity onPress={() => setReceipt("")}>
                     <Image source={require("@assets/Icons/closeIcon.png")} style={styles.deleteIcon}/>
-                </TouchableOpacity>                
+                </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.doneBtn}
-            onPress={()=>navigation.goBack()}>
+            <TouchableOpacity style={styles.doneBtn} onPress={addReceiptHandler}>
                 <Text style={styles.doneBtnText}>완료</Text>
             </TouchableOpacity>
         </View>
@@ -59,95 +99,95 @@ function AddReceipt_M({navigation}){
 }
 
 const styles = StyleSheet.create({
-    background:{
-        flex:1,
-        backgroundColor:theme.color.white,
-        paddingBottom:77*theme.height,
-        paddingHorizontal:16*theme.width,
-        paddingTop:30*theme.height,
+    background: {
+        flex: 1,
+        backgroundColor: theme.color.white,
+        paddingBottom: 77 * theme.height,
+        paddingHorizontal: 16 * theme.width,
+        paddingTop: 30 * theme.height,
     },
-    titleText:{
-        fontFamily:'Pretendard-Bold',
-        fontSize:theme.fontSizes.fontSizes26,
+    titleText: {
+        fontFamily: 'Pretendard-Bold',
+        fontSize: theme.fontSizes.fontSizes26,
         color: theme.color.grey2,
     },
-    line:{
-        marginTop:20*theme.height,
-        height:1,
-        backgroundColor:theme.color.grey6,
+    line: {
+        marginTop: 20 * theme.height,
+        height: 1,
+        backgroundColor: theme.color.grey6,
     },
-    contentContainer:{
-        flexDirection:'row',
-        justifyContent:'space-between',
-        alignItems:'center',
-        marginHorizontal:4*theme.width,
-        marginTop:20*theme.height,
+    contentContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginHorizontal: 4 * theme.width,
+        marginTop: 20 * theme.height,
     },
-    contentTitleText:{
-        fontFamily:'Pretendard-Medium',
-        fontSize:theme.fontSizes.fontSizes18,
+    contentTitleText: {
+        fontFamily: 'Pretendard-Medium',
+        fontSize: theme.fontSizes.fontSizes18,
         color: theme.color.grey10,
-        lineHeight:22,
+        lineHeight: 22,
     },
-    contentNumberText:{
-        fontFamily:'Pretendard-Medium',
-        fontSize:theme.fontSizes.fontSizes15,
+    contentNumberText: {
+        fontFamily: 'Pretendard-Medium',
+        fontSize: theme.fontSizes.fontSizes15,
         color: theme.color.grey2,
-        lineHeight:22,
+        lineHeight: 22,
     },
-    addReceiptContainer:{
-        flexDirection:'row',
-        alignItems:'center',
-        marginHorizontal:4*theme.width,
-        marginTop:20*theme.height,
+    addReceiptContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginHorizontal: 4 * theme.width,
+        marginTop: 20 * theme.height,
     },
-    iconStyle:{
-        height:22*theme.width*theme.height,
-        width:22*theme.width*theme.height,
-        marginRight: 10*theme.width,
+    iconStyle: {
+        height: 22 * theme.width * theme.height,
+        width: 22 * theme.width * theme.height,
+        marginRight: 10 * theme.width,
     },
-    addReceiptText:{
-        fontFamily:'Pretendard-Medium',
-        fontSize:theme.fontSizes.fontSizes15,
+    addReceiptText: {
+        fontFamily: 'Pretendard-Medium',
+        fontSize: theme.fontSizes.fontSizes15,
         color: theme.color.grey10,
-        lineHeight:22,
+        lineHeight: 22,
     },
-    imageView:{
+    imageView: {
         //height:40*theme.height,
-        padding:10*theme.width,
-        flexDirection:'row',
-        justifyContent:'space-between',
-        alignItems:'center',
-        backgroundColor:theme.color.background,
-        borderRadius:15,
-        marginTop:15*theme.height,
+        padding: 10 * theme.width,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: theme.color.background,
+        borderRadius: 15,
+        marginTop: 15 * theme.height,
     },
-    deleteIcon:{
-        height:24*theme.width*theme.height,
-        width:24*theme.width*theme.height,
+    deleteIcon: {
+        height: 24 * theme.width * theme.height,
+        width: 24 * theme.width * theme.height,
     },
-    imageText:{
-        fontFamily:'Pretendard-Medium',
-        fontSize:theme.fontSizes.fontSizes14,
+    imageText: {
+        fontFamily: 'Pretendard-Medium',
+        fontSize: theme.fontSizes.fontSizes14,
         color: theme.color.grey10,
-        lineHeight:22,
-        marginLeft:5*theme.width,
+        lineHeight: 22,
+        marginLeft: 5 * theme.width,
         //height:22*theme.height
     },
-    doneBtn:{
-        position:'absolute',
-        height:50*theme.height,
-        width:358*theme.width,
-        backgroundColor:theme.color.main,
-        borderRadius:5,
-        alignItems:'center',
-        justifyContent:'center',   
-        bottom:97*theme.height,     
-        left:16*theme.width,
+    doneBtn: {
+        position: 'absolute',
+        height: 50 * theme.height,
+        width: 358 * theme.width,
+        backgroundColor: theme.color.main,
+        borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        bottom: 97 * theme.height,
+        left: 16 * theme.width,
     },
-    doneBtnText:{
-        fontFamily:'Pretendard-SemiBold',
-        fontSize:theme.fontSizes.fontSizes18,
+    doneBtnText: {
+        fontFamily: 'Pretendard-SemiBold',
+        fontSize: theme.fontSizes.fontSizes18,
         color: theme.color.white,
     }
 

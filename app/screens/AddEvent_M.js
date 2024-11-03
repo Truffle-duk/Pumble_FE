@@ -14,41 +14,7 @@ import {
 import {theme} from "@assets/Theme";
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {call} from "@utils/ApiService";
-import {ethers} from "ethers";
-
-// 배포 서버 연결
-/*const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
-const privateKey = "0xde49fbfcea11b03f850ca72e5bafa45168963eec8811f506d59f1a4f262a75cc"
-const wallet = new ethers.Wallet(privateKey, provider)
-const eventContractAddress = "0xA3B55216bc84D56c45b033B11FDc1DA25722b233"
-const eventContractABI = [
-    "event EventTokenRecords(string indexed hGroupId, uint256 indexed hTimestamp, string indexed hUserId, string userId, uint256 timestamp, uint256 eventId, uint256 tokenNum)",
-    "function createEvent(uint256 _eventId, uint256 _maxPpl, uint256 _reward)",
-    "function distributeTokens(uint256 _eventId, uint256 _amount, string memory _groupId, string _userId)",
-    "function eventOver(uint256 _eventId) public returns (string memory)"
-]
-const eventContract = new ethers.Contract(eventContractAddress, eventContractABI, wallet)
-
-const createEventBlock = async (eventId, maxPeople, reward) => {
-    try {
-        console.log(eventId)
-        console.log(maxPeople)
-        console.log(reward)
-
-        const txResponse = await eventContract.createEvent(eventId, maxPeople, reward)
-        console.log(`Transaction hash: ${txResponse.hash}`);
-
-        // 트랜잭션 영수증 대기
-        const receipt = await txResponse.wait();
-        console.log(`Transaction confirmed in block: ${receipt.blockNumber}`);
-        console.log(receipt)
-
-        return "Success!"
-    } catch (e) {
-        console.log(e)
-        console.log('error here')
-    }
-}*/
+import {createEventBlock} from "@utils/BlockchainFunction";
 
 function EventNameInput({title, setTitle}) {
     const [eventName, setEventName] = useState("")
@@ -311,7 +277,7 @@ function EventToken({reward, setReward}) {
                         returnKeyType='done'
                         keyboardType="numeric"
                         maxLength={4}
-                        value={reward}
+                        value={reward.toString()}
                         onChangeText={setReward}
                         placeholder="0"
                         placeholderTextColor={theme.color.grey1}
@@ -342,7 +308,7 @@ function EventMaxPeople({maxPeople, setMaxPeople}) {
                         returnKeyType='done'
                         keyboardType="numeric"
                         maxLength={4}
-                        value={maxPeople}
+                        value={maxPeople.toString()}
                         onChangeText={setMaxPeople}
                         placeholder="0"
                         placeholderTextColor={theme.color.grey1}
@@ -388,7 +354,7 @@ function EventCodeInput({ecode, setECode}) {
             </View> */}
             <TextInput
                 style={styles.input}
-                value={ecode}
+                value={ecode.toString()}
                 //onChangeText={setPlace}
                 placeholder="일정의 장소을 입력해주세요"
                 placeholderTextColor={theme.color.grey1}
@@ -457,7 +423,7 @@ function AddEvent_M({navigation}) {
                     }
                 })
 
-            await createEventBlock(eventId, maxPeople, reward)
+            /*await createEventBlock(eventId, maxPeople, reward)
                 .then(log => {
                     if (log === "Success!") {
                         alert("일정 생성 완료!")
@@ -465,7 +431,7 @@ function AddEvent_M({navigation}) {
                     } else {
                         alert("블록체인 기록 과정에서 문제가 발생했습니다.")
                     }
-                })
+                })*/
 
         } else {
             alert('폼을 다시 확인해주세요!');
