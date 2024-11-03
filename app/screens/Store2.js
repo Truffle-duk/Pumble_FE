@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {StyleSheet, View, Text, ScrollView, TouchableOpacity, Image} from 'react-native';
 import { theme } from "@assets/Theme";
 import {call} from "@utils/ApiService";
+import { GroupCall } from "@utils/GroupService";
 
 const Store2 = ({navigation, route}) => {
     const [selectedTab, setSelectedTab] = useState(route.params.initialTab);
@@ -9,11 +10,14 @@ const Store2 = ({navigation, route}) => {
     console.log(route.params.initialTab)
 
     useEffect(() => {
-        const api = `/store/1/list?category=${selectedTab}`
-        call(api, true, 'GET')
-            .then(data => {
-                setItems(data.result.items)
-            })
+        GroupCall("GID")
+            .then(async gid=>{
+                const api = `/store/${gid}/list?category=${selectedTab}`
+                call(api, true, 'GET')
+                    .then(data => {
+                        setItems(data.result.items)
+                    })
+                })
     }, [selectedTab]);
 
     return (

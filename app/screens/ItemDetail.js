@@ -3,6 +3,7 @@ import {View, Text, Image, StyleSheet, TouchableOpacity, Dimensions, Modal, Anim
 import { theme } from "@assets/Theme";
 import {call} from "@utils/ApiService";
 import {purchaseItem} from "@utils/BlockchainFunction";
+import { GroupCall } from '@utils/GroupService';
 
 const { width: screenWidth } = Dimensions.get('window');
 const imageSize = screenWidth
@@ -32,14 +33,16 @@ const ItemDetail = ({route}) => {
                 setItemCategory('기타')
                 break
         }
-
-        const api = `/store/1/item/${itemId}`
-        call(api, true, 'GET')
-            .then(data => {
-                setProduct(data.result)
-            })
-            .catch(err => {
-                console.log("Error occurred at ItemDetail: " + err)
+        GroupCall("GID")
+            .then(async gid=>{
+                const api = `/store/${gid}/item/${itemId}`
+                call(api, true, 'GET')
+                    .then(data => {
+                        setProduct(data.result)
+                    })
+                    .catch(err => {
+                        console.log("Error occurred at ItemDetail: " + err)
+                    })
             })
     }, []);
 
@@ -48,28 +51,31 @@ const ItemDetail = ({route}) => {
     };
 
     const buyItem = async (price) => {
-        const purchaseApi = 'store/1/purchase'
-        /*await purchaseItem("1", "2", itemId, product.price)
-            .then(log => {
-                if (log === "Success!") {
-                    call(purchaseApi, true, "PATCH", {price: price})
-                        .then(_ => {
-                            setMoney(true)
-                            setModalVisible(true)
-                        })
-                        .catch(_ => {
+        GroupCall("GID")
+            .then(async gid=>{
+                const purchaseApi = `store/${gid}/purchase`
+                /*await purchaseItem("1", "2", itemId, product.price)
+                    .then(log => {
+                        if (log === "Success!") {
+                            call(purchaseApi, true, "PATCH", {price: price})
+                                .then(_ => {
+                                    setMoney(true)
+                                    setModalVisible(true)
+                                })
+                                .catch(_ => {
+                                    setMoney(false)
+                                    setModalVisible(false)
+                                })
+                        } else {
                             setMoney(false)
                             setModalVisible(false)
-                        })
-                } else {
-                    setMoney(false)
-                    setModalVisible(false)
-                }
+                        }
+                    })
+                    .catch(_ => {
+                        setMoney(false)
+                        setModalVisible(false)
+                    })*/
             })
-            .catch(_ => {
-                setMoney(false)
-                setModalVisible(false)
-            })*/
     }
 
     const image = product.image ? {uri: `${product.image}`} : require('@assets/Images/defaultGift.png')

@@ -4,6 +4,7 @@ import {StyleSheet, View, Text, Image, ScrollView, TouchableOpacity} from 'react
 import Keychain from "react-native-keychain";
 import {call} from "@utils/ApiService";
 import {useFocusEffect} from "@react-navigation/native";
+import { GroupCall } from "@utils/GroupService";
 
 const Store = ({navigation}) => {
     const [isAdminMode, setIsAdminMode] = useState(true); // 관리자 모드 상태를 관리
@@ -33,14 +34,17 @@ const Store = ({navigation}) => {
 
     useFocusEffect(
         useCallback(() => {
-            const api = '/store/1/recent'
-            call(api, true, 'GET')
-                .then(data => {
-                    setItems(data.result.items)
-                })
-                .catch(err => {
-                    console.log('Error occurred at Store.js: ' + err)
-                })
+            GroupCall("GID")
+                .then(async gid=>{
+                    const api = `/store/${gid}/recent`
+                    call(api, true, 'GET')
+                        .then(data => {
+                            setItems(data.result.items)
+                        })
+                        .catch(err => {
+                            console.log('Error occurred at Store.js: ' + err)
+                        })
+                    })
         }, [])
     )
 
@@ -87,6 +91,7 @@ const Store = ({navigation}) => {
                             <Text style={styles.moreButtonText}>더보기 {">"}</Text>
                         </TouchableOpacity>
                     </View>
+                    {items.length!==0?<View>
                     <View style={styles.productRow}>
                         <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {
                             itemId: items[0].itemId,
@@ -134,7 +139,7 @@ const Store = ({navigation}) => {
                             <Text style={styles.productText}>{items[3].price + ' pb'}</Text>
                             <Text style={styles.productDescription}>{items[3].name}</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View></View>:<Text style={styles.sectionTitle}>상품이 없어요!</Text>}
                 </View>
             </ScrollView>
 

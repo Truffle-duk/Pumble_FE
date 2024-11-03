@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, ScrollView 
 import { launchImageLibrary } from 'react-native-image-picker';
 import { theme } from "@assets/Theme";
 import {call, formDataCall} from '@utils/ApiService';
+import { GroupCall } from '@utils/GroupService';
 
 const category=[
     {
@@ -65,28 +66,31 @@ const Store_Add = ({navigation}) => {
 
     const handleCompletePress = async () => {
         if (isFormComplete) {
-            const api=`/store/1`
-            const formData = new FormData();
-            if (imageUri) {
-                formData.append('image', {
-                    uri: imageUri,
-                    name: `item_${productName}.jpg`,
-                    type: 'image/jpeg'
-                });
-            }
-            formData.append('name', productName)
-            formData.append('price', productPrice)
-            formData.append('category', productCategory)
-            formData.append('description', productDescription)
-
-            await formDataCall(api, true, 'POST', formData)
-                .then(data => {
-                    if (data.isSuccess) {
-                        alert('상품이 등록되었습니다!');
-                        navigation.navigate('Store')
-                    } else {
-                        alert('상품 등록을 실패하였습니다');
+            GroupCall("GID")
+                .then(async gid=>{
+                    const api=`/store/${gid}`
+                    const formData = new FormData();
+                    if (imageUri) {
+                        formData.append('image', {
+                            uri: imageUri,
+                            name: `item_${productName}.jpg`,
+                            type: 'image/jpeg'
+                        });
                     }
+                    formData.append('name', productName)
+                    formData.append('price', productPrice)
+                    formData.append('category', productCategory)
+                    formData.append('description', productDescription)
+
+                    await formDataCall(api, true, 'POST', formData)
+                        .then(data => {
+                            if (data.isSuccess) {
+                                alert('상품이 등록되었습니다!');
+                                navigation.navigate('Store')
+                            } else {
+                                alert('상품 등록을 실패하였습니다');
+                            }
+                        })
                 })
 
         } else {
