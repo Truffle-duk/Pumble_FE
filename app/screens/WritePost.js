@@ -3,30 +3,34 @@ import { theme } from "@assets/Theme";
 import { StyleSheet, View, Text, Button, TouchableOpacity, Image, ScrollView, TextInput } from 'react-native';
 import Keychain from "react-native-keychain";
 import {call} from "@utils/ApiService";
+import { GroupCall } from "@utils/GroupService";
 
 export default function Writepost({navigation}){
     const [Title,setTitle]=useState("");
     const [Content,setContent]=useState("");
 
     const submitPost = async () => {
-        const api = "/community/1/post"
-        const request = {
-            title: Title,
-            content: Content
-        }
-
-        await call(api, true, 'POST', request)
-            .then(data => {
-                if (data.code !== 200) {
-                    console.log('Response Data:', data);
-                    new Error('Network response was not ok');
-                } else {
-                    alert("글이 정상적으로 게시되었습니다.")
-                    navigation.goBack()
+        GroupCall("GID")
+            .then(async id=>{
+                const api = `/community/${id}/post`
+                const request = {
+                    title: Title,
+                    content: Content
                 }
-            })
-            .catch(err => {
-                console.error('Fetch Error:', err);
+
+                await call(api, true, 'POST', request)
+                    .then(data => {
+                        if (data.code !== 200) {
+                            console.log('Response Data:', data);
+                            new Error('Network response was not ok');
+                        } else {
+                            alert("글이 정상적으로 게시되었습니다.")
+                            navigation.goBack()
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Fetch Error:', err);
+                    })
             })
     }
 

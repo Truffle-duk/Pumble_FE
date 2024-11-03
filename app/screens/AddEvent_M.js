@@ -15,6 +15,7 @@ import {theme} from "@assets/Theme";
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {call} from "@utils/ApiService";
 import {createEventBlock} from "@utils/BlockchainFunction";
+import { GroupCall } from "@utils/GroupService";
 
 function EventNameInput({title, setTitle}) {
     const [eventName, setEventName] = useState("")
@@ -400,42 +401,45 @@ function AddEvent_M({navigation}) {
         const fEndDate = `${endDateSplit[0]}-${endDateSplit[1]}-${endDateSplit[2]}T${endTime}`;
 
         if (isFormComplete) {
-            const api = '/event/1'
-            const request = {
-                title: title,
-                startDate: new Date(fStartDate),
-                endDate: new Date(fEndDate),
-                place: place,
-                description: description,
-                code: ecode,
-                maxPeople: maxPeople,
-                reward: reward,
-            }
-
-            const eventId = await call(api, true, 'POST', request)
-                .then(data => {
-                    console.log(data)
-                    if (data.code && data.code === 200) {
-                        return data.result.eventId
-                    } else {
-                        console.log(data.code)
-                        alert("네트워크 오류가 발생했어요...")
+            GroupCall("GID")
+                .then(async gid=>{
+                    const api = `/event/${gid}`
+                    const request = {
+                        title: title,
+                        startDate: new Date(fStartDate),
+                        endDate: new Date(fEndDate),
+                        place: place,
+                        description: description,
+                        code: ecode,
+                        maxPeople: maxPeople,
+                        reward: reward,
                     }
+
+                    const eventId = await call(api, true, 'POST', request)
+                        .then(data => {
+                            console.log(data)
+                            if (data.code && data.code === 200) {
+                                return data.result.eventId
+                            } else {
+                                console.log(data.code)
+                                alert("네트워크 오류가 발생했어요...")
+                            }
+                        })
+
+                    /*await createEventBlock(eventId, maxPeople, reward)
+                        .then(log => {
+                            if (log === "Success!") {
+                                alert("일정 생성 완료!")
+                                navigation.navigate("Event")
+                            } else {
+                                alert("블록체인 기록 과정에서 문제가 발생했습니다.")
+                            }
+                        })*/
                 })
-
-            /*await createEventBlock(eventId, maxPeople, reward)
-                .then(log => {
-                    if (log === "Success!") {
-                        alert("일정 생성 완료!")
-                        navigation.navigate("Event")
-                    } else {
-                        alert("블록체인 기록 과정에서 문제가 발생했습니다.")
-                    }
-                })*/
-
         } else {
             alert('폼을 다시 확인해주세요!');
         }
+    
 
     };
 

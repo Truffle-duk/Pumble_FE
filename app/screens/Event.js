@@ -289,24 +289,20 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
 
     const submitCode = async (id, submitCode, reward, groupId, groupUserId) => {
         await setCode("")
-        const api = `/event/1/join/${id}`
-        const request = {
-            code: submitCode
-        }
-        await call(api, true, "POST", request)
-            .then(data => {
-                if (data.result.attendeeId) {
-                    console.log("Successfully Joined.")
+        GroupCall("GID")
+            .then(async gid=>{
+                const api = `/event/${gid}/join/${id}`
+                const request = {
+                    code: submitCode
                 }
-            }).catch(err => console.log("Error at JoinEvent API, ", err))
+                await call(api, true, "POST", request)
+                    .then(data => {
+                        if (data.result.attendeeId) {
+                            console.log("Successfully Joined.")
+                        }
+                    }).catch(err => console.log("Error at JoinEvent API, ", err))
+                })
 
-        /*await attendEvent(id, reward, groupId, groupUserId)
-            .then(_ => {
-                alert(`${reward} PB를 받았어요!`)
-                closeModal()
-                updateHandler()
-            })
-            .catch(error => console.log("Error at JoinEvent Blockchain, ", error))*/
     }
 
     return (
@@ -531,67 +527,73 @@ export default function Event({navigation}) {
     })
     const animatedHeight = useRef(new Animated.Value(0)).current;
     const [calendarOverlayVisible, setCalendarOverlayVisible] = useState(false);
-    const [gid, setGid]=useState(1)
+    //const [gid, setGid]=useState(1)
 
     const fetchData = async () => {
-        try {
-            // 모든 행사 불러오기
-            const fetchAllEventApi = `/event/${gid}/list/all`;
-            const allEventsData = await call(fetchAllEventApi, true, 'GET');
-            setDatas(allEventsData.result.events);
+        return GroupCall("GID")
+            .then(async gid=>{
+                try {
+                    // 모든 행사 불러오기
+                    const fetchAllEventApi = `/event/${gid}/list/all`;
+                    const allEventsData = await call(fetchAllEventApi, true, 'GET');
+                    setDatas(allEventsData.result.events);
 
-            // 이번 달 행사 불러오기
-            const monthlyEventsData = await fetchMonthlyEvent();
-            setThisMonthDatas(monthlyEventsData.events);
+                    // 이번 달 행사 불러오기
+                    const monthlyEventsData = await fetchMonthlyEvent();
+                    setThisMonthDatas(monthlyEventsData.events);
 
-            // 지난/다음 행사 불러오기
-            const fetchLastNextEventApi = `/event/${gid}/lastAndNext`;
-            const lastNextEventsData = await call(fetchLastNextEventApi, true, 'GET');
-            setUpcomingEvents(lastNextEventsData.result.events[0]);
-            setLastEvents(lastNextEventsData.result.events[1]);
+                    // 지난/다음 행사 불러오기
+                    const fetchLastNextEventApi = `/event/${gid}/lastAndNext`;
+                    const lastNextEventsData = await call(fetchLastNextEventApi, true, 'GET');
+                    setUpcomingEvents(lastNextEventsData.result.events[0]);
+                    setLastEvents(lastNextEventsData.result.events[1]);
 
-            // 사용자 이름 가져오기
-            const nameApi = `/group/${gid}/profile`;
-            const nameData = await call(nameApi, true, 'GET');
-            if (nameData.code === 200) {
-                setUser(nameData.result.nickname);
-            }
-        } catch (err) {
-            console.log("Error occurred in useFocusEffect: " + err);
-        }
+                    // 사용자 이름 가져오기
+                    const nameApi = `/group/${gid}/profile`;
+                    const nameData = await call(nameApi, true, 'GET');
+                    if (nameData.code === 200) {
+                        setUser(nameData.result.nickname);
+                    }
+                } catch (err) {
+                    console.log("Error occurred in useFocusEffect: " + err);
+                }
+    })
     };
-    const fetchGid = async () => {
-        try {
-            // gid 불러오기
-            const id = await GroupCall("GID");
-            console.log("id:",id)
-            setGid(id);
-        } catch (err) {
-            console.log("Error occurred in useFocusEffect: " + err);
-        }
-    };
+    // const fetchGid = async () => {
+    //     try {
+    //         // gid 불러오기
+    //         const id = await GroupCall("GID");
+    //         console.log("id:",id)
+    //         setGid(id);
+    //     } catch (err) {
+    //         console.log("Error occurred in useFocusEffect: " + err);
+    //     }
+    // };
 
     useFocusEffect(
         useCallback(() => {            
-            fetchGid();
+            //fetchGid();
             fetchData();
-            console.log("Gid:",gid)
+            //console.log("Gid:",gid)
         }, [])
     );
 
-    useEffect(()=>{
-        fetchData();
-    },[gid])
+    // useEffect(()=>{
+    //     fetchData();
+    // },[gid])
 
     const fetchMonthlyEvent = async () => {
-        const api = `/event/${gid}/list/month`
-        return await call(api, true, 'GET')
-            .then(data => {
-                return data.result
-            })
-            .catch(err => {
-                console.log("Error occurred at fetchMonthlyEvent" + err)
-            })
+        return GroupCall("GID")
+            .then(async gid=>{
+                const api = `/event/${gid}/list/month`
+                return await call(api, true, 'GET')
+                    .then(data => {
+                        return data.result
+                    })
+                    .catch(err => {
+                        console.log("Error occurred at fetchMonthlyEvent" + err)
+                    })
+                })
     }
 
     const updateData = async () => {

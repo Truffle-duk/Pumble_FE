@@ -3,12 +3,17 @@ import {theme} from "@assets/Theme";
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {call} from "@utils/ApiService";
 import {useFocusEffect} from "@react-navigation/native";
+import { GroupCall } from "@utils/GroupService";
 
-const fetchData = async ({no}) => {
-    const api = `/community/1/post/list?page=${no}`
-    return await call(api, true, 'GET')
-        .then(response => {
-            return response
+const fetchData = async (no) => {
+    return GroupCall("GID")
+        .then(async id=>{
+            const api = `/community/${id}/post/list?page=${no}`
+            return await call(api, true, 'GET')
+                .then(response => {                    
+                    //console.log("Response11: ",id, response)
+                    return response
+                })
         })
 };
 
@@ -78,9 +83,11 @@ export default function Community({navigation}) {
     const postListUpdateHandler = async () => {
         setPage(1); // 페이지를 1로 리셋
         setPostLists([]); // 기존 게시물 목록을 초기화
-        const data = await fetchData({no: 1}); // 페이지 1의 데이터를 다시 불러오기
-        setPostLists(data.result.postList); // 게시물 목록 업데이트
-        setHasMore(data.result.isLast); // 더 불러올 항목이 있는지 설정
+        const data = await fetchData(page); // 페이지 1의 데이터를 다시 불러오기
+        if (data&& data.result){
+            setPostLists(data.result.postList); // 게시물 목록 업데이트
+            setHasMore(data.result.isLast); // 더 불러올 항목이 있는지 설정
+        }
     };
 
     useEffect(() => {
@@ -94,8 +101,8 @@ export default function Community({navigation}) {
 
         setTimeout(async () => {
             if (!hasMore) {
-                const response = await fetchData({no: page});
-                //console.log("Response from fetchPostList:", response);
+                const response = await fetchData(page);
+                console.log("Response from fetchPostList:", response);
 
                 if (response.code === 200) {
                     const newData = response.result.postList;
@@ -119,7 +126,7 @@ export default function Community({navigation}) {
     };
 
     return (
-        <View>
+        <View style={{flex:1, backgroundColor: theme.color.white,}}>
             <ScrollView contentContainerStyle={styles.background}
                         onScroll={handleScroll}
                 //scrollEventThrottle={400}
@@ -135,6 +142,7 @@ export default function Community({navigation}) {
 
 const styles = StyleSheet.create({
     background: {
+        //flex:1,
         backgroundColor: theme.color.white,
         paddingBottom: 107 * theme.height,
         paddingTop: 15 * theme.height,

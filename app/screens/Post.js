@@ -91,25 +91,28 @@ function WriteReply({postId, updateHandler}){
     const [InputReply, setInputReply]=useState("");
 
     const submitComment = async () => {
-        const api = `/community/1/comment/${postId}`
-        const request = {
-            content: InputReply
-        }
-
-        await call(api, true, 'POST', request)
-            .then(data => {
-                console.log(data)
-                if(data.code !== 200) {
-                    console.log('Response Data:', data);
-                    new Error('Network response was not ok at fetchAllData');
-                } else {
-                    setInputReply("")
-                    updateHandler()
+        GroupCall("GID")
+            .then(async gid=>{
+                const api = `/community/${gid}/comment/${postId}`
+                const request = {
+                    content: InputReply
                 }
-            })
-            .catch(err => {
-                console.error('Fetch Error:', err);
-            })
+
+                await call(api, true, 'POST', request)
+                    .then(data => {
+                        console.log(data)
+                        if(data.code !== 200) {
+                            console.log('Response Data:', data);
+                            new Error('Network response was not ok at fetchAllData');
+                        } else {
+                            setInputReply("")
+                            updateHandler()
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Fetch Error:', err);
+                    })
+        })
     }
 
     return(
@@ -166,38 +169,47 @@ export default function Post({route, navigation}){
     },[])
 
     const fetchPost = async () => {
-        const api = `/community/1/post/${id}`
-        return await call(api, true, 'GET')
-            .then(data => {
-                return data.result
-            })
-            .catch(err => {
-                console.log("Error occurred at fetchPost: " + err)
-            })
+        return GroupCall("GID")
+            .then(async gid=>{
+                const api = `/community/${gid}/post/${id}`
+                return await call(api, true, 'GET')
+                    .then(data => {
+                        return data.result
+                    })
+                    .catch(err => {
+                        console.log("Error occurred at fetchPost: " + err)
+                    })
+                })
     }
 
     const fetchComments = async () => {
-        const api = `/community/1/comment/${id}`
-        await call(api, true, 'GET')
-            .then(data => {
-                setReplyList(data.result.commentList)
-                setReplyCount(data.result.commentListSize)
-            })
-            .catch(err => {
-                console.log("Error occurred at fetchComments: " + err)
+        GroupCall("GID")
+            .then(async gid=>{
+                const api = `/community/${gid}/comment/${id}`
+                await call(api, true, 'GET')
+                    .then(data => {
+                        setReplyList(data.result.commentList)
+                        setReplyCount(data.result.commentListSize)
+                    })
+                    .catch(err => {
+                        console.log("Error occurred at fetchComments: " + err)
+                    })
             })
     }
     const fetchDeletePost = async () => {
-        const api = `/community/1/post/${id}`
-        return await call(api, true, 'DELETE')
-            .then(data => {
-                alert('글이 삭제됐습니다.')
-                navigation.navigate('Community')
-                return data.result                
-            })
-            .catch(err => {
-                console.log("Error occurred at fetchDeletePost: " + err)
-            })
+        return GroupCall("GID")
+            .then(async gid=>{
+                const api = `/community/${gid}/post/${id}`
+                return await call(api, true, 'DELETE')
+                    .then(data => {
+                        alert('글이 삭제됐습니다.')
+                        navigation.navigate('Community')
+                        return data.result                
+                    })
+                    .catch(err => {
+                        console.log("Error occurred at fetchDeletePost: " + err)
+                    })
+                })
     }
 
     useEffect(()=>{
