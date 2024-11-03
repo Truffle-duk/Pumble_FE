@@ -4,6 +4,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { theme } from "@assets/Theme";
 import * as Keychain from 'react-native-keychain';
 import {call} from "@utils/ApiService";
+import { GroupCall } from '@utils/GroupService';
 
 const NoticeDetail = () => {
     const route = useRoute();
@@ -12,11 +13,14 @@ const NoticeDetail = () => {
     const [noti, setNoti]=useState(null)
 
     useEffect(() => {
-        const noticeDetailApi = `/community/1/notice/${noticeId}`
-        call(noticeDetailApi, true, 'GET')
-            .then(data => {
-                setNoti(data.result)
-            })
+        GroupCall("GID")
+          .then(async id=>{
+            const noticeDetailApi = `/community/${id}/notice/${noticeId}`
+            call(noticeDetailApi, true, 'GET')
+                .then(data => {
+                    setNoti(data.result)
+                })
+        })
     }, []);
 
     return (

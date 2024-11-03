@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, Alert} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {theme} from "@assets/Theme";
 import * as Keychain from 'react-native-keychain';
 import {call} from "@utils/ApiService";
+import { GroupCall } from '@utils/GroupService';
 
 const isAdmin = true; // 관리자 모드를 제어하는 플래그
 
@@ -14,17 +15,21 @@ const Notification = () => {
         writer: {nickname: "", hasAuthority: false}
     }])
 
-    useEffect(() => {
-        const api = '/community/1/notice/list?page=1'
-        call(api, true, 'GET')
-            .then(data => {
-                setNotiList(data.result.noticeList)
-            })
-            .catch(err => {
-                console.log("Error occurred at Notification")
-            })
-    }, []);
-
+    useFocusEffect(
+        useCallback(() => {
+            GroupCall("GID")
+          .then(async id=>{
+            const api = `/community/${id}/notice/list?page=1`
+            call(api, true, 'GET')
+                .then(data => {
+                    setNotiList(data.result.noticeList)
+                })
+                .catch(err => {
+                    console.log("Error occurred at Notification")
+                })
+          })
+        }, [])
+    )
 
     const handleNoticePress = (noticeId) => {
         navigation.navigate('NoticeDetail', {noticeId: noticeId});
@@ -35,27 +40,32 @@ const Notification = () => {
     };
 
     const handleDeletePress = async (noticeId) => {
-        //console.log(noticeId)
-        const dapi = `/community/1/notice/${noticeId}`
-        //const dapi=`/community/1/notice/12`
-        return await call(dapi, true, 'DELETE')
-            .then(data => {
-                console.log(data)
-                if (data.code === 200) {
-                    alert('공지가 삭제되었습니다.');
-                } else {
-                    alert("공지 삭제를 실패했습니다.")
-                }
-            })
-            .catch(err => {
-                console.log(err)
-                console.log("Error occurred at delete notification")
-            })
+        GroupCall("GID")
+          .then(async id=>{
+            // console.log(noticeId)
+            // console.log("notifi GID", id)
+            const dapi = `/community/${id}/notice/${noticeId}`
+            //const dapi=`/community/1/notice/12`
+            return await call(dapi, true, 'DELETE')
+                .then(data => {
+                    console.log(data)
+                    if (data.code === 200) {
+                        alert('공지가 삭제되었습니다.');
+                    } else {
+                        alert("공지 삭제를 실패했습니다.")
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    console.log("Error occurred at delete notification")
+                })
+        })
     }
 
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
+                {notiList.length===0?<View></View>:
                 <TouchableOpacity style={styles.mainNotice}
                                   onPress={() => handleNoticePress(notiList[0].notice.noticeId)}>
                     <View style={styles.mainNoticeContent}>
@@ -64,6 +74,7 @@ const Notification = () => {
                         <Image source={require('../assets/Icons/arrow-Down.png')} style={styles.arrowDownIcon}/>
                     </View>
                 </TouchableOpacity>
+                }
 
                 {/* 나머지 공지사항들을 표시 */}
                 {notiList.length === 0 ? (

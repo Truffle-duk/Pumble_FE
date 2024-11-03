@@ -35,7 +35,7 @@ function ProfileView({navigation, name, imageUri, Auth, pb, qty}) {
                 </View>
             </View>
             <TouchableOpacity style={styles.modifyProfileBtn}
-                              onPress={() => navigation.navigate('ModifyProfile')}
+                              onPress={async () => navigation.navigate('ModifyProfile',{gid:await GroupCall("GID")})}
             >
                 <Text style={styles.modifyProfileText}>프로필 수정</Text>
             </TouchableOpacity>
@@ -213,7 +213,10 @@ export default function MyPage({navigation}) {
     const [gid, setGid] = useState(1)
 
     const handleProfile = async () => {
-        const api = '/group/1/profile';
+        //console."log("mypage Gid:", gid);
+        GroupCall("GID")
+          .then(async id=>{
+            const api = `/group/${id}/profile`;
 
         try {
             // 비동기 호출을 대기 (await)하여 데이터를 받아옴
@@ -234,11 +237,14 @@ export default function MyPage({navigation}) {
             // 에러 처리 (필요한 경우)
             console.error('Error fetching profile:', error);
         }
+
+          })
+        
     };
-
-
+    
     useFocusEffect(
         useCallback(() => {
+            //fetchGid();
             handleProfile();
         }, [])
     )
@@ -278,7 +284,9 @@ export default function MyPage({navigation}) {
     };
 
     const fetchDeleteGroup = async () => {
-        const api = `/group/1`
+      GroupCall("GID")
+      .then(async id=>{
+        const api = `/group/${id}`
         return await call(api, true, 'DELETE')
             .then(data => {
                 alert('탈퇴하였습니다!')
@@ -288,6 +296,8 @@ export default function MyPage({navigation}) {
             .catch(err => {
                 console.log("Error occurred at fetchDeletePost: " + err)
             })
+      })
+        
     }
 
     return (

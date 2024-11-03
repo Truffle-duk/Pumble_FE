@@ -27,11 +27,17 @@ function ModifyProfileImage({imageUri, setImageUri, setIsValidImage, setRequestU
                 }
             })
     };
+    const profileImage = imageUri ? {uri: `${imageUri}`} : require('@assets/Images/Guinguin_Face.png')
 
     return (
         <View style={styles.profileModifyImageContainer}>
             <View style={styles.profileImageContainer}>
-                <Image source={imageUri} style={styles.profileImage}/>
+                {
+                    imageUri && imageUri !== "null"?
+                    <Image source={imageUri} style={styles.profileImage}/>
+                    :<Image source={require('@assets/Images/Guinguin_Face.png')} style={styles.profileImage}/>
+                }
+                
             </View>
             <TouchableOpacity style={styles.profileImageModifyBtn} onPress={selectImage}>
                 <Image source={require('@assets/Icons/galleryAdd.png')}
@@ -75,7 +81,7 @@ function SaveBtn({handleChangeProfile}) {
     )
 }
 
-export default function ModifyProfile({navigation}) {
+export default function ModifyProfile({route, navigation}) {
     const [nickname, setNickname] = useState("");
     const [isValidImage, setIsValidImage] = useState(false);
     const [requestUri, setRequestUri] = useState("")
@@ -83,8 +89,10 @@ export default function ModifyProfile({navigation}) {
     const [prevName, setPrevName] = useState("귄귄쓰");
     const [prevProfileImage, setPrevProfileImage] = useState(require('@assets/Images/Guinguin_Face.png'))
 
+    const {gid} = route.params;
+
     const getProfile = async () => {
-        const api = '/group/1/profile';
+        const api = `/group/${gid}/profile`;
 
         try {
             // 비동기 호출을 대기 (await)하여 데이터를 받아옴
@@ -109,7 +117,7 @@ export default function ModifyProfile({navigation}) {
                 type: 'image/jpeg'
             });
 
-            const changeProfileImage = '/group/1/profile/image'
+            const changeProfileImage = `/group/${gid}/profile/image`
             if (isValidImage) {
                 return formDataCall(changeProfileImage, true, 'PATCH', formData)
                     .then(data => {
@@ -119,7 +127,7 @@ export default function ModifyProfile({navigation}) {
         }
 
         const changeNicknameHandler = async () => {
-            const changeNickname = '/group/1/profile/nickname'
+            const changeNickname = `/group/${gid}/profile/nickname`
             if(nickname.includes(" ") || nickname.length === 0 || nickname.length > 10) { // 닉네임 유효성 검사
                 alert('닉네임에 공백이 포함되어 있거나 길이가 10 초과입니다.')
             }
@@ -165,6 +173,7 @@ export default function ModifyProfile({navigation}) {
     useEffect(() => {
         //setNickname("귄귄쓰")
         getProfile();
+        //console.log("modify profile Gid:", gid)
     }, [])
 
     return (
