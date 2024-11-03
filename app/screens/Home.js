@@ -4,6 +4,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import {StyleSheet, View, Text, Button, TouchableOpacity, Image, StatusBar, ScrollView} from 'react-native';
 import {Dimensions} from 'react-native';
 import {ethers} from "ethers";
+import { call } from "@utils/ApiService";
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -78,7 +79,7 @@ function LedgerCard({navigation}) {
             <View style={styles.ledgerLine}/>
             <View style={styles.ledgerGotoLedgerContainer}>
                 <TouchableOpacity style={styles.ledgerGotoLedgerTouch}
-                                  onPress={() => navigation.navigate('Ledger2')}>
+                                  onPress={() => navigation.navigate('Ledger')}>
                     <Text style={styles.ledgerGotoLedgerText}>내역 보러가기</Text>
                     <Image source={require("@assets/Icons/dropdownIcon.png")}
                            style={styles.ledgerGotoLedgerIcon}/>
@@ -138,31 +139,81 @@ function RewardBanner({navigation}) {
     )
 }
 
-function RewardStoreCard({}) {
+function RewardStoreCard({navigation}) {
+    
+    const dummy = [
+        {
+            image: 'https://pumble-s3.s3.ap-northeast-2.amazonaws.com/store/4dde93d405a1086fb5f025fa183fc445.png',
+            name: 'test',
+            price: 0,
+        },
+        {
+            image: 'https://pumble-s3.s3.ap-northeast-2.amazonaws.com/store/4dde93d405a1086fb5f025fa183fc445.png',
+            name: 'test',
+            price: 0,
+        },
+        {
+            image: 'https://pumble-s3.s3.ap-northeast-2.amazonaws.com/store/4dde93d405a1086fb5f025fa183fc445.png',
+            name: 'test',
+            price: 0,
+        },
+        {
+            image: 'https://pumble-s3.s3.ap-northeast-2.amazonaws.com/store/4dde93d405a1086fb5f025fa183fc445.png',
+            name: 'test',
+            price: 0,
+        }
+    ]
+    const [items, setItems] = useState(dummy)
+
+    useFocusEffect(
+        useCallback(() => {
+            const api = '/store/1/recent'
+            call(api, true, 'GET')
+                .then(data => {
+                    setItems(data.result.items)
+                    console.log(data.result.items)
+                })
+                .catch(err => {
+                    console.log('Error occurred at Store.js: ' + err)
+                })
+        }, [])
+    )
+        
+
     return (
         <View style={styles.rewardStoreCard}>
             <View style={styles.rewardStoreHeaderContainer}>
                 <Text style={styles.rewardStoreHeaderText}>리워드 스토어</Text>
-                <TouchableOpacity style={styles.rewardStoreCardNavigationContainer}>
+                <TouchableOpacity style={styles.rewardStoreCardNavigationContainer}
+                    onPress={()=> navigation.navigate('Store')}>
                     <Text style={styles.rewardStoreCardNavigationText}>더보기</Text>
                     <Image source={require('@assets/Icons/arrow1_Right.png')}
                            style={styles.rewardStoreCardNavigationIcon}/>
                 </TouchableOpacity>
             </View>
             <View style={styles.rewardStoreBannerContianer}>
-                <Image source={require('@assets/Images/RewardStore_Banner.png')}
+                <Image source={require('@assets/Images/homebannerImg.png')}
                        style={styles.rewardStoreBannerImage}
                 />
-                <Text style={styles.rewardStoreBannerText}>커피/케이크</Text>
+                {/* <Text style={styles.rewardStoreBannerText}>커피/케이크</Text> */}
             </View>
             <View style={styles.rewardStoreProductListContainer}>
                 <View style={styles.rewardStoreItemContainer}>
                     <View style={styles.rewardStoreItemDetailContainer}>
-                        <Image source={require('@assets/Images/ProductImage1.png')}
-                               style={styles.rewardStoreItemImage}/>
+                    {items[0].image && items[0].image !== 'null'?
+                        <Image
+                            source={{uri: items[0].image}}
+                            style={styles.rewardStoreItemImage}
+                        />:
+                        <Image
+                            source={require('@assets/Images/defaultGift.png')}
+                            style={styles.rewardStoreItemImage}
+                        />}
+                        {/* <Image source={require('@assets/Images/ProductImage1.png')}
+                               style={styles.rewardStoreItemImage}/> */}
                         <View>
-                            <Text style={styles.rewardStoreItemNameText}>스타벅스 블루베리 치즈 케이크</Text>
-                            <Text style={styles.rewardStoreItemPriceText}>12 PB</Text>
+                            <Text style={styles.rewardStoreItemNameText}>{items[0].name}</Text>
+                            <Text style={styles.rewardStoreItemPriceText}>{items[0].price} PB</Text>
                         </View>
                     </View>
                     <TouchableOpacity>
@@ -172,11 +223,18 @@ function RewardStoreCard({}) {
                 </View>
                 <View style={styles.rewardStoreItemContainer}>
                     <View style={styles.rewardStoreItemDetailContainer}>
-                        <Image source={require('@assets/Images/ProductImage2.png')}
-                               style={styles.rewardStoreItemImage}/>
+                    {items[1].image && items[1].image !== 'null'?
+                        <Image
+                            source={{uri: items[1].image}}
+                            style={styles.rewardStoreItemImage}
+                        />:
+                        <Image
+                            source={require('@assets/Images/defaultGift.png')}
+                            style={styles.rewardStoreItemImage}
+                        />}
                         <View>
-                            <Text style={styles.rewardStoreItemNameText}>아이스 스타벅스 돌체라떼 T</Text>
-                            <Text style={styles.rewardStoreItemPriceText}>10 PB</Text>
+                            <Text style={styles.rewardStoreItemNameText}>{items[1].name}</Text>
+                            <Text style={styles.rewardStoreItemPriceText}>{items[1].price} PB</Text>
                         </View>
                     </View>
                     <TouchableOpacity>
@@ -191,6 +249,22 @@ function RewardStoreCard({}) {
 }
 
 export default function Home({navigation}) {
+    // const [items, setItems] = useState([])
+
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         const api = '/store/1/recent'
+    //         call(api, true, 'GET')
+    //             .then(data => {
+    //                 setItems(data.result.items)
+    //                 console.log(data.result.items)
+    //             })
+    //             .catch(err => {
+    //                 console.log('Error occurred at Store.js: ' + err)
+    //             })
+    //     }, [])
+    // )
+
     return (
         <>
             {/* <StatusBar
@@ -209,7 +283,7 @@ export default function Home({navigation}) {
                     <CommunityCard navigation={navigation}/>
                 </View>
                 <RewardBanner navigation={navigation}/>
-                <RewardStoreCard/>
+                <RewardStoreCard navigation={navigation}/>
             </ScrollView>
         </>
     );

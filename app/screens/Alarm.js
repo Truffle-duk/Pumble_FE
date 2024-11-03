@@ -93,8 +93,8 @@ function Alarm() {
     const [datas, setDatas] = useState([]);
 
     useEffect(() => {
-        //setDatas(alarmList);
-        setDatas([]);
+        setDatas(alarmList);
+        //setDatas([]);
     }, []);
 
     const renderContent = (data) => {

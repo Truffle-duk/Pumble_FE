@@ -169,11 +169,11 @@ const styles = StyleSheet.create({
         paddingBottom: 77 * theme.height
     },
     scrollContainer: {
-        paddingHorizontal: 15,
+        paddingHorizontal: 15 *theme.width,
     },
     banner: {
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 20*theme.height,
     },
     bannerImage: {
         width: 405 * theme.width,
@@ -182,14 +182,14 @@ const styles = StyleSheet.create({
     iconRow: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        marginBottom: 30,
+        marginBottom: 30*theme.height,
     },
     iconContainer: {
         alignItems: 'center',
     },
     icon: {
-        width: 50 * theme.width,
-        height: 50 * theme.height,
+        width: 50 * theme.width * theme.height,
+        height: 50 * theme.height * theme.width,
     },
     iconLabel: {
         fontSize: theme.fontSizes.fontSizes11,
@@ -197,19 +197,19 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     productsSection: {
-        marginBottom: 20,
+        marginBottom: 20*theme.height,
     },
     headerContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 8
+        marginBottom: 8*theme.height
     },
     sectionTitle: {
         fontFamily: 'Pretendard-SemiBold',
         fontSize: theme.fontSizes.fontSizes18,
         color: theme.color.grey2,
-        marginBottom: 10,
+        marginBottom: 10 * theme.height,
     },
     moreButton: {
         backgroundColor: theme.color.white,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     productRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 20
+        marginBottom: 20*theme.height
     },
     productCard: {
         width: 174 * theme.width,
@@ -232,10 +232,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     productImage: {
-        width: 174 * theme.width,
-        height: 174 * theme.width,
+        width: 174 * theme.width*theme.height,
+        height: 174 * theme.width*theme.height,
         borderRadius: 15,
-        marginBottom: 8,
+        marginBottom: 8*theme.height,
         borderWidth: 1,
         borderColor: '#00000022'
     },
