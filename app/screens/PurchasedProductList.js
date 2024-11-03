@@ -97,7 +97,8 @@ export default function PurchasedProductList(){
     },[])
 
     return (
-        <ScrollView contentContainerStyle={styles.background}>
+      <View style={styles.background}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Text style={styles.headText}>구매 상품 내역</Text>
           {
             MyPurchasedProducts.length===0?(
@@ -112,12 +113,17 @@ export default function PurchasedProductList(){
           }
           {/* <ProductList List={MyPurchasedProducts}/> */}
         </ScrollView>
+        </View>
       );
   }
 
 const styles=StyleSheet.create({
   background:{
+    flex:1,
     backgroundColor:theme.color.white,
+    
+  },
+  scrollContainer:{
     paddingTop:30*theme.height,
     paddingHorizontal:16*theme.width,
     paddingBottom:92*theme.height,

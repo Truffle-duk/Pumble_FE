@@ -22,7 +22,7 @@ export default function ChangeGroupPW({route, navigation}){
                 password: password,
             }
             call(checkPwApi, true, 'POST', checkPwRequest)
-                .then(data => {
+                .then(async data => {
                     if (data.code === 200) {
                         //navigation.navigate('Start', { nickname: nickname });
                         setArePasswordsSame(true);
@@ -34,25 +34,37 @@ export default function ChangeGroupPW({route, navigation}){
         }
     };
 
-    const handleChangePw = () => {
+    const handleChangePw = async () => {
         handleCheckPw()
         if (arePasswordsSame) {
+            //const api=`/group/${gid}/password`
             const api=`/group/${gid}/password`
             const request={
                 newPassword: newPw
             }
-            call(api, true, 'PATCH', request)
-                .then(async data => {
-                    console.log(newPw)
-                    if (data.code === 200){
-                        alert('모임의 패스워드가 변경되었습니다!');
-                        navigation.goBack();
-                    }else{
-                        alert('패스워드 변경 과정에서 오류가 발생했습니다 :(');
-                    }
-                }).catch(err => {
-                    console.log(err)
-                })
+            // call(api, true, 'PATCH', request)
+            //     .then(async data => {
+            //         console.log(newPw)
+            //         if (data.code === 200){
+            //             alert('모임의 패스워드가 변경되었습니다!');
+            //             navigation.goBack();
+            //         }else{
+            //             alert('패스워드 변경 과정에서 오류가 발생했습니다 :(');
+            //         }
+            //     }).catch(err => {
+            //         console.log(err)
+            //     })
+            try {
+                const data = await call(api, true, 'PATCH', request);
+                if (data.code === 200) {
+                    alert('모임의 패스워드가 변경되었습니다!');
+                    navigation.goBack();
+                } else {
+                    alert('패스워드 변경 과정에서 오류가 발생했습니다 :(');
+                }
+            } catch (err) {
+                console.error('Failed to change password:', err);
+            }
         }
     }
 

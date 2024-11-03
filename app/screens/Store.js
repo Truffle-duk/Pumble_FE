@@ -49,7 +49,7 @@ const Store = ({ navigation }) => {
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.banner}>
                     <Image
-                        source={require('../assets/Images/store_banner.png')}
+                        source={require('@assets/Images/StoreBannerImg.png')}
                         style={styles.bannerImage}
                     />
                 </View>
@@ -79,41 +79,61 @@ const Store = ({ navigation }) => {
                     <View style={styles.headerContainer}>
                         <Text style={styles.sectionTitle}>최신 상품</Text>
                         <TouchableOpacity style={styles.moreButton} onPress={() => navigation.navigate('Store2')}>
-                            <Text style={styles.moreButtonText}>더보기 ></Text>
+                            <Text style={styles.moreButtonText}>더보기 {">"}</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.productRow}>
                         <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {itemId: items[0].itemId, category: items[0].category})}>
-                            <Image
-                                source={{uri: items[0].image}}
-                                style={styles.productImage}
-                            />
+                            {items[0].image && items[0].image !== 'null'?
+                                <Image
+                                    source={{uri: items[0].image}}
+                                    style={styles.productImage}
+                                />:
+                                <Image
+                                    source={require('@assets/Images/defaultGift.png')}
+                                    style={styles.productImage}
+                                />}
                             <Text style={styles.productText}>{items[0].price + ' pb'}</Text>
                             <Text style={styles.productDescription}>{items[0].name}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {itemId: items[1].itemId, category: items[1].category})}>
-                            <Image
-                                source={{uri: items[1].image}}
-                                style={styles.productImage}
-                            />
+                            {items[1].image && items[1].image !== 'null'?
+                                <Image
+                                    source={{uri: items[1].image}}
+                                    style={styles.productImage}
+                                />:
+                                <Image
+                                    source={require('@assets/Images/defaultGift.png')}
+                                    style={styles.productImage}
+                                />}
                             <Text style={styles.productText}>{items[1].price + ' pb'}</Text>
                             <Text style={styles.productDescription}>{items[1].name}</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.productRow}>
                         <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {itemId: items[2].itemId, category: items[2].category})}>
-                            <Image
-                                source={{uri: items[2].image}}
-                                style={styles.productImage}
-                            />
+                            {items[2].image && items[2].image !== 'null'?
+                                <Image
+                                    source={{uri: items[2].image}}
+                                    style={styles.productImage}
+                                />:
+                                <Image
+                                    source={require('@assets/Images/defaultGift.png')}
+                                    style={styles.productImage}
+                                />}
                             <Text style={styles.productText}>{items[2].price + ' pb'}</Text>
                             <Text style={styles.productDescription}>{items[2].name}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate("ItemDetail", {itemId: items[3].itemId, category: items[3].category})}>
-                            <Image
-                                source={{uri: items[3].image}}
-                                style={styles.productImage}
-                            />
+                            {items[3].image && items[3].image !== 'null'?
+                                <Image
+                                    source={{uri: items[3].image}}
+                                    style={styles.productImage}
+                                />:
+                                <Image
+                                    source={require('@assets/Images/defaultGift.png')}
+                                    style={styles.productImage}
+                                />}
                             <Text style={styles.productText}>{items[3].price + ' pb'}</Text>
                             <Text style={styles.productDescription}>{items[3].name}</Text>
                         </TouchableOpacity>
@@ -128,13 +148,13 @@ const Store = ({ navigation }) => {
                                     style={[styles.adminButton, styles.addButton]}
                                     onPress={() => navigation.navigate('Store_Add')}
                                 >
-                                    <Image source={require('../assets/Icons/add.png')} style={styles.adminIcon} />
+                                    <Image source={require('@assets/Icons/addsquareIcon2.png')} style={styles.adminIcon} />
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={[styles.adminButton, styles.checkButton]}
                                     onPress={() => navigation.navigate('Store_Check')}
                                 >
-                                    <Image source={require('../assets/Icons/check.png')} style={styles.adminIcon} />
+                                    <Image source={require('@assets/Icons/checkIcon.png')} style={styles.adminIcon} />
                                 </TouchableOpacity>
                             </>
                         )}
@@ -235,20 +255,23 @@ const styles = StyleSheet.create({
     adminButton: {
         position: 'absolute',
         right: 20 * theme.width,
-        width: 60 * theme.width,
-        height: 60 * theme.height,
+        width: 60 * theme.width*theme.height,
+        height: 60 * theme.height*theme.width,
         justifyContent: 'center',
         alignItems: 'center',
+        borderRadius: 15,
+        backgroundColor:theme.color.main,
+
     },
     addButton: {
         bottom: 97 * theme.height,
     },
     checkButton: {
-        bottom: 97 * theme.height + 60,
+        bottom: 97 * theme.height + 75 * theme.width*theme.height,
     },
     adminIcon: {
-        width: 60 * theme.width,
-        height: 60 * theme.height,
+        width: 35 * theme.width*theme.height,
+        height: 35 * theme.height*theme.width,
     },
 });
 

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Wallet from "@utils/Wallet";
 import BottomTabNavigator from '../app/components/BottomTabNavigator';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Onboarding from '@screens/Onboarding';
 import Login from '@screens/Login'
 import Join1 from '@screens/Join1';
@@ -11,12 +12,15 @@ import Join4 from '@screens/Join4';
 import Start from '@screens/Start';
 import JoinGroup from '@screens/JoinGroup';
 import CreateGroup from '@screens/CreateGroup';
+import { StatusBar } from 'react-native';
 
 
 import { NavigationContainer } from '@react-navigation/native';
 import StackNavigator from '@components/StackNavigator';
 import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+import { theme } from '@assets/Theme';
 
 
 const Stack = createStackNavigator();
@@ -38,41 +42,37 @@ function MainStackNavigator() {
     );
   }
 
-function App() {
+function AppContent() {
   const [isFirstLaunch, setIsFirstLaunch] = useState(null);
-
-  // useEffect(() => {
-  //   const checkFirstLaunch = async () => {
-  //     const alreadyLaunched = await AsyncStorage.getItem('alreadyLaunched');
-  //     if (alreadyLaunched === null) {
-  //       setIsFirstLaunch(true);
-  //       await AsyncStorage.setItem('alreadyLaunched', 'true');
-  //     } else {
-  //       setIsFirstLaunch(false);
-  //     }
-  //   };
-  //   checkFirstLaunch();
-  // }, []);
-
-  // if (isFirstLaunch === null) {
-  //   return null;  // 로딩 상태
-  // } 
+  const insets = useSafeAreaInsets();
 
     return (
-        <SafeAreaProvider>
+          <SafeAreaView 
+          style={{backgroundColor: theme.color.main, paddingTop:0, 
+            flex:1}}
+          >
             {/* <Wallet /> */}
+            <StatusBar 
+                //hidden={true}
+                barStyle="light-content" 
+                translucent={true}
+                backgroundColor="transparent" 
+            />
             <NavigationContainer>
-              {/* {isFirstLaunch ?(
-                <MainStackNavigator/>
-              ):(
-                <BottomTabNavigator/>
-              )} */}
                 <MainStackNavigator/>
             </NavigationContainer>            
             {/* <BottomTabNavigator /> */}
-        </SafeAreaProvider>
+            </SafeAreaView>
         
     );
+}
+
+function App(){
+  return(
+    <SafeAreaProvider>
+      <AppContent/>
+    </SafeAreaProvider>
+  )
 }
 
 export default App;

@@ -5,6 +5,8 @@ import {createNativeStackNavigator, NativeStackScreenProps} from '@react-navigat
 
 import {theme} from '@assets/Theme';
 
+import { Platform } from "react-native";
+
 //pages
 import Home from '@screens/Home';
 import Ledger from '@screens/Ledger';
@@ -46,6 +48,9 @@ import Store_Add from '@screens/Store_Add';
 import Store_Check from '@screens/Store_Check';
 
 import NoticeWrite from "@screens/NoticeWrite";
+
+import ManageGroupMembers from "@screens/ManageGroupMembers";
+import LinkBankAccounts from "@screens/LinkBankAccount";
 
 const Stack = createNativeStackNavigator();
 
@@ -202,7 +207,7 @@ function StackHeader({navigation, scene, previous}) {
     };
 
     return (
-        <View style={styles.stackHeaderStyle}>
+        <View style={[styles.stackHeaderStyle, {height: Platform.OS==="ios"?95*theme.height:70*theme.height}]}>
             <View style={styles.stackHeaderGroupContainer}>
                 <Text style={styles.headerTitle}>{headerTitle}</Text>
                 <TouchableOpacity onPress={openSwitchModal}>
@@ -226,7 +231,7 @@ function StackHeader({navigation, scene, previous}) {
 
 function CustomHeader({navigation, title}) {
     return (
-        <View style={styles.MyPageHeader}>
+        <View style={[styles.MyPageHeader,{height: Platform.OS==="ios"?95*theme.height:70*theme.height}]}>
             <TouchableOpacity
                 onPress={() => navigation.goBack()}>
                 <Image source={require('../assets/Icons/backArrow.png')}
@@ -416,6 +421,10 @@ const StackNavigator = ({route}) => {
                 <Stack.Screen name='NoticeWrite' component={NoticeWrite} options={{
                     header:(props)=><CustomHeader {...props} title={"공지 작성"}/>
                 }}/>
+                <Stack.Screen name='ManageGroupMembers' component={ManageGroupMembers} options={{
+                    header:(props)=><CustomHeader {...props} title={"구성원 관리"}/>
+                }}/>
+                <Stack.Screen name="LinkBankAccounts" component={LinkBankAccounts} options={{headerShown: false}}/>
             </Stack.Navigator>
         </>
 
@@ -430,7 +439,8 @@ const styles = StyleSheet.create({
         height: 70 * theme.height,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: 'flex-end',
+        paddingBottom:24*theme.height,
     },
     stackHeaderGroupContainer: {
         flexDirection: 'row',

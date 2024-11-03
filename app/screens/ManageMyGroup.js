@@ -2,12 +2,12 @@ import { theme } from "@assets/Theme";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Text, Button, TouchableOpacity, Image, StatusBar, ScrollView, Modal, Animated,} from 'react-native';
 
-function ManageMember({navigation}){
+function ManageMember({navigation, gid}){
     return(
       <View style={styles.mypageCheckDetailContainer}>
         <Text style={styles.mypageCheckDetailTitle}>내 모임 구성원 관리</Text>
         <TouchableOpacity style={styles.mypageCheckDetailNavigate}
-          //onPress={()=>navigation.navigate()}
+          onPress={()=>navigation.navigate('ManageGroupMembers', {gid: gid})}
           >
           <Text style={styles.mypageCheckDetailNavigateText}>구성원 관리하기</Text>
         </TouchableOpacity>
@@ -19,6 +19,11 @@ function ManageGroup({navigation, openDeleteGroupOverlay, gid}){
     return(
       <View style={styles.mypageCheckDetailContainer}>
         <Text style={styles.mypageCheckDetailTitle}>내 모임 관리</Text>
+        <TouchableOpacity style={styles.mypageCheckDetailNavigate}
+          onPress={()=>navigation.navigate('LinkBankAccounts', {gid: gid})}
+          >
+          <Text style={styles.mypageCheckDetailNavigateText}>모임 계좌 연동하기</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.mypageCheckDetailNavigate}
           onPress={()=>navigation.navigate('ChangeGroupPW', {gid: gid})}
           >
@@ -104,7 +109,7 @@ export default function ManageMyGroup({route, navigation}){
 
     return(
         <View style={styles.background}>
-            <ManageMember navigation={navigation}/>
+            <ManageMember navigation={navigation} gid={gid}/>
             <View style={styles.lineHorizontal}/>
             <ManageGroup navigation={navigation} openDeleteGroupOverlay={openDeleteGroupModal} gid={gid}/>
             <DeleteGroupOverlay overlayVisible={deleteGroupOverlayVisible}  animatedHeight={animatedHeight} closeModal={closeDeleteGroupModal} navigation={navigation} gid={gid}/>

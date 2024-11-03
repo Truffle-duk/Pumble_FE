@@ -22,7 +22,7 @@ function ProfileView({navigation, name, imageUri, Auth, pb, qty}){
         <View>
           <Text style={styles.profileNameText}>{name}</Text>
           <View style={styles.profileRoleContainer}>
-            <Image source={require('@assets/Icons/crownIcon1.png')}
+            <Image source={require('@assets/Icons/starIcon.png')}
               style={styles.profileRoleIcon}/>
             <Text style={styles.profileRoleText}>{Auth}</Text>
           </View>

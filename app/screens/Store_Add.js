@@ -170,11 +170,14 @@ const styles = StyleSheet.create({
     scrollContainer: {
         flexGrow: 1,
         justifyContent: 'flex-start',
+        
     },
     container: {
         flex: 1,
         backgroundColor: theme.color.white,
-        padding: 20 * theme.width,
+        paddingHorizontal: 20 * theme.width,
+        paddingTop:30*theme.height,
+        paddingBottom:107*theme.height
     },
     label: {
         fontFamily: 'Pretendard-SemiBold',
@@ -235,8 +238,8 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     imageIcon: {
-        width: 22 * theme.width,
-        height: 22 * theme.height,
+        width: 22 * theme.width * theme.height,
+        height: 22 * theme.height * theme.width,
         marginRight: 10,
     },
     imagePickerText: {
