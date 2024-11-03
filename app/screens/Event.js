@@ -382,7 +382,7 @@ function EventCalendarOverlay({overlayVisible, animatedHeight, closeModal, overl
 
     const deleteEvent = async () => {
         const remainToken = await getEventToken()
-        await eventOver(overlayData.eventId, remainToken)
+        /*await eventOver(overlayData.eventId, remainToken)
             .then(result => {
                 if (result === "Success!") {
                     const api = `/event/1/delete/${overlayData.eventId}`
@@ -399,12 +399,12 @@ function EventCalendarOverlay({overlayVisible, animatedHeight, closeModal, overl
             })
             .catch(err => {
                 console.log("Error in deleteEvent blockchain: ", err)
-            })
+            })*/
     }
 
     const eventDone = async () => {
         const remainToken = await getEventToken()
-        await eventOver(overlayData.eventId, remainToken)
+        /*await eventOver(overlayData.eventId, remainToken)
             .then(result => {
                 if (result === "Success!") {
                     const api = `/event/1/done/${overlayData.eventId}`
@@ -421,7 +421,7 @@ function EventCalendarOverlay({overlayVisible, animatedHeight, closeModal, overl
             })
             .catch(err => {
                 console.log("Error in doneEvent blockchain: ", err)
-            })
+            })*/
     }
 
     return (
