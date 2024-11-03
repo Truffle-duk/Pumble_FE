@@ -359,7 +359,9 @@ const StackNavigator = ({route}) => {
                     )
                 }
 
-                <Stack.Screen name="Alarm" component={Alarm}/>
+                <Stack.Screen name="Alarm" component={Alarm} options={{
+                    header: (props) => <CustomHeader {...props} title={"알림"}/>
+                }}/>
                 {/* <Stack.Screen name='ModifyProfile' component={ModifyProfile}/>
             <Stack.Screen name='PBHistory' component={PBHistory}/>
             <Stack.Screen name='PurchasedProductList' component={PurchasedProductList}/> */}
