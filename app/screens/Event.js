@@ -25,6 +25,8 @@ import {LocaleConfig} from 'react-native-calendars';
 import Keychain from "react-native-keychain";
 import {attendEvent, eventOver} from "@utils/BlockchainFunction";
 import {call} from "@utils/ApiService";
+import { GroupCall } from "@utils/GroupService";
+import { id } from "ethers";
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -78,28 +80,43 @@ function EventCard({lastEvent, upcomingEvent}) {
             <View style={styles.eventCard}>
                 <View>
                     <View style={styles.dDayContainer}>
-                        <Text style={styles.dDayText}>{lastEvent.DDay}</Text>
+                    {lastEvent?
+                    <Text style={styles.dDayText}>{lastEvent.DDay}</Text>:
+                    <Text style={styles.dDayText}>-</Text>
+                    }
+                        
                     </View>
                 </View>
                 <View style={styles.eventCardDescriptionContainer}>
                     {/* <Image source={require(`../assets/Icons/eventIcon${random1}.png`)}/> */}
                     <Image source={eventIcons[random1]}
                            style={styles.eventCardIconStyle}/>
-                    <Text style={styles.eventCardNameText}>{lastEvent.title}</Text>
+                    {lastEvent?
+                    <Text style={styles.eventCardNameText}>{lastEvent.title}</Text>:
+                    <Text style={styles.eventCardNameText}>-</Text>}
+                    
                     <Text style={styles.eventCardLastText}>지난 일정</Text>
                 </View>
             </View>
             <View style={styles.eventCard}>
                 <View>
                     <View style={styles.dDayContainer}>
-                        <Text style={styles.dDayText}>{upcomingEvent.DDay}</Text>
+                        {upcomingEvent?
+                        <Text style={styles.dDayText}>{upcomingEvent.DDay}</Text>:
+                        <Text style={styles.dDayText}>-</Text>
+                        }
+                        
                     </View>
                 </View>
                 <View style={styles.eventCardDescriptionContainer}>
                     {/* <Image source={require(`../assets/Icons/eventIcon${random1}.png`)}/> */}
                     <Image source={eventIcons[random2]}
                            style={styles.eventCardIconStyle}/>
-                    <Text style={styles.eventCardNameText}>{upcomingEvent.title}</Text>
+                           {
+                            upcomingEvent?
+                            <Text style={styles.eventCardNameText}>{upcomingEvent.title}</Text>:
+                            <Text style={styles.eventCardNameText}>-</Text>
+                           }                    
                     <Text style={styles.eventCardLastText}>다가오는 일정</Text>
                 </View>
             </View>
@@ -514,48 +531,60 @@ export default function Event({navigation}) {
     })
     const animatedHeight = useRef(new Animated.Value(0)).current;
     const [calendarOverlayVisible, setCalendarOverlayVisible] = useState(false);
+    const [gid, setGid]=useState(1)
+
+    const fetchData = async () => {
+        try {
+            // 모든 행사 불러오기
+            const fetchAllEventApi = `/event/${gid}/list/all`;
+            const allEventsData = await call(fetchAllEventApi, true, 'GET');
+            setDatas(allEventsData.result.events);
+
+            // 이번 달 행사 불러오기
+            const monthlyEventsData = await fetchMonthlyEvent();
+            setThisMonthDatas(monthlyEventsData.events);
+
+            // 지난/다음 행사 불러오기
+            const fetchLastNextEventApi = `/event/${gid}/lastAndNext`;
+            const lastNextEventsData = await call(fetchLastNextEventApi, true, 'GET');
+            setUpcomingEvents(lastNextEventsData.result.events[0]);
+            setLastEvents(lastNextEventsData.result.events[1]);
+
+            // 사용자 이름 가져오기
+            const nameApi = `/group/${gid}/profile`;
+            const nameData = await call(nameApi, true, 'GET');
+            if (nameData.code === 200) {
+                setUser(nameData.result.nickname);
+            }
+        } catch (err) {
+            console.log("Error occurred in useFocusEffect: " + err);
+        }
+    };
+    const fetchGid = async () => {
+        try {
+            // gid 불러오기
+            const id = await GroupCall("GID");
+            console.log("id:",id)
+            setGid(id);
+        } catch (err) {
+            console.log("Error occurred in useFocusEffect: " + err);
+        }
+    };
 
     useFocusEffect(
-        useCallback(() => {
-            // 모든 행사 불러오기
-            const fetchAllEventApi = '/event/1/list/all'
-            call(fetchAllEventApi, true, 'GET')
-                .then(data => {
-                    setDatas(data.result.events)
-                })
-                .catch(err => {
-                    console.log("Error occurred at firstUseEffect1: " + err)
-                })
+        useCallback(() => {            
+            fetchGid();
+            fetchData();
+            console.log("Gid:",gid)
+        }, [])
+    );
 
-            fetchMonthlyEvent()
-                .then(data => {
-                    setThisMonthDatas(data.events)
-                })
-                .catch(err => {
-                    console.log("Error occurred at firstUseEffect2" + err)
-                })
-
-            const fetchLastNextEventApi = '/event/1/lastAndNext'
-            call(fetchLastNextEventApi, true, 'GET')
-                .then(data => {
-                    setUpcomingEvents(data.result.events[0])
-                    setLastEvents(data.result.events[1])
-                })
-                .catch(err => {
-                    console.log("Error occurred at firstUseEffect3" + err)
-                })
-
-            const nameApi = '/group/1/profile';
-            call(nameApi, true, 'GET')
-                .then(data => {
-                    if (data.code === 200) {
-                        setUser(data.result.nickname);
-                    }
-                })
-        }, []))
+    useEffect(()=>{
+        fetchData();
+    },[gid])
 
     const fetchMonthlyEvent = async () => {
-        const api = '/event/1/list/month'
+        const api = `/event/${gid}/list/month`
         return await call(api, true, 'GET')
             .then(data => {
                 return data.result
@@ -576,7 +605,7 @@ export default function Event({navigation}) {
     }
 
     const updateAfterDelete = () => {
-        const fetchAllEventApi = '/event/1/list/all'
+        const fetchAllEventApi = `/event/${gid}/list/all`
         call(fetchAllEventApi, true, 'GET')
             .then(data => {
                 setDatas(data.result.events)
@@ -593,7 +622,7 @@ export default function Event({navigation}) {
                 console.log("Error occurred at updateData" + err)
             })
 
-        const fetchLastNextEventApi = '/event/1/lastAndNext'
+        const fetchLastNextEventApi = `'/event/${gid}/lastAndNext`
         call(fetchLastNextEventApi, true, 'GET')
             .then(data => {
                 setUpcomingEvents(data.result.events[0])
