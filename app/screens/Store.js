@@ -7,7 +7,15 @@ import {useFocusEffect} from "@react-navigation/native";
 import { GroupCall } from "@utils/GroupService";
 
 const Store = ({navigation}) => {
-    const [isAdminMode, setIsAdminMode] = useState(true); // 관리자 모드 상태를 관리
+    const [userAuth, setUserAuth]=useState("member");
+    const fetchAuth = async () =>{
+        try{
+            const auth = await GroupCall('GAUTH')
+            setUserAuth(auth);
+        }catch(err){
+            console.log("something wrong on fetch user auth", err)
+        }
+    }
     const dummy = [
         {
             image: 'https://pumble-s3.s3.ap-northeast-2.amazonaws.com/store/4dde93d405a1086fb5f025fa183fc445.png',
@@ -45,6 +53,7 @@ const Store = ({navigation}) => {
                             console.log('Error occurred at Store.js: ' + err)
                         })
                     })
+            fetchAuth();
         }, [])
     )
 
@@ -144,7 +153,7 @@ const Store = ({navigation}) => {
             </ScrollView>
 
             {/* 관리자 모드 버튼 */}
-            {isAdminMode && (
+            {userAuth !== "member" && (
                 <>
                     <TouchableOpacity
                         style={[styles.adminButton, styles.addButton]}

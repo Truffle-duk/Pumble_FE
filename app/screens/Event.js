@@ -33,7 +33,7 @@ const screenHeight = Dimensions.get('screen').height;
 
 
 //dummy
-const userAuth = "staff"
+
 
 //날짜 세기
 const getDateDifference = (date1, date2) => {
@@ -124,7 +124,7 @@ function EventCard({lastEvent, upcomingEvent}) {
     )
 }
 
-function EventCalendar({data, openCalendarModal}) {
+function EventCalendar({data, openCalendarModal, userAuth}) {
     //캘린더 로컬화
     LocaleConfig.locales['kr'] = {
         monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
@@ -142,6 +142,7 @@ function EventCalendar({data, openCalendarModal}) {
             //console.log(data)
             const matchingEvent = data.filter(data => data.startDate.startsWith(day.dateString));
             const eventIds = matchingEvent.map(event => event.eventId);
+            console.log("userAuth:", userAuth)
             if (userAuth !== "member") {
                 openCalendarModal(matchingEvent);
             }
@@ -528,6 +529,7 @@ export default function Event({navigation}) {
     const animatedHeight = useRef(new Animated.Value(0)).current;
     const [calendarOverlayVisible, setCalendarOverlayVisible] = useState(false);
     //const [gid, setGid]=useState(1)
+    const [userAuth, setUserAuth]=useState("member");
 
     const fetchData = async () => {
         return GroupCall("GID")
@@ -569,12 +571,21 @@ export default function Event({navigation}) {
     //         console.log("Error occurred in useFocusEffect: " + err);
     //     }
     // };
+    const fetchAuth = async () =>{
+        try{
+            const auth = await GroupCall('GAUTH')
+            setUserAuth(auth);
+        }catch(err){
+            console.log("something wrong on fetch user auth", err)
+        }
+    }
 
     useFocusEffect(
         useCallback(() => {            
             //fetchGid();
             fetchData();
             //console.log("Gid:",gid)
+            fetchAuth();
         }, [])
     );
 
@@ -675,14 +686,14 @@ export default function Event({navigation}) {
         <ScrollView contentContainerStyle={styles.background}>
             <Top user={user} thisMonthEvent={thisMonthDatas}/>
             <EventCard lastEvent={lastEvents} upcomingEvent={upcomingEvents}/>
-            <EventCalendar data={datas} openCalendarModal={openCalendarModal}/>
+            <EventCalendar data={datas} openCalendarModal={openCalendarModal} userAuth={userAuth}/>
             <EventList thisMonthEvents={thisMonthDatas} openModal={openModal}/>
             <EventOverlay overlayVisible={overlayVisible} animatedHeight={animatedHeight} closeModal={closeModal}
                           overlayData={overlayData} updateHandler={updateData}/>
             <EventCalendarOverlay overlayVisible={calendarOverlayVisible} animatedHeight={animatedHeight}
                                   closeModal={closeCalendarModal}
                                   overlayData={overlayData} deleteHandler={updateAfterDelete} doneHandler={updateData}/>
-            {userAuth === "staff" &&
+            {userAuth !== "member" &&
                 <TouchableOpacity style={styles.writeBtn} onPress={() => navigation.navigate('AddEvent')}>
                     <Image source={require('@assets/Icons/writePen.png')} style={styles.writeIcon}/>
                 </TouchableOpacity>}

@@ -69,7 +69,7 @@ function Ledger2({navigation}) {
     const [transactionIdx, setTransactionIdx] = useState(0);
 
     //dummy auth
-    const [auth, setAuth] = useState("staff");
+    const [auth, setAuth]=useState("member");
 
     //영수증 사진용 모달
     const [receiptOverlayVisible, setReceiptOverlayVisible] = useState(false);
@@ -130,12 +130,21 @@ function Ledger2({navigation}) {
                 setDatas(filteredData.reverse());
             });*/
     };
+    const fetchAuth = async () =>{
+        try{
+            const userauth = await GroupCall('GAUTH')
+            setAuth(userauth);
+        }catch(err){
+            console.log("something wrong on fetch user auth", err)
+        }
+    }
 
     useFocusEffect(
         useCallback(() => {
             initialize().then(_ => {
                 console.log("Ledger Initialize")
             })
+            fetchAuth();
         }, [])
     )
 

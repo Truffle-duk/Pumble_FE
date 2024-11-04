@@ -10,10 +10,19 @@ const isAdmin = true; // 관리자 모드를 제어하는 플래그
 
 const Notification = () => {
     const navigation = useNavigation();
+    const [userAuth, setUserAuth]=useState("member");
     const [notiList, setNotiList] = useState([{
         notice: {noticeId: 0, title: "", createdAt: ""},
         writer: {nickname: "", hasAuthority: false}
     }])
+    const fetchAuth = async () =>{
+        try{
+            const auth = await GroupCall('GAUTH')
+            setUserAuth(auth);
+        }catch(err){
+            console.log("something wrong on fetch user auth", err)
+        }
+    }
 
     useFocusEffect(
         useCallback(() => {
@@ -28,9 +37,11 @@ const Notification = () => {
                     console.log("Error occurred at Notification")
                 })
           })
+          fetchAuth();
         }, [])
     )
 
+    
     const handleNoticePress = (noticeId) => {
         navigation.navigate('NoticeDetail', {noticeId: noticeId});
     };
@@ -78,7 +89,10 @@ const Notification = () => {
 
                 {/* 나머지 공지사항들을 표시 */}
                 {notiList.length === 0 ? (
-                    <Text>공지가 없어요..ㅜㅜ</Text>
+                    <View style={{alignItems:'center', marginTop:30*theme.height}}>
+                        <Text>공지가 없어요..ㅜㅜ</Text>
+                    </View>
+                    
                 ) : (
                     notiList.map((notice, index) => (
                         <TouchableOpacity //key={notice.noticeId} 
@@ -99,7 +113,7 @@ const Notification = () => {
                                 <Text style={styles.noticeAuthor}>{notice.writer.nickname}</Text>
                                 <View style={styles.noticeTextContainer}>
                                     <Text style={styles.noticeDate}>{notice.notice.createdAt.split('T')[0]}</Text>
-                                    {isAdmin && (
+                                    {userAuth !== "member" && (
                                         <TouchableOpacity onPress={() => handleDeletePress(notice.notice.noticeId)}>
                                             <Image source={require('@assets/Icons/trash.png')}
                                                    style={styles.trashIcon}/>
@@ -114,7 +128,7 @@ const Notification = () => {
             </ScrollView>
 
             {/* 관리자 모드일 때 글쓰기 버튼 표시 */}
-            {isAdmin && (
+            {userAuth !== "member" && (
                 <TouchableOpacity style={styles.writeButton} onPress={handleWritePress}>
                     <Image source={require('../assets/Icons/writePen.png')} style={styles.writeIcon}/>
                 </TouchableOpacity>
