@@ -253,7 +253,16 @@ function EventList({thisMonthEvents, openModal}) {
                     thisMonthEvents.map((thisMonthEvent, index) =>
                         <View key={index} style={styles.eventListItemContainer}>
                             <View style={styles.eventListItemDetailContainer}>
-                                <View style={styles.eventListItemIcon}/>
+                                <View style={styles.eventListItemIcon}>
+                                    <Image source={
+                                            index % 3 === 0
+                                                ? require('@assets/Icons/event1.png')
+                                                : index % 3 === 1
+                                                ? require('@assets/Icons/event2.png')
+                                                : require('@assets/Icons/event3.png')
+                                        }
+                                    style={styles.eventListIcon}/>
+                                </View>
                                 <View>
                                     <Text style={styles.eventListItemName}>{thisMonthEvent.title}</Text>
                                     <Text
@@ -905,6 +914,12 @@ const styles = StyleSheet.create({
         width: 40 * theme.width * theme.height,
         backgroundColor: theme.color.white,
         marginRight: 15 * theme.width,
+        alignItems:'center',
+        justifyContent:'center',
+    },
+    eventListIcon:{
+        height: 40 * theme.width * theme.height,
+        width: 40 * theme.width * theme.height,
     },
     eventListItemName: {
         fontFamily: "Pretendard-SemiBold",

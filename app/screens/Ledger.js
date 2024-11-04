@@ -292,7 +292,21 @@ function Ledger2({navigation}) {
                                         <View style={styles.historyItemDetailContainer}>
                                             {/* 이미지 삽입 */}
                                             <View style={styles.historyItemViewDetail}>
-                                                <View style={styles.historyItemImage}/>
+                                                <View style={styles.historyItemImage}>
+                                                    <Image source={
+                                                        index % 6 === 0
+                                                        ? require('@assets/Icons/ledgerIcon1.png')
+                                                        : index % 6 === 1
+                                                        ? require('@assets/Icons/ledgerIcon2.png')
+                                                        : index % 6 === 2
+                                                        ? require('@assets/Icons/ledgerIcon3.png')
+                                                        : index % 6 === 3
+                                                        ? require('@assets/Icons/ledgerIcon4.png')
+                                                        : index % 6 === 4
+                                                        ? require('@assets/Icons/ledgerIcon5.png')
+                                                        : require('@assets/Icons/ledgerIcon6.png')
+                                                    }/>
+                                                </View>
                                                 <View>
                                                     <Text style={styles.counterpartyText}>{transactionInfo.counterparty}</Text>
                                                     <Text style={styles.timeText}>{formatDateForBottom(transactionInfo.date)}</Text>
@@ -409,6 +423,12 @@ const styles = StyleSheet.create({
         backgroundColor: theme.color.background,
         borderRadius: 100,
         marginRight: 10 * theme.width,
+        justifyContent:'center',
+        alignItems:'center',
+    },
+    historyItemIcon:{
+        height: 33 * theme.width * theme.height,
+        width: 33 * theme.width * theme.height,
     },
     historyItemDetailContainer: {
         flexDirection: 'row',
