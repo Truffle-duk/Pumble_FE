@@ -1,6 +1,8 @@
 import { theme } from "@assets/Theme";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, Image, ScrollView } from 'react-native';
+import {StyleSheet, View, Text, Image, ScrollView, TouchableOpacity} from 'react-native';
+import {GroupCall} from "@utils/GroupService";
+import {call} from "@utils/ApiService";
 
 const alarmList = [
     {
@@ -89,50 +91,50 @@ const alarmList = [
     },
 ];
 
-function Alarm() {
+function Alarm({navigation}) {
     const [datas, setDatas] = useState([]);
 
+    const initialize = async () => {
+        let groupId
+        await GroupCall("GID")
+            .then(gid => {
+                groupId = gid
+            })
+
+        await call(`/notification/${groupId}`, true, 'GET')
+            .then(data => {
+                setDatas(data.result)
+            })
+    }
+
     useEffect(() => {
-        setDatas(alarmList);
-        //setDatas([]);
+        initialize()
     }, []);
 
     const renderContent = (data) => {
-        if (data.Lable === 1) {
+        if (data.type === 'receipt') {
             return (
-                <View style={styles.contentContainer}>
+                <TouchableOpacity style={styles.contentContainer} onPress={() => navigation.navigate('Ledger2')}>
                     <View style={styles.iconView}>
                         <Image style={styles.icon} source={require("@assets/Icons/receiptEditIcon.png")} />
                     </View>
                     <View style={styles.textContainer}>
-                        <Text style={styles.headerLable}>새로운 영수증이 등록됐어요!</Text>
-                        <Text style={styles.contentLable}>"{data.content}"의 사용 영수증이 등록됐어요!</Text>
+                        <Text style={styles.headerLable}>🧾 새로운 영수증이 등록됐어요.</Text>
+                        <Text style={styles.contentLable}>장부에서 확인해볼까요?</Text>
                     </View>
-                </View>
+                </TouchableOpacity>
             );
-        } else if (data.Lable === 2) {
+        } else if (data.type === 'notice') {
             return (
-                <View style={styles.contentContainer}>
+                <TouchableOpacity style={styles.contentContainer} onPress={() => navigation.navigate('NoticeDetail', {noticeId: data.notice_id})}>
                     <View style={styles.iconView}>
                         <Image style={styles.icon} source={require("@assets/Icons/editPen3.png")} />
                     </View>
                     <View style={styles.textContainer}>
-                        <Text style={styles.headerLable}>새로운 글이 등록됐어요!</Text>
-                        <Text style={styles.contentLable}>{data.content}</Text>
+                        <Text style={styles.headerLable}>🚨 새로운 공지가 등록됐어요.</Text>
+                        <Text style={styles.contentLable}>지금 바로 확인하러 가봅시다!</Text>
                     </View>
-                </View>
-            );
-        } else {
-            return (
-                <View style={styles.contentContainer}>
-                    <View style={styles.iconView}>
-                        <Image style={styles.icon} source={require("@assets/Icons/megaphone2.png")} />
-                    </View>
-                    <View style={styles.textContainer}>
-                        <Text style={styles.headerLable}>새로운 공지사항이 등록됐어요!</Text>
-                        <Text style={styles.contentLable}>"{data.content}"이 등록됐어요!</Text>
-                    </View>
-                </View>
+                </TouchableOpacity>
             );
         }
     };
