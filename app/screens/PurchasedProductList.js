@@ -3,6 +3,7 @@ import {StyleSheet, View, Text, Button, TouchableOpacity, Image, ScrollView} fro
 import React, {useEffect, useState} from "react";
 import {call} from "@utils/ApiService";
 import {getReceiveHistory, getPurchaseHistory} from "@utils/BlockchainFunction";
+import {GroupCall} from "@utils/GroupService";
 
 const purchasedProducts = [
     {
@@ -97,19 +98,35 @@ export default function PurchasedProductList() {
     const [organizedList, setOrganizedList] = useState([])
     const [MyPurchasedProducts, setMyPurchasedProducts] = useState([]);
 
-    useEffect(() => {
-        /*getPurchaseHistory(1, 2)
+    const initialize = async () => {
+        let groupId
+        await GroupCall("GID")
+            .then(async gid => {
+                groupId = gid
+            })
+
+        let groupUserId
+        await call(`/group/${groupId}/profile`, true, 'GET')
+            .then(data => {
+                groupUserId = data.result.group_user_id
+            })
+
+        await getPurchaseHistory(groupId, groupUserId)
             .then(events => {
                 setHistories(events)
             })
             .catch(error => console.error("Error fetching purchase history: ", error));
 
-        getReceiveHistory(1, 2)
+        await getReceiveHistory(groupId, groupUserId)
             .then(events => {
                 setReceiveHistories(events)
             })
-            .catch(error => console.error("Error fetching receive history: ", error));*/
-        setMyPurchasedProducts(purchasedProducts); //뷰 확인을 위한 데모 데이터
+            .catch(error => console.error("Error fetching receive history: ", error));
+    }
+
+    useEffect(() => {
+        initialize()
+        //setMyPurchasedProducts(purchasedProducts); //뷰 확인을 위한 데모 데이터
     }, [])
 
     useEffect(() => {

@@ -5,6 +5,7 @@ import {StyleSheet, View, Text, Button, TouchableOpacity, Image, StatusBar, Scro
 import {Dimensions} from 'react-native';
 import { call } from "@utils/ApiService";
 import {getBalance} from "@utils/BlockchainFunction";
+import {UUID} from "@env"
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -12,12 +13,12 @@ const screenHeight = Dimensions.get('screen').height;
 function LedgerCard({navigation}) {
     const [balance, setBalance] = useState("로딩 중...")
 
-    /*useFocusEffect(
+    useFocusEffect(
         useCallback(() => {
-            getBalance("testuuid")
+            getBalance(UUID)
                 .then(response => {
-                    console.log(response)
-                    setBalance(Number(response[0].args[3]).toLocaleString())
+                    const res = response
+                    setBalance(Number(res[res.length - 1].args[3]).toLocaleString())
                 })
                 .then(_ => {
                     console.log("Balance Updated")
@@ -26,7 +27,7 @@ function LedgerCard({navigation}) {
                     console.log(err)
                 })
         }, [])
-    )*/
+    )
 
     return (
         <View style={styles.ledgerContainer}>
@@ -137,14 +138,13 @@ function RewardStoreCard({navigation}) {
             call(api, true, 'GET')
                 .then(data => {
                     setItems(data.result.items)
-                    console.log(data.result.items)
                 })
                 .catch(err => {
                     console.log('Error occurred at Store.js: ' + err)
                 })
         }, [])
     )
-        
+
 
     return (
         <View style={styles.rewardStoreCard}>

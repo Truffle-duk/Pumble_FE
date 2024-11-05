@@ -297,22 +297,33 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
         ? parseInt(overlayData.startDate.split('T')[1].substring(0, 2))
         : 0;
 
-    const submitCode = async (id, submitCode, reward, groupId, groupUserId) => {
+    const submitCode = async (id, submitCode, reward) => {
         await setCode("")
-        GroupCall("GID")
-            .then(async gid=>{
+        let groupId
+        let groupUserId
+        await GroupCall("GID")
+            .then(async gid => {
+                groupId = gid
                 const api = `/event/${gid}/join/${id}`
                 const request = {
                     code: submitCode
                 }
                 await call(api, true, "POST", request)
                     .then(data => {
-                        if (data.result.attendeeId) {
+                        if (data.result.groupUserId) {
+                            groupUserId = data.result.groupUserId
                             console.log("Successfully Joined.")
                         }
                     }).catch(err => console.log("Error at JoinEvent API, ", err))
                 })
 
+        if (groupId && groupUserId) {
+            await attendEvent(id, reward, groupId, groupUserId)
+                .then(_ => {
+                    updateHandler()
+                    closeModal()
+                })
+        }
     }
 
     return (
@@ -374,7 +385,7 @@ function EventOverlay({overlayVisible, animatedHeight, closeModal, overlayData, 
                             />
                         </View>
                         <TouchableOpacity style={styles.overlayInputBtn}
-                                          onPress={() => submitCode(overlayData.eventId, code, overlayData.reward, 1, 2)}>
+                                          onPress={() => submitCode(overlayData.eventId, code, overlayData.reward)}>
                             <Text style={styles.overlayInputBtnText}>입력</Text>
                         </TouchableOpacity>
 
@@ -405,7 +416,7 @@ function EventCalendarOverlay({overlayVisible, animatedHeight, closeModal, overl
 
     const deleteEvent = async () => {
         const remainToken = await getEventToken()
-        /*await eventOver(overlayData.eventId, remainToken)
+        await eventOver(overlayData.eventId, remainToken)
             .then(result => {
                 if (result === "Success!") {
                     const api = `/event/1/delete/${overlayData.eventId}`
@@ -422,12 +433,12 @@ function EventCalendarOverlay({overlayVisible, animatedHeight, closeModal, overl
             })
             .catch(err => {
                 console.log("Error in deleteEvent blockchain: ", err)
-            })*/
+            })
     }
 
     const eventDone = async () => {
         const remainToken = await getEventToken()
-        /*await eventOver(overlayData.eventId, remainToken)
+        await eventOver(overlayData.eventId, remainToken)
             .then(result => {
                 if (result === "Success!") {
                     const api = `/event/1/done/${overlayData.eventId}`
@@ -444,7 +455,7 @@ function EventCalendarOverlay({overlayVisible, animatedHeight, closeModal, overl
             })
             .catch(err => {
                 console.log("Error in doneEvent blockchain: ", err)
-            })*/
+            })
     }
 
     return (

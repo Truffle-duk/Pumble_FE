@@ -130,6 +130,7 @@ export default function ModifyProfile({route, navigation}) {
             const changeNickname = `/group/${gid}/profile/nickname`
             if(nickname.includes(" ") || nickname.length === 0 || nickname.length > 10) { // 닉네임 유효성 검사
                 alert('닉네임에 공백이 포함되어 있거나 길이가 10 초과입니다.')
+                return
             }
 
             return call(changeNickname, true, 'PATCH', { newNickname: nickname })

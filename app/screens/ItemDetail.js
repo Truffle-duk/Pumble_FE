@@ -52,9 +52,15 @@ const ItemDetail = ({route}) => {
 
     const buyItem = async (price) => {
         GroupCall("GID")
-            .then(async gid=>{
-                const purchaseApi = `store/${gid}/purchase`
-                /*await purchaseItem("1", "2", itemId, product.price)
+            .then(async gid => {
+                console.log(gid)
+                const purchaseApi = `/store/${gid}/purchase`
+                let groupUserId
+                await call(`/group/${gid}/profile`, true, 'GET')
+                    .then(data => {
+                        groupUserId = data.result.group_user_id
+                    })
+                await purchaseItem(gid, groupUserId, itemId, price)
                     .then(log => {
                         if (log === "Success!") {
                             call(purchaseApi, true, "PATCH", {price: price})
@@ -74,7 +80,7 @@ const ItemDetail = ({route}) => {
                     .catch(_ => {
                         setMoney(false)
                         setModalVisible(false)
-                    })*/
+                    })
             })
     }
 

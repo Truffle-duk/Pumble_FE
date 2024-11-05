@@ -128,10 +128,10 @@ export async function call(api, needToken, method, request/*, isMultipart=false*
 
     return fetch(options.url, options)
         .then((response) => {
+            console.log(response)
             if (response.ok || response.status === 401) {
                 return response.json()
             } else { //TODO: 200 이외의 코드 처리
-                console.log(response)
                 throw Error(response)
             }
         })

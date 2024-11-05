@@ -4,13 +4,15 @@ import {StyleSheet, View, Text, Button, TouchableOpacity, Image, ScrollView} fro
 import React, {useEffect, useState} from "react";
 import {getPBHistory} from "@utils/BlockchainFunction";
 import {call} from "@utils/ApiService";
+import {GroupCall} from "@utils/GroupService";
 
 function PBBalanceCard({balance}) {
+    console.log(balance)
     return (
         <View style={styles.PBBalanceCardContainer}>
             <View style={styles.PBBalanceCardTextContainer}>
                 <Text style={styles.PBBalanceHeadText}>내 PB</Text>
-                <Text style={styles.PBBalanceBalenceText}>+{balance} PB</Text>
+                <Text style={styles.PBBalanceBalenceText}>{balance ? `+${balance} PB` : '+0 PB'}</Text>
             </View>
             <Image source={require("@assets/Images/Piggybank.png")}
                    style={styles.PBBalanceImage}/>
@@ -22,14 +24,30 @@ function PBHistoryList() {
     const [histories, setHistories] = useState([])
     const [titleList, setTitleList] = useState([])
     const [realHistories, setRealHistories] = useState([])
-    /*useEffect(() => {
-        getPBHistory(1, 2)
+
+    const initialize = async () => {
+        let groupId
+        await GroupCall("GID")
+            .then(async gid => {
+                groupId = gid
+            })
+
+        let groupUserId
+        await call(`/group/${groupId}/profile`, true, 'GET')
+            .then(data => {
+                groupUserId = data.result.group_user_id
+            })
+
+        getPBHistory(groupId, groupUserId)
             .then(events => {
-                console.log(events)
                 setHistories(events)
             })
             .catch(error => console.error("Error fetching events: ", error));
-    }, []);*/
+    }
+
+    useEffect(() => {
+        initialize()
+    }, []);
 
     useEffect(() => {
         if (histories.length > 0) {
@@ -48,8 +66,14 @@ function PBHistoryList() {
     }, [histories]);
 
     const getTitleList = async (eventIdList) => {
+        let groupId
+        await GroupCall("GID")
+            .then(async gid => {
+                groupId = gid
+            })
+
         for (let i = 0; i < eventIdList.length; i++) {
-            await call(`/event/1?id=${eventIdList[i]}`, true, 'GET')
+            await call(`/event/${groupId}?id=${eventIdList[i]}`, true, 'GET')
                 .then(data => {
                     const title = data.result.title
                     setTitleList(prevState => [...prevState, title])
@@ -96,11 +120,21 @@ function PBHistoryList() {
 export default function PBHistory() {
     const [PBBalance, setPBbalance] = useState(0);
 
-    useEffect(() => {
-        call('/group/1/profile', true, 'GET')
+    const initialize = async () => {
+        let groupId
+        await GroupCall("GID")
+            .then(async gid => {
+                groupId = gid
+            })
+
+        await call(`/group/${groupId}/profile`, true, 'GET')
             .then(data => {
                 setPBbalance(data.result.token)
             })
+    }
+
+    useEffect(() => {
+        initialize()
     }, []);
 
     return (
@@ -110,7 +144,7 @@ export default function PBHistory() {
             <ScrollView
                 //contentContainerStyle={styles.background}
             >
-                <PBBalanceCard balence={PBBalance}/>
+                <PBBalanceCard balance={PBBalance}/>
                 <PBHistoryList />
             </ScrollView>
         </View>

@@ -7,11 +7,11 @@ import {TouchableOpacity} from "react-native-gesture-handler";
 
 import {GroupCall} from "@utils/GroupService";
 import {useFocusEffect} from "@react-navigation/native";
+import {UUID} from '@env'
 
 
 //사진 띄우기용 모달
 function ReceiptOverlay({overlayVisible, animatedHeight, closeModal, imageuri}) {
-
     return (
         <Modal
             transparent={true}
@@ -32,33 +32,15 @@ function ReceiptOverlay({overlayVisible, animatedHeight, closeModal, imageuri}) 
                             />
                         </TouchableOpacity>
                     </View>
-                    {/* <View style={styles.quitOverlayContainer}>
-              <Image source={require("@assets/Images/Guinguin_Sad.png")}
-                style={styles.quitOverlayImage}/>
-              <Text style={styles.quitOverlayMainText}>정말 삭제하시겠어요?</Text>
-              <Text style={styles.quitOverlayDetailText}>더 즐거운 모임 활동이 당신을 기다려요</Text>
-            </View>
-            <TouchableOpacity onPress={closeModal}
-              style={styles.maintainBtn}>
-              <Text style={styles.maintainBtnText}>모임 유지하기</Text>
-            </TouchableOpacity>
-            <View style={styles.quitBtnContainer}>
-              <TouchableOpacity style={styles.quitBtn}
-                onPress={()=>navigation.navigate('ConfirmPW')}>
-                <Text style={styles.quitBtnText}>모임 삭제하기</Text>
-              </TouchableOpacity>
-            </View>             */}
                     <View style={{alignItems: 'center', justifyContent: 'center'}}>
                         <Image
-                            source={{uri: imageuri}}
+                            source={{uri: `${imageuri}`}}
                             style={styles.receiptImage}
-                            resizeMode="contain"
                         />
                     </View>
 
                 </Animated.View>
             </TouchableOpacity>
-
         </Modal>
     )
 }
@@ -69,14 +51,14 @@ function Ledger2({navigation}) {
     const [transactionIdx, setTransactionIdx] = useState(0);
 
     //dummy auth
-    const [auth, setAuth]=useState("member");
+    const [auth, setAuth] = useState("member");
 
     //영수증 사진용 모달
     const [receiptOverlayVisible, setReceiptOverlayVisible] = useState(false);
     const animatedHeight = useRef(new Animated.Value(0)).current;
     const [receiptImageUri, setReceiptImageUri] = useState("")
 
-    const openReceiptModal = ({uri}) => {
+    const openReceiptModal = (uri) => {
         setReceiptOverlayVisible(true);
         setReceiptImageUri(uri);
         Animated.timing(animatedHeight, {
@@ -111,7 +93,7 @@ function Ledger2({navigation}) {
         }*/
 
         // 이전 거래내역 데이터 가져오기
-        /*getPastEvents("testuuid")
+        getPastEvents(UUID)
             .then(response => {
                 const filteredData = response.reduce((acc, item) => {
                     const transactionIndex = item.args[3]; // args[3]이 트랜잭션 인덱스
@@ -119,6 +101,7 @@ function Ledger2({navigation}) {
 
                     if (existingIndex === -1) {
                         // acc에 해당 transactionIndex가 없으면 추가
+                        console.log(item)
                         acc.push(item);
                     } else if (item.args[9] !== "" && acc[existingIndex].args[9] === "") {
                         // 기존 요소의 args[9]가 비어 있고 현재 item의 args[9]가 비어 있지 않으면 교체
@@ -128,13 +111,13 @@ function Ledger2({navigation}) {
                     return acc;
                 }, []);
                 setDatas(filteredData.reverse());
-            });*/
+            });
     };
-    const fetchAuth = async () =>{
-        try{
+    const fetchAuth = async () => {
+        try {
             const userauth = await GroupCall('GAUTH')
             setAuth(userauth);
-        }catch(err){
+        } catch (err) {
             console.log("something wrong on fetch user auth", err)
         }
     }
@@ -149,22 +132,20 @@ function Ledger2({navigation}) {
     )
 
     // 거래내역 데이터가 변할 때마다 잔액 다시 조회
-    /*useEffect(() => {
-        getBalance("testuuid")
+    useEffect(() => {
+        getBalance(UUID)
             .then(response => {
-                console.log(response)
-                setBalance(Number(response[0].args[3]))
+                setBalance(Number(response[response.length - 1].args[3]).toLocaleString())
             })
             .catch(err => {
                 console.log(err)
             })
-    }, [datas]);*/
+    }, [datas]);
 
     ledgerContract.on("TransactionCreated", (hGroupId, category, groupId, transactionIndex, isDeposit, amount, counterparty, description, timestamp, receiptDetails, event) => {
         setTransactionIdx(transactionIndex)
         setDatas(prevState => {
             const eventExists = prevState.find(data => data.args[3].toString() === transactionIndex.toString());
-            console.log(eventExists)
             if (!eventExists) {
                 return [{"args": [hGroupId, category, groupId, transactionIndex, isDeposit, amount, counterparty, description, timestamp, receiptDetails]}, ...prevState];
             }
@@ -226,7 +207,7 @@ function Ledger2({navigation}) {
                         style={styles.iconStyle}/>
                     <TouchableOpacity
                         onPress={() => navigation.navigate('AddReceipt', {
-                            transactionInfo: info
+                            transactionInfo: JSON.stringify(info)
                         })}>
                         <Image source={require("@assets/Icons/addsquareIcon.png")}
                                style={styles.iconStyle}/>
@@ -235,7 +216,7 @@ function Ledger2({navigation}) {
             )
         } else if (info.receiptUrl !== "" && auth === 'member') { // 영수증 O, 일반 유저
             return (
-                <TouchableOpacity onPress={() => openReceiptModal(data.args[9])}>
+                <TouchableOpacity onPress={() => openReceiptModal(info)}>
                     <Image
                         source={require("../assets/Icons/receiptCheckIcon_Active.png")}
                         style={styles.iconStyle}
@@ -245,12 +226,15 @@ function Ledger2({navigation}) {
         } else { // 영수증 O, 운영진 이상
             return (
                 <View style={{flexDirection: 'row'}}>
-                    <Image
-                        source={require("../assets/Icons/receiptCheckIcon_Active.png")}
-                        style={styles.iconStyle}/>
+                    <TouchableOpacity onPress={() => openReceiptModal(info.receiptUrl)}>
+                        <Image
+                            source={require("../assets/Icons/receiptCheckIcon_Active.png")}
+                            style={styles.iconStyle}
+                        />
+                    </TouchableOpacity>
                     <TouchableOpacity
                         onPress={() => navigation.navigate('AddReceipt', {
-                            transactionInfo: info
+                            transactionInfo: JSON.stringify(info)
                         })}>
                         <Image source={require("@assets/Icons/addsquareIcon.png")}
                                style={styles.iconStyle}/>
@@ -261,89 +245,88 @@ function Ledger2({navigation}) {
     }
 
     return (
-        <ScrollView contentContainerStyle={styles.background}>
-            <View style={styles.balanceContainer}>
-                <Text style={styles.balanceHeadText}>공금 잔액</Text>
-                <Text style={styles.ledgerText}>{balance.toLocaleString()}원</Text>
-            </View>
-            <View style={styles.transactionHistoryContainer}>
-                <View style={styles.transactionHistoryHeaderContainer}>
-                    <Text style={styles.transactionHistoryHeaderText}>상세 내역</Text>
+        <View style={styles.background2}>
+            <ScrollView contentContainerStyle={styles.background}>
+                <View style={styles.balanceContainer}>
+                    <Text style={styles.balanceHeadText}>공금 잔액</Text>
+                    <Text style={styles.ledgerText}>{balance.toLocaleString()}원</Text>
                 </View>
+                <View style={styles.transactionHistoryContainer}>
+                    <View style={styles.transactionHistoryHeaderContainer}>
+                        <Text style={styles.transactionHistoryHeaderText}>상세 내역</Text>
+                    </View>
 
-                {
-                    datas.length === 0 ? (
-                        <View style={styles.activityIndicatorView}>
-                            <ActivityIndicator color={theme.color.grey1} size="large"/>
-                        </View>
-                    ) : (
+                    {
+                        datas.length === 0 ? (
+                            <View style={styles.activityIndicatorView}>
+                                <ActivityIndicator color={theme.color.grey1} size="large"/>
+                            </View>
+                        ) : (
                             datas.map((data, index) => {
-                                const transactionInfo = {
-                                    transactionIdx: data.args[3],
-                                    counterparty: data.args[6],
-                                    description: data.args[7],
-                                    date: data.args[8],
-                                    amount: Number(data.args[5]),
-                                    receiptUrl: data.args[9]
-                                }
-                                return (
-                                    <View key={index} style={styles.historyItemContainer}>
-                                        <Text style={styles.historyItemDateText}>{formatDateForTop(transactionInfo.date)}</Text>
-                                        <View style={styles.historyItemDetailContainer}>
-                                            {/* 이미지 삽입 */}
-                                            <View style={styles.historyItemViewDetail}>
-                                                <View style={styles.historyItemImage}>
-                                                    <Image source={
-                                                        index % 6 === 0
-                                                        ? require('@assets/Icons/ledgerIcon1.png')
-                                                        : index % 6 === 1
-                                                        ? require('@assets/Icons/ledgerIcon2.png')
-                                                        : index % 6 === 2
-                                                        ? require('@assets/Icons/ledgerIcon3.png')
-                                                        : index % 6 === 3
-                                                        ? require('@assets/Icons/ledgerIcon4.png')
-                                                        : index % 6 === 4
-                                                        ? require('@assets/Icons/ledgerIcon5.png')
-                                                        : require('@assets/Icons/ledgerIcon6.png')
-                                                    }/>
-                                                </View>
-                                                <View>
-                                                    <Text style={styles.counterpartyText}>{transactionInfo.counterparty}</Text>
-                                                    <Text style={styles.timeText}>{formatDateForBottom(transactionInfo.date)}</Text>
-                                                </View>
-                                            </View>
-                                            <View style={styles.historyItemViewDetail}>
-                                                {data.args[4]
-                                                    ? <Text
-                                                        style={styles.amountText}>{transactionInfo.amount.toLocaleString()}원</Text>
-                                                    : <Text
-                                                        style={styles.amountText}>-{transactionInfo.amount.toLocaleString()}원</Text>
-                                                }
-                                                {data.args[4] // isIncome
-                                                    ? <></>
-                                                    : <View>
-                                                        {renderReceiptView(auth, transactionInfo)}
+                                    let amount = data.args[4] ? Number(data.args[5]) : -1 * Number(data.args[5])
+                                    const transactionInfo = {
+                                        transactionIdx: data.args[3].toString(),
+                                        counterparty: data.args[6],
+                                        description: data.args[7],
+                                        date: data.args[8].toString(),
+                                        amount: amount,
+                                        receiptUrl: data.args[9]
+                                    }
+                                    return (
+                                        <View key={index} style={styles.historyItemContainer}>
+                                            <Text
+                                                style={styles.historyItemDateText}>{formatDateForTop(transactionInfo.date)}</Text>
+                                            <View style={styles.historyItemDetailContainer}>
+                                                <View style={styles.historyItemViewDetail}>
+                                                    <View style={styles.historyItemImage}>
+                                                        <Image source={
+                                                            index % 6 === 0
+                                                                ? require('@assets/Icons/ledgerIcon1.png')
+                                                                : index % 6 === 1
+                                                                    ? require('@assets/Icons/ledgerIcon2.png')
+                                                                    : index % 6 === 2
+                                                                        ? require('@assets/Icons/ledgerIcon3.png')
+                                                                        : index % 6 === 3
+                                                                            ? require('@assets/Icons/ledgerIcon4.png')
+                                                                            : index % 6 === 4
+                                                                                ? require('@assets/Icons/ledgerIcon5.png')
+                                                                                : require('@assets/Icons/ledgerIcon6.png')
+                                                        } style={styles.historyItemIcon}/>
                                                     </View>
-                                                }
+                                                    <View>
+                                                        <Text
+                                                            style={styles.counterpartyText}>{transactionInfo.counterparty}</Text>
+                                                        <Text
+                                                            style={styles.timeText}>{formatDateForBottom(transactionInfo.date)}</Text>
+                                                    </View>
+                                                </View>
+                                                <View style={styles.detailContainer}>
+                                                    <Text style={styles.amountText}>{`${amount.toLocaleString()}원`}</Text>
+                                                    {renderReceiptView(auth, transactionInfo)}
+                                                </View>
                                             </View>
                                         </View>
-                                    </View>
-                                )
-                            }
+                                    )
+                                }
+                            )
                         )
-                    )
-                }
-            </View>
-
+                    }
+                </View>
+            </ScrollView>
             <ReceiptOverlay overlayVisible={receiptOverlayVisible} animatedHeight={animatedHeight}
                             closeModal={closeReceiptModal} imageuri={receiptImageUri}/>
-        </ScrollView>
+        </View>
 
     );
 }
 
 const styles = StyleSheet.create({
     background: {
+        backgroundColor: theme.color.background,
+        paddingBottom: 77 * theme.height
+    },
+    background2: {
+        flex: 1,
         backgroundColor: theme.color.background,
         paddingBottom: 77 * theme.height
     },
@@ -423,10 +406,10 @@ const styles = StyleSheet.create({
         backgroundColor: theme.color.background,
         borderRadius: 100,
         marginRight: 10 * theme.width,
-        justifyContent:'center',
-        alignItems:'center',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    historyItemIcon:{
+    historyItemIcon: {
         height: 33 * theme.width * theme.height,
         width: 33 * theme.width * theme.height,
     },
@@ -458,8 +441,8 @@ const styles = StyleSheet.create({
         color: theme.color.grey2,
     },
     overlayBackground: {
-        flex: 1,
         justifyContent: 'flex-end', // 하단 정렬
+        height: "100%",
         backgroundColor: 'rgba(0,0,0,0.2)',
     },
     overlayContainer: {
@@ -498,9 +481,13 @@ const styles = StyleSheet.create({
         marginTop: 15 * theme.height,
     },
     receiptImage: {
-        width: 300 * theme.width,
-    }
-
+        width: 300 * theme.height * theme.width,
+        height: "60%",
+        resizeMode: "contain",
+    },
+    detailContainer: {
+        flexDirection: "row"
+    },
 })
 
 export default Ledger2;

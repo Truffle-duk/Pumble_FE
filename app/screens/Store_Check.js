@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, Image, ScrollView, TouchableOpacity, Alert } fr
 import { theme } from "@assets/Theme";
 import {getReceiveHistoryAll, getPurchaseHistoryAll, receiveItem} from "@utils/BlockchainFunction";
 import {call} from "@utils/ApiService";
+import {GroupCall} from "@utils/GroupService";
 
 const Store_Check = () => {
     const [purchaseList, setPurchaseList] = useState([])
@@ -10,19 +11,28 @@ const Store_Check = () => {
     const [organizedList, setOrganizedList] = useState([])
     const [finalList, setFinalList] = useState([])
 
-    useEffect(() => {
-        /*getPurchaseHistoryAll(1)
+    const initialize = async () => {
+        let groupId
+        await GroupCall("GID")
+            .then( gid => {
+                groupId = gid
+            })
+
+        await getPurchaseHistoryAll(groupId)
             .then(events => {
                 setPurchaseList(events)
             })
             .catch(error => console.error("Error fetching purchase history: ", error));
 
-        getReceiveHistoryAll(1)
+        await getReceiveHistoryAll(groupId)
             .then(events => {
                 setReceiveList(events)
             })
-            .catch(error => console.error("Error fetching receive history: ", error));*/
+            .catch(error => console.error("Error fetching receive history: ", error));
+    }
 
+    useEffect(() => {
+        initialize()
     }, []);
 
     useEffect(() => {
@@ -74,17 +84,29 @@ const Store_Check = () => {
     }
 
     const handlePurchaseComplete = async (id, timestamp) => {
-        /*await receiveItem (1, 2, timestamp)
+        let groupId
+        await GroupCall("GID")
+            .then( gid => {
+                groupId = gid
+            })
+
+        let groupUserId
+        await call(`/group/${groupId}/profile`, true, 'GET')
+            .then(data => {
+                groupUserId = data.result.group_user_id
+            })
+
+        await receiveItem (groupId, groupUserId, timestamp)
             .then(log => {
                 if (log === "Success!") {
-                    alert('수령 완료', '수령 완료 처리되었습니다.');
                     setFinalList((prevProducts) =>
                         prevProducts.map((product) =>
                             product.itemId === id ? { ...product, isReceived: true } : product
                         )
                     );
+                    alert('수령 완료', '수령 완료 처리되었습니다.');
                 }
-            })*/
+            })
     };
 
     return (

@@ -14,10 +14,13 @@ import {theme} from "@assets/Theme";
 import {launchImageLibrary} from 'react-native-image-picker';
 import {addReceipt} from "@utils/BlockchainFunction";
 import {formDataCall} from "@utils/ApiService";
+import {UUID} from "@env"
+import {GroupCall} from "@utils/GroupService";
 
 function AddReceipt_M({navigation, route}) {
     const [receipt, setReceipt] = useState("");
     const {transactionInfo} = route.params
+    const transactionInformation = JSON.parse(transactionInfo)
 
     const selectImage = () => {
         const options = {
@@ -44,12 +47,18 @@ function AddReceipt_M({navigation, route}) {
         const formData = new FormData();
         formData.append('image', {
             uri: receipt,
-            name: `receipt_${Number(transactionInfo.transactionIdx)}.jpg`,
+            name: `receipt_${Number(transactionInformation.transactionIdx)}.jpg`,
             type: 'image/jpeg'
         });
         formData.append('date', formattedDate)
 
-        const api = `/ledger/1/receipt`
+        let groupId
+        await GroupCall("GID")
+            .then(gid => {
+                groupId = gid
+            })
+
+        const api = `/ledger/${groupId}/receipt`
         const receiptUrl = await formDataCall(api, true, 'POST', formData)
             .then(data => {
                 if (data.isSuccess) {
@@ -58,19 +67,19 @@ function AddReceipt_M({navigation, route}) {
             })
 
 
-        /*await addReceipt("testuuid", transactionInfo.transactionIdx, receiptUrl)
+        await addReceipt(UUID, Number(transactionInformation.transactionIdx), receiptUrl)
             .then(_ => {
                 alert("영수증이 성공적으로 업로드 되었습니다.")
                 navigation.navigate('Ledger')
-            })*/
+            })
     }
 
-    const transactionDate = new Date(Number(transactionInfo.date) * 1000)
+    const transactionDate = new Date(Number(transactionInformation.date) * 1000)
     const formattedDate = `${transactionDate.getFullYear()}-${String(transactionDate.getMonth() + 1).padStart(2, '0')}-${String(transactionDate.getDate()).padStart(2, '0')}`;
     const formattedDateTime = `${transactionDate.getFullYear()}-${String(transactionDate.getMonth() + 1).padStart(2, '0')}-${String(transactionDate.getDate()).padStart(2, '0')} ${String(transactionDate.getHours()).padStart(2, '0')}:${String(transactionDate.getMinutes()).padStart(2, '0')}`;
     return (
         <View style={styles.background}>
-            <Text style={styles.titleText}>{transactionInfo.counterparty}</Text>
+            <Text style={styles.titleText}>{transactionInformation.counterparty}</Text>
             <View style={styles.line}/>
             <View style={styles.contentContainer}>
                 <Text style={styles.contentTitleText}>거래 시간</Text>
@@ -78,7 +87,7 @@ function AddReceipt_M({navigation, route}) {
             </View>
             <View style={styles.contentContainer}>
                 <Text style={styles.contentTitleText}>거래 금액</Text>
-                <Text style={styles.contentNumberText}>{`${transactionInfo.amount.toLocaleString()}원`}</Text>
+                <Text style={styles.contentNumberText}>{`${transactionInformation.amount.toLocaleString()}원`}</Text>
             </View>
             <View style={styles.line}/>
             <TouchableOpacity style={styles.addReceiptContainer} onPress={selectImage}>

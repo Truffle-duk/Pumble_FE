@@ -426,7 +426,7 @@ function AddEvent_M({navigation}) {
                             }
                         })
 
-                    /*await createEventBlock(eventId, maxPeople, reward)
+                    await createEventBlock(eventId, maxPeople, reward)
                         .then(log => {
                             if (log === "Success!") {
                                 alert("일정 생성 완료!")
@@ -434,7 +434,7 @@ function AddEvent_M({navigation}) {
                             } else {
                                 alert("블록체인 기록 과정에서 문제가 발생했습니다.")
                             }
-                        })*/
+                        })
                 })
         } else {
             alert('폼을 다시 확인해주세요!');

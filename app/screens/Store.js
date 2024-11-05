@@ -157,7 +157,7 @@ const Store = ({navigation}) => {
                 <>
                     <TouchableOpacity
                         style={[styles.adminButton, styles.addButton]}
-                        onPress={() => navigation.navigate('Store_Add', navigation = {navigation})}
+                        onPress={() => navigation.navigate('Store_Add')}
                     >
                         <Image source={require('@assets/Icons/addsquareIcon2.png')} style={styles.adminIcon}/>
                     </TouchableOpacity>

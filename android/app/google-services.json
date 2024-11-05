@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "777088139821",
+    "project_id": "pumble-d5ecd",
+    "storage_bucket": "pumble-d5ecd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:777088139821:android:5e7bca873fb4d34ceaeea4",
+        "android_client_info": {
+          "package_name": "com.pumble_fe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDb3ZLMJ2OEhKQDw6fpv1b0i0hLP_0xEs4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

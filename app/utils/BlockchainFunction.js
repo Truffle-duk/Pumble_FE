@@ -1,18 +1,18 @@
 import {ethers} from "ethers";
+import {INFURA_ENDPOINT, TOKEN_CONTRACT_ADDRESS, LEDGER_CONTRACT_ADDRESS, EVENT_CONTRACT_ADDRESS, STORE_CONTRACT_ADDRESS, SEPOLIA_PRIVATE_KEY} from "@env"
 
-const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
-const privateKey = "0x99f2f4b9e95b04b9927d39f058f5118cb0b27bbe96aa75a438a722d1c1ae861d"
-const wallet = new ethers.Wallet(privateKey, provider)
+const provider = new ethers.JsonRpcProvider(INFURA_ENDPOINT);
+const wallet = new ethers.Wallet(SEPOLIA_PRIVATE_KEY, provider)
 
 // Token Contract
-const tokenContractAddress = "0xA81F5e462DdDECE4202077f16f925e78B63f16a0"
+const tokenContractAddress = TOKEN_CONTRACT_ADDRESS
 const tokenContractABI = [
     "function approve(address spender, uint256 amount) public returns (bool)"
 ]
 const tokenContract = new ethers.Contract(tokenContractAddress, tokenContractABI, wallet)
 
 // Store Contract
-const storeContractAddress = "0x5B5e9B16b760BA351421435b237ddFaC9C669ff6"
+const storeContractAddress = STORE_CONTRACT_ADDRESS
 const storeContractABI = [
     "event PurchaseItem(string indexed hGroupId, string indexed hUserId, string indexed hItemId, string groupId, string userId, string itemId, uint256 timestamp)",
     "event ReceiveItem(string indexed hGroupId, string indexed hUserId, string indexed hItemId, string groupId, string userId, string itemId, uint256 timestamp, bool isReceived)",
@@ -22,7 +22,7 @@ const storeContractABI = [
 const storeContract = new ethers.Contract(storeContractAddress, storeContractABI, wallet)
 
 // Event Contract
-const eventContractAddress = "0x6693Eb8b597ED6c85F2BB22C17fc2E26b2870F9A"
+const eventContractAddress = EVENT_CONTRACT_ADDRESS
 const eventContractABI = [
     "event EventTokenRecords(string indexed hGroupId, uint256 indexed hTimestamp, string indexed hUserId, string userId, uint256 timestamp, uint256 eventId, uint256 tokenNum)",
     "function createEvent(uint256 _eventId, uint256 _maxPpl, uint256 _reward)",
@@ -32,7 +32,7 @@ const eventContractABI = [
 const eventContract = new ethers.Contract(eventContractAddress, eventContractABI, wallet)
 
 // Ledger Contract
-const ledgerContractAddress = "0xA631D62C0F41AAF4eC6A78145338532303e8A3e2"
+const ledgerContractAddress = LEDGER_CONTRACT_ADDRESS
 const ledgerContractABI = [
     "event TransactionCreated(string indexed hGroupId, string indexed category, string groupId, uint256 transactionIndex, bool isDeposit, uint256 amount, string counterparty, string description, uint256 timestamp, string receiptDetails)",
     "event RetrieveBalance(string indexed hGroupId, string indexed category, string groupId, uint256 balance)",
@@ -52,7 +52,7 @@ export const getPurchaseHistoryAll = async (groupId) => {
 
     // 필터 설정
     const filter = {
-        address: storeContract,
+        address: storeContractAddress,
         fromBlock: 0,
         toBlock: 'latest',
         topics: [
@@ -84,7 +84,7 @@ export const getReceiveHistoryAll = async (groupId) => {
 
     // 필터 설정
     const filter = {
-        address: storeContract,
+        address: storeContractAddress,
         fromBlock: 0,
         toBlock: 'latest',
         topics: [
@@ -136,7 +136,7 @@ export async function getPurchaseHistory(groupId, groupUserId) {
 
     // 필터 설정
     const filter = {
-        address: storeContract,
+        address: storeContractAddress,
         fromBlock: 0,
         toBlock: 'latest',
         topics: [
@@ -168,7 +168,7 @@ export async function getReceiveHistory(groupId, groupUserId) {
 
     // 필터 설정
     const filter = {
-        address: storeContract,
+        address: storeContractAddress,
         fromBlock: 0,
         toBlock: 'latest',
         topics: [
@@ -199,11 +199,15 @@ export const purchaseItem = async (groupId, gUserId, itemId, price) => {
         console.log(`${groupId}, ${gUserId}, ${itemId}, ${price}`)
         // approve
         const approvePrice = ethers.parseUnits(price.toString(), 18) // PB 단위
-        await tokenContract.approve(storeContractAddress, approvePrice)
+        const tx1 = await tokenContract.approve(storeContractAddress, approvePrice)
 
         const nonce = await provider.getTransactionCount(wallet.address, "latest") //몇 번째 순서인지 계산
+        const feeData = await provider.getFeeData();
+        console.log(feeData)
+        const gasPrice = feeData.gasPrice * 110n / 100n;
+
         console.log(nonce)
-        const txResponse = await storeContract.purchaseItem(groupId.toString(), gUserId.toString(), itemId.toString(), price, { nonce: nonce })
+        const txResponse = await storeContract.purchaseItem(groupId.toString(), gUserId.toString(), itemId.toString(), price, { nonce: nonce + 1, gasPrice: gasPrice })
         console.log(`Transaction hash: ${txResponse.hash}`);
 
         // 트랜잭션 영수증 대기
@@ -324,7 +328,7 @@ export async function getBalance(groupId) {
     // 필터 설정
     const filter = {
         address: ledgerContractAddress,
-        fromBlock: 'latest',
+        fromBlock: 0,
         toBlock: 'latest',
         topics: [
             ethers.id("RetrieveBalance(string,string,string,uint256)"), // 이벤트 시그니처
@@ -370,7 +374,7 @@ export async function getPastEvents(groupId) {
         // 로그를 이벤트 객체로 디코딩
         const iface = new ethers.Interface(ledgerContractABI);
         const events = logs.map(log => iface.parseLog(log))
-
+        console.log(events)
         return events;
     } catch (error) {
         console.error("Error fetching past events:", error);

@@ -1,5 +1,5 @@
 import {theme} from "@assets/Theme";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {
     StyleSheet,
     View,
@@ -15,6 +15,7 @@ import {
 import {call} from "@utils/ApiService";
 import {GroupCall} from '@utils/GroupService';
 import Keychain from "react-native-keychain";
+import {useFocusEffect} from "@react-navigation/native";
 
 function ProfileView({navigation, wallet, name, email}) {
     return (
@@ -253,25 +254,26 @@ export default function AppMyPage({navigation}) {
     }
 
 
-    useEffect(() => {
-
-        const getWallet = async () => {
-            const wallet = await Keychain.getInternetCredentials("Wallet");
-            if (wallet) {
-                return wallet
-            } else {
-                console.log('No Wallet token found');
+    useFocusEffect(
+        useCallback(() => {
+            const getWallet = async () => {
+                const wallet = await Keychain.getInternetCredentials("Wallet");
+                if (wallet) {
+                    return wallet
+                } else {
+                    console.log('No Wallet token found');
+                }
             }
-        }
 
-        getWallet()
-            .then(wallet => {
-                console.log(wallet.username)
-                setWallet(wallet.username)
-            })
-        //setWallet("0xB1a7218C36E8fd07FC9fdE33074eDaCc5dcB4ED5")
-        handleProfile();
-    }, []);
+            getWallet()
+                .then(wallet => {
+                    console.log(wallet.username)
+                    setWallet(wallet.username)
+                })
+
+            handleProfile(navigation);
+        },  [])
+    )
 
 
     const openLogoutModal = () => {
