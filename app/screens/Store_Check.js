@@ -62,13 +62,19 @@ const Store_Check = () => {
     }, [organizedList]);
 
     const getItemInfoList = async (itemList) => {
+        let groupId
+        await GroupCall("GID")
+            .then( gid => {
+                groupId = gid
+            })
+
         for (let i = 0; i < itemList.length; i++) {
             let nickname
-            await call(`/store/1/buyer/${itemList[i].buyerId}`, true, 'GET')
+            await call(`/store/${groupId}/buyer/${itemList[i].buyerId}`, true, 'GET')
                 .then(data => {
                     nickname = data.result.nickname
                 })
-            await call(`/store/1/item/${itemList[i].itemId}`, true, 'GET')
+            await call(`/store/${groupId}/item/${itemList[i].itemId}`, true, 'GET')
                 .then(data => {
                     const item = {
                         itemId: itemList[i].itemId,
@@ -100,7 +106,7 @@ const Store_Check = () => {
             .then(log => {
                 if (log === "Success!") {
                     setFinalList((prevProducts) =>
-                        prevProducts.map((product) =>
+                        prevProducts.reverse().map((product) =>
                             product.itemId === id ? { ...product, isReceived: true } : product
                         )
                     );
@@ -126,7 +132,7 @@ const Store_Check = () => {
                                 <Text style={styles.productName}>{product.name}</Text>
                                 <View style={styles.productMetaData}>
                                     <Text style={styles.productSeller}>{product.buyerName}</Text>
-                                    <Text style={styles.productDate}>{`${date.getFullYear()}.${date.getMonth()}.${date.getDate()}`}</Text>
+                                    <Text style={styles.productDate}>{`${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`}</Text>
                                 </View>
                             </View>
                             <TouchableOpacity

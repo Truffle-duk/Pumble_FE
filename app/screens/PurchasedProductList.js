@@ -84,7 +84,7 @@ function ProductList({product}) {
                 <View style={styles.productTextContainer}>
                     <Text style={styles.productNameText}>{product.name}</Text>
                     <Text
-                        style={styles.productPurchasedDateText}>{`${product.date.getFullYear()}.${product.date.getMonth()}.${product.date.getDate()}`}</Text>
+                        style={styles.productPurchasedDateText}>{`${product.date.getFullYear()}.${product.date.getMonth() + 1}.${product.date.getDate()}`}</Text>
                 </View>
             </View>
             {product.isReceived ? <Receipt/> : <Purchased/>}
@@ -153,8 +153,14 @@ export default function PurchasedProductList() {
     }, [organizedList]);
 
     const getItemInfoList = async (itemList) => {
+        let groupId
+        await GroupCall("GID")
+            .then(async gid => {
+                groupId = gid
+            })
+
         for (let i = 0; i < itemList.length; i++) {
-            await call(`/store/1/item/${itemList[i].itemId}`, true, 'GET')
+            await call(`/store/${groupId}/item/${itemList[i].itemId}`, true, 'GET')
                 .then(data => {
                     const date = new Date(Number(itemList[i].timestamp) * 1000)
                     const item = {
@@ -179,7 +185,7 @@ export default function PurchasedProductList() {
                             <Text>구매한 상품이 없어요....</Text>
                         </View>
                     ) : (
-                        MyPurchasedProducts.map((item, index) =>
+                        MyPurchasedProducts.reverse().map((item, index) =>
                             <ProductList product={item} key={index}/>
                         )
                     )

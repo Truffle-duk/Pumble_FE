@@ -1,9 +1,18 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
-import {ActivityIndicator, Image, ScrollView, StyleSheet, Text, View, Modal, Animated} from 'react-native';
+import {
+    ActivityIndicator,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+    Modal,
+    Animated,
+    TouchableOpacity
+} from 'react-native';
 import {theme} from "@assets/Theme";
 import "@ethersproject/shims";
 import {getBalance, getPastEvents, ledgerContract} from "@utils/BlockchainFunction";
-import {TouchableOpacity} from "react-native-gesture-handler";
 
 import {GroupCall} from "@utils/GroupService";
 import {useFocusEffect} from "@react-navigation/native";
@@ -11,12 +20,12 @@ import {UUID} from '@env'
 
 
 //사진 띄우기용 모달
-function ReceiptOverlay({overlayVisible, animatedHeight, closeModal, imageuri}) {
+function ReceiptOverlay({overlayVisible, closeModal, imageuri}) {
     return (
         <Modal
             transparent={true}
             visible={overlayVisible}
-            animationType="None"
+            animationType="none"
             onRequestClose={closeModal}
         >
             <TouchableOpacity onPress={closeModal} activeOpacity={1} style={styles.overlayBackground}>
@@ -32,13 +41,12 @@ function ReceiptOverlay({overlayVisible, animatedHeight, closeModal, imageuri}) 
                             />
                         </TouchableOpacity>
                     </View>
-                    <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                    <View style={{alignItems: 'center', height: '70%'}}>
                         <Image
                             source={{uri: `${imageuri}`}}
                             style={styles.receiptImage}
                         />
                     </View>
-
                 </Animated.View>
             </TouchableOpacity>
         </Modal>
@@ -65,7 +73,9 @@ function Ledger2({navigation}) {
             toValue: 500, // 모달의 높이
             duration: 0, // 애니메이션 지속 시간
             useNativeDriver: false
-        }).start();
+        }).start(() => {
+
+        });
     };
 
     const closeReceiptModal = () => {
@@ -73,25 +83,12 @@ function Ledger2({navigation}) {
             toValue: 500,
             duration: 0,
             useNativeDriver: false
-        }).start(() => setReceiptOverlayVisible(false));
+        }).start(() => {
+            setReceiptOverlayVisible(false)
+        });
     };
 
     const initialize = async () => {
-        // 임시 지갑 생성 및 트랜잭션 전송
-        /*const tempWallet = ethers.Wallet.createRandom();
-        const senderWallet = new ethers.Wallet("0x5d225315bb68e16f4345c24697c374bcd426afcad3dfb6ec0e6d4087eddffef8", provider);
-        const tx = {
-            to: tempWallet.address,
-            value: ethers.parseEther("1.0")
-        };
-        try {
-            const txResponse = await senderWallet.sendTransaction(tx);
-            await txResponse.wait();
-            console.log(`Transaction hash: ${txResponse.hash}`);
-        } catch (error) {
-            console.error("Transaction failed:", error);
-        }*/
-
         // 이전 거래내역 데이터 가져오기
         getPastEvents(UUID)
             .then(response => {
@@ -101,7 +98,6 @@ function Ledger2({navigation}) {
 
                     if (existingIndex === -1) {
                         // acc에 해당 transactionIndex가 없으면 추가
-                        console.log(item)
                         acc.push(item);
                     } else if (item.args[9] !== "" && acc[existingIndex].args[9] === "") {
                         // 기존 요소의 args[9]가 비어 있고 현재 item의 args[9]가 비어 있지 않으면 교체
@@ -216,7 +212,7 @@ function Ledger2({navigation}) {
             )
         } else if (info.receiptUrl !== "" && auth === 'member') { // 영수증 O, 일반 유저
             return (
-                <TouchableOpacity onPress={() => openReceiptModal(info)}>
+                <TouchableOpacity onPress={() => openReceiptModal(info.receiptUrl)}>
                     <Image
                         source={require("../assets/Icons/receiptCheckIcon_Active.png")}
                         style={styles.iconStyle}
@@ -482,8 +478,8 @@ const styles = StyleSheet.create({
     },
     receiptImage: {
         width: 300 * theme.height * theme.width,
-        height: "60%",
-        resizeMode: "contain",
+        height: "100%",
+        resizeMode: "contain"
     },
     detailContainer: {
         flexDirection: "row"
