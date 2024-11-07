@@ -86,6 +86,10 @@ function AddReceipt_M({navigation, route}) {
                 <Text style={styles.contentNumberText}>{formattedDateTime}</Text>
             </View>
             <View style={styles.contentContainer}>
+                <Text style={styles.contentTitleText}>상세 내용</Text>
+                <Text style={styles.contentNumberText}>{transactionInformation.description}</Text>
+            </View>
+            <View style={styles.contentContainer}>
                 <Text style={styles.contentTitleText}>거래 금액</Text>
                 <Text style={styles.contentNumberText}>{`${transactionInformation.amount.toLocaleString()}원`}</Text>
             </View>

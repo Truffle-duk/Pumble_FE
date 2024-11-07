@@ -106,7 +106,7 @@ const Store_Check = () => {
             .then(log => {
                 if (log === "Success!") {
                     setFinalList((prevProducts) =>
-                        prevProducts.reverse().map((product) =>
+                        prevProducts.map((product) =>
                             product.itemId === id ? { ...product, isReceived: true } : product
                         )
                     );
@@ -119,7 +119,7 @@ const Store_Check = () => {
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <Text style={styles.pageTitle}>상품 수령 내역</Text>
-                {finalList.map((product, index) => {
+                {finalList.reverse().map((product, index) => {
                     const image = product.image ? {uri: `${product.image}`} : require('@assets/Images/defaultGift.png')
                     const date = new Date(Number(product.timestamp) * 1000)
                     return (

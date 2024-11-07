@@ -31,7 +31,7 @@ function MainStackNavigator() {
 
     const navigation = new useNavigation()
 
-    /*useEffect(() => {
+    useEffect(() => {
         // FCM Permission 요청
         async function requestUserPermission() {
             const authStatus = await messaging().requestPermission();
@@ -109,7 +109,7 @@ function MainStackNavigator() {
             unsubscribeOnMessage();
             unsubscribeOnTokenRefresh();
         };
-    }, []);*/
+    }, []);
 
     return (
         <Stack.Navigator>

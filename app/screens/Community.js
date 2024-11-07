@@ -3,7 +3,7 @@ import {theme} from "@assets/Theme";
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {call} from "@utils/ApiService";
 import {useFocusEffect} from "@react-navigation/native";
-import { GroupCall } from "@utils/GroupService";
+import {GroupCall} from "@utils/GroupService";
 
 const fetchData = async (no) => {
     return GroupCall("GID")
@@ -102,11 +102,16 @@ export default function Community({navigation}) {
         setTimeout(async () => {
             if (!hasMore) {
                 const response = await fetchData(page);
-                console.log("Response from fetchPostList:", response);
 
                 if (response.code === 200) {
                     const newData = response.result.postList;
-                    setPostLists(prevData => [...prevData, ...newData]);
+                    setPostLists(prevData => {
+                        const mergedData = [...prevData, ...newData];
+                        return mergedData.filter(
+                            (item, index, self) =>
+                                index === self.findIndex(t => t.postId === item.postId) // `postId`로 중복 필터링
+                        );
+                    });
                     setHasMore(response.result.isLast);
                 }
             }

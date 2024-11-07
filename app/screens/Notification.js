@@ -24,20 +24,23 @@ const Notification = () => {
         }
     }
 
+    const initialize = async () => {
+        GroupCall("GID")
+            .then(async id=>{
+                const api = `/community/${id}/notice/list?page=1`
+                call(api, true, 'GET')
+                    .then(data => {
+                        setNotiList(data.result.noticeList)
+                    })
+                    .catch(err => {
+                        console.log("Error occurred at Notification")
+                    })
+            })
+        await fetchAuth();
+    }
     useFocusEffect(
         useCallback(() => {
-            GroupCall("GID")
-          .then(async id=>{
-            const api = `/community/${id}/notice/list?page=1`
-            call(api, true, 'GET')
-                .then(data => {
-                    setNotiList(data.result.noticeList)
-                })
-                .catch(err => {
-                    console.log("Error occurred at Notification")
-                })
-          })
-          fetchAuth();
+            initialize()
         }, [])
     )
 
@@ -53,15 +56,16 @@ const Notification = () => {
     const handleDeletePress = async (noticeId) => {
         GroupCall("GID")
           .then(async id=>{
-            // console.log(noticeId)
-            // console.log("notifi GID", id)
+            console.log(noticeId)
+            console.log("notifi GID", id)
             const dapi = `/community/${id}/notice/${noticeId}`
-            //const dapi=`/community/1/notice/12`
-            return await call(dapi, true, 'DELETE')
+            console.log(dapi)
+            call(dapi, true, 'DELETE')
                 .then(data => {
                     console.log(data)
                     if (data.code === 200) {
                         alert('공지가 삭제되었습니다.');
+                        initialize()
                     } else {
                         alert("공지 삭제를 실패했습니다.")
                     }
